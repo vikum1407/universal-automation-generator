@@ -3,32 +3,34 @@ package com.testgen.template;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import freemarker.template.Version;
 import org.springframework.stereotype.Service;
 
-import java.io.StringWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Map;
 
 @Service
 public class TemplateService {
 
-    private final Configuration configuration;
+    private final Configuration freemarkerConfig;
 
-    public TemplateService() {
-        configuration = new Configuration(new Version("2.3.32"));
-        configuration.setClassForTemplateLoading(this.getClass(), "/templates");
-        configuration.setDefaultEncoding("UTF-8");
+    public TemplateService(Configuration freemarkerConfig) {
+        this.freemarkerConfig = freemarkerConfig;
     }
 
-    public String renderTemplate(String templateName, Map<String, Object> dataModel) {
-        try {
-            Template template = configuration.getTemplate(templateName);
-            StringWriter writer = new StringWriter();
-            template.process(dataModel, writer);
+    public String renderTemplate(String frameworkType,
+                                 String languageType,
+                                 Map<String, Object> model) throws IOException, TemplateException {
+
+        String templatePath = String.format("%s/%s/test.ftl",
+                frameworkType.toLowerCase(),
+                languageType.toLowerCase());
+
+        Template template = freemarkerConfig.getTemplate(templatePath);
+
+        try (StringWriter writer = new StringWriter()) {
+            template.process(model, writer);
             return writer.toString();
-        } catch (IOException | TemplateException e) {
-            throw new RuntimeException("Error rendering template: " + templateName, e);
         }
     }
 }
