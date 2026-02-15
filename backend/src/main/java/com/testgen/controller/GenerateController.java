@@ -1,5 +1,6 @@
 package com.testgen.controller;
 
+import com.testgen.generator.FrameworkGenerator;
 import com.testgen.model.ApiMetadata;
 import com.testgen.model.FrameworkType;
 import com.testgen.model.LanguageType;
@@ -14,9 +15,10 @@ import org.springframework.web.bind.annotation.*;
 public class GenerateController {
 
     private final JsonParserService jsonParserService;
+    private final FrameworkGenerator frameworkGenerator;
 
     @PostMapping
-    public ApiMetadata generate(@RequestBody GenerateRequest request) {
+    public GeneratedResponse generate(@RequestBody GenerateRequest request) {
 
         ApiMetadata metadata = new ApiMetadata();
         metadata.setUrl(request.getUrl());
@@ -24,7 +26,17 @@ public class GenerateController {
         metadata.setRequestFields(jsonParserService.parseRequestJson(request.getRequestJson()));
         metadata.setResponseFields(jsonParserService.parseResponseJson(request.getResponseJson()));
 
-        return metadata;
+        String generatedCode = frameworkGenerator.generate(
+                metadata,
+                request.getFrameworkType(),
+                request.getLanguageType()
+        );
+
+        GeneratedResponse response = new GeneratedResponse();
+        response.setMetadata(metadata);
+        response.setGeneratedCode(generatedCode);
+
+        return response;
     }
 
     @Data
@@ -35,5 +47,11 @@ public class GenerateController {
         private String responseJson;
         private FrameworkType frameworkType;
         private LanguageType languageType;
+    }
+
+    @Data
+    public static class GeneratedResponse {
+        private ApiMetadata metadata;
+        private String generatedCode;
     }
 }
