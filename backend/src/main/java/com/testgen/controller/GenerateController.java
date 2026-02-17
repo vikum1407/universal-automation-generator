@@ -5,8 +5,6 @@ import com.testgen.model.ApiMetadata;
 import com.testgen.model.FrameworkType;
 import com.testgen.model.LanguageType;
 import com.testgen.packager.ZipService;
-import com.testgen.parser.JsonParserService;
-import freemarker.template.TemplateException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import freemarker.template.TemplateException;
 import java.io.IOException;
 
 @RestController
@@ -21,7 +20,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class GenerateController {
 
-    private final JsonParserService jsonParserService;
     private final FrameworkGenerator frameworkGenerator;
     private final ZipService zipService;
 
@@ -31,8 +29,12 @@ public class GenerateController {
         ApiMetadata metadata = new ApiMetadata();
         metadata.setUrl(request.getUrl());
         metadata.setMethod(request.getMethod());
-        metadata.setRequestFields(jsonParserService.parseRequestJson(request.getRequestJson()));
-        metadata.setResponseFields(jsonParserService.parseResponseJson(request.getResponseJson()));
+        metadata.setHeaders(request.getHeaders());
+        metadata.setQueryParams(request.getQueryParams());
+        metadata.setRequestJson(request.getRequestJson());
+        metadata.setResponseJson(request.getResponseJson());
+        metadata.setExpectedStatus(request.getExpectedStatus());
+        metadata.setExpectedResponseJson(request.getExpectedResponseJson());
 
         String generatedCode = frameworkGenerator.generate(
                 metadata,
@@ -53,8 +55,12 @@ public class GenerateController {
         ApiMetadata metadata = new ApiMetadata();
         metadata.setUrl(request.getUrl());
         metadata.setMethod(request.getMethod());
-        metadata.setRequestFields(jsonParserService.parseRequestJson(request.getRequestJson()));
-        metadata.setResponseFields(jsonParserService.parseResponseJson(request.getResponseJson()));
+        metadata.setHeaders(request.getHeaders());
+        metadata.setQueryParams(request.getQueryParams());
+        metadata.setRequestJson(request.getRequestJson());
+        metadata.setResponseJson(request.getResponseJson());
+        metadata.setExpectedStatus(request.getExpectedStatus());
+        metadata.setExpectedResponseJson(request.getExpectedResponseJson());
 
         String generatedCode = frameworkGenerator.generate(
                 metadata,
@@ -76,6 +82,13 @@ public class GenerateController {
         private String method;
         private String requestJson;
         private String responseJson;
+
+        private java.util.Map<String, String> headers;
+        private java.util.Map<String, String> queryParams;
+
+        private int expectedStatus;
+        private String expectedResponseJson;
+
         private FrameworkType frameworkType;
         private LanguageType languageType;
     }
