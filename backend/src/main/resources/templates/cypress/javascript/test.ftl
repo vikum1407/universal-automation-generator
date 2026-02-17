@@ -1,4 +1,4 @@
-describe('Generated API Test', () => {
+describe('${metadata.testName}', () => {
 
   it('should execute API request', () => {
 

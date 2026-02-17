@@ -17,4 +17,6 @@ public class ApiMetadata {
 
     private int expectedStatus;
     private String expectedResponseJson;
+
+    private String testName;
 }

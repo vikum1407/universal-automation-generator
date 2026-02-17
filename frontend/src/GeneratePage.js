@@ -16,6 +16,8 @@ export default function GeneratePage() {
   const [language, setLanguage] = useState("JAVA");
   const [generatedCode, setGeneratedCode] = useState("");
 
+  const [testName, setTestName] = useState("");
+
   const safeParse = (value) => {
     try {
       return JSON.parse(value);
@@ -25,17 +27,17 @@ export default function GeneratePage() {
   };
 
   const generateCode = async () => {
-    const payload = {
-      url,
-      method,
-      headers: safeParse(headers),
-      queryParams: safeParse(queryParams),
-      requestJson,
-      responseJson,
-      expectedStatus,
-      expectedResponseJson,
-      frameworkType: framework,
-      languageType: language
+    const payload = { 
+      url, method, 
+      headers: safeParse(headers), 
+      queryParams: safeParse(queryParams), 
+      requestJson, 
+      responseJson, 
+      expectedStatus, 
+      expectedResponseJson, 
+      testName, 
+      frameworkType: framework, 
+      languageType: language 
     };
 
     const res = await axios.post("http://localhost:8080/api/generate", payload);
@@ -43,17 +45,17 @@ export default function GeneratePage() {
   };
 
   const downloadZip = async () => {
-    const payload = {
-      url,
-      method,
-      headers: safeParse(headers),
-      queryParams: safeParse(queryParams),
-      requestJson,
-      responseJson,
-      expectedStatus,
-      expectedResponseJson,
-      frameworkType: framework,
-      languageType: language
+    const payload = { 
+      url, method, 
+      headers: safeParse(headers), 
+      queryParams: safeParse(queryParams), 
+      requestJson, 
+      responseJson, 
+      expectedStatus, 
+      expectedResponseJson, 
+      testName, 
+      frameworkType: framework, 
+      languageType: language 
     };
 
     const res = await axios.post("http://localhost:8080/api/generate/zip", payload, {
@@ -134,6 +136,11 @@ export default function GeneratePage() {
           value={expectedStatus}
           onChange={e => setExpectedStatus(parseInt(e.target.value))}
         />
+      </div>
+
+      <div> 
+        <label>Test Name:</label> 
+        <input placeholder="Example: CreatePostTest" value={testName} onChange={e => setTestName(e.target.value)} /> 
       </div>
 
       <div>

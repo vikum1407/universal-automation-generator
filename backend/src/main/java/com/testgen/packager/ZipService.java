@@ -1,41 +1,26 @@
 package com.testgen.packager;
 
 import org.springframework.stereotype.Service;
-import java.io.*;
-import java.nio.file.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Service
 public class ZipService {
 
-    public byte[] createZip(String fileName, String fileContent) {
+    public byte[] createZip(String fileName, String content) throws IOException {
 
-        try {
-            Path tempDir = Files.createTempDirectory("generated-framework");
-            Path filePath = tempDir.resolve(fileName);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos);
 
-            // Write file
-            Files.writeString(filePath, fileContent);
+        ZipEntry entry = new ZipEntry(fileName);
+        zos.putNextEntry(entry);
+        zos.write(content.getBytes());
+        zos.closeEntry();
 
-            // Create ZIP
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ZipOutputStream zos = new ZipOutputStream(baos);
-
-            ZipEntry entry = new ZipEntry(fileName);
-            zos.putNextEntry(entry);
-            zos.write(fileContent.getBytes());
-            zos.closeEntry();
-            zos.close();
-
-            // Cleanup
-            Files.deleteIfExists(filePath);
-            Files.deleteIfExists(tempDir);
-
-            return baos.toByteArray();
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating ZIP file", e);
-        }
+        zos.close();
+        return baos.toByteArray();
     }
 }

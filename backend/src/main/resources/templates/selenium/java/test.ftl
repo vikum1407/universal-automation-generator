@@ -4,7 +4,7 @@ import org.testng.annotations.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GeneratedTest {
+public class ${metadata.testName} {
 
     @Test
     public void testApi() {

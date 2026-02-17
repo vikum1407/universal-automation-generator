@@ -5,6 +5,7 @@ import com.testgen.model.ApiMetadata;
 import com.testgen.model.FrameworkType;
 import com.testgen.model.LanguageType;
 import com.testgen.packager.ZipService;
+import com.testgen.util.NameSanitizer;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +36,7 @@ public class GenerateController {
         metadata.setResponseJson(request.getResponseJson());
         metadata.setExpectedStatus(request.getExpectedStatus());
         metadata.setExpectedResponseJson(request.getExpectedResponseJson());
+        metadata.setTestName(NameSanitizer.sanitize(request.getTestName()));
 
         String generatedCode = frameworkGenerator.generate(
                 metadata,
@@ -61,6 +63,7 @@ public class GenerateController {
         metadata.setResponseJson(request.getResponseJson());
         metadata.setExpectedStatus(request.getExpectedStatus());
         metadata.setExpectedResponseJson(request.getExpectedResponseJson());
+        metadata.setTestName(NameSanitizer.sanitize(request.getTestName()));
 
         String generatedCode = frameworkGenerator.generate(
                 metadata,
@@ -68,7 +71,10 @@ public class GenerateController {
                 request.getLanguageType()
         );
 
-        byte[] zipBytes = zipService.createZip("GeneratedTest.java", generatedCode);
+        // Dynamic file name based on sanitized test name
+        String fileName = metadata.getTestName() + ".java";
+
+        byte[] zipBytes = zipService.createZip(fileName, generatedCode);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=generated-framework.zip")
@@ -91,6 +97,8 @@ public class GenerateController {
 
         private FrameworkType frameworkType;
         private LanguageType languageType;
+
+        private String testName;
     }
 
     @Data

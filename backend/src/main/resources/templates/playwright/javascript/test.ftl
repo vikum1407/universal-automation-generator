@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('Generated API Test', async ({ request }) => {
+test('${metadata.testName}', async ({ request }) => {
 
   const response = await request.${metadata.method?lower_case}("${metadata.url}", {
     headers: ${headers?json_string},
