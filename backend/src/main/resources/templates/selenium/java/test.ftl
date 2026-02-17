@@ -11,8 +11,8 @@ public class GeneratedTest {
         WebDriver driver = new ChromeDriver();
 
         // API Metadata
-        String url = "${url}";
-        String method = "${method}";
+        String url = "${metadata.url}";
+        String method = "${metadata.method}";
 
         System.out.println("Testing API: " + url);
         System.out.println("Method: " + method);

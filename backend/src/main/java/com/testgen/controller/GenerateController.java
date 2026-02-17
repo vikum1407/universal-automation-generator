@@ -6,12 +6,15 @@ import com.testgen.model.FrameworkType;
 import com.testgen.model.LanguageType;
 import com.testgen.packager.ZipService;
 import com.testgen.parser.JsonParserService;
+import freemarker.template.TemplateException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/generate")
@@ -23,7 +26,7 @@ public class GenerateController {
     private final ZipService zipService;
 
     @PostMapping
-    public GeneratedResponse generate(@RequestBody GenerateRequest request) {
+    public GeneratedResponse generate(@RequestBody GenerateRequest request) throws TemplateException, IOException {
 
         ApiMetadata metadata = new ApiMetadata();
         metadata.setUrl(request.getUrl());
@@ -45,7 +48,7 @@ public class GenerateController {
     }
 
     @PostMapping("/zip")
-    public ResponseEntity<byte[]> generateZip(@RequestBody GenerateRequest request) {
+    public ResponseEntity<byte[]> generateZip(@RequestBody GenerateRequest request) throws TemplateException, IOException {
 
         ApiMetadata metadata = new ApiMetadata();
         metadata.setUrl(request.getUrl());

@@ -22,7 +22,7 @@ public class SeleniumGenerator {
         Map<String, Object> model = new HashMap<>();
         model.put("metadata", metadata);
 
-        return templateService.renderTemplate("selenium/test.ftl",
+        return templateService.renderTemplate("selenium",
                 language.name().toLowerCase(),
                 model);
     }

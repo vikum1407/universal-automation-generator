@@ -3,8 +3,11 @@ package com.testgen.generator;
 import com.testgen.model.ApiMetadata;
 import com.testgen.model.FrameworkType;
 import com.testgen.model.LanguageType;
+import freemarker.template.TemplateException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -14,7 +17,7 @@ public class FrameworkGenerator {
     private final CypressGenerator cypressGenerator;
     private final PlaywrightGenerator playwrightGenerator;
 
-    public String generate(ApiMetadata metadata, FrameworkType framework, LanguageType language) {
+    public String generate(ApiMetadata metadata, FrameworkType framework, LanguageType language) throws TemplateException, IOException {
 
         return switch (framework) {
             case SELENIUM -> seleniumGenerator.generate(metadata, language);
