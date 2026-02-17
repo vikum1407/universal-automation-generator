@@ -1,12 +1,20 @@
 package com.testgen.model;
 
 import lombok.Data;
-import java.util.List;
+import java.util.Map;
 
 @Data
 public class ApiMetadata {
+
     private String url;
     private String method;
-    private List<RequestField> requestFields;
-    private List<ResponseField> responseFields;
+
+    private Map<String, String> headers;
+    private Map<String, String> queryParams;
+
+    private String requestJson;
+    private String responseJson;
+
+    private int expectedStatus;
+    private String expectedResponseJson;
 }

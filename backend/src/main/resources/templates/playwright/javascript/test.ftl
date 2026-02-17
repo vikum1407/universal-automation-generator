@@ -1,11 +1,13 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
-test('Generated API Test', async () => {
+test('Generated API Test', async ({ request }) => {
 
-  const url = "${metadata.url}";
-  const method = "${metadata.method}";
+  const response = await request.${metadata.method?lower_case}("${metadata.url}", {
+    headers: ${headers?json_string},
+    params: ${queryParams?json_string},
+    data: ${requestJson?json_string}
+  });
 
-  console.log("Testing API: " + url);
-  console.log("Method: " + method);
-
+  expect(response.status()).toBe(${expectedStatus});
+  console.log(await response.text());
 });

@@ -1,22 +1,33 @@
 package generated.selenium;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.testng.annotations.Test;
+
+import java.util.Map;
 
 public class GeneratedTest {
 
     @Test
     public void testApi() {
-        WebDriver driver = new ChromeDriver();
 
-        // API Metadata
         String url = "${metadata.url}";
         String method = "${metadata.method}";
 
-        System.out.println("Testing API: " + url);
-        System.out.println("Method: " + method);
+        Map<String, String> headers = ${headers?json_string};
+        Map<String, String> queryParams = ${queryParams?json_string};
+        String requestBody = ${requestJson?json_string};
 
-        driver.quit();
+        Response response = RestAssured
+                .given()
+                .headers(headers)
+                .queryParams(queryParams)
+                .body(requestBody)
+                .when()
+                .request(method, url);
+
+        response.then().statusCode(${expectedStatus});
+
+        System.out.println("Response Body: " + response.getBody().asString());
     }
 }

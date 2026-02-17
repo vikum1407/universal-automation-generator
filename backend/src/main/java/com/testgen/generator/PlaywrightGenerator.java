@@ -21,6 +21,13 @@ public class PlaywrightGenerator {
 
         Map<String, Object> model = new HashMap<>();
         model.put("metadata", metadata);
+        model.put("url", metadata.getUrl());
+        model.put("method", metadata.getMethod());
+        model.put("headers", metadata.getHeaders());
+        model.put("queryParams", metadata.getQueryParams());
+        model.put("requestJson", metadata.getRequestJson());
+        model.put("expectedStatus", metadata.getExpectedStatus());
+        model.put("expectedResponseJson", metadata.getExpectedResponseJson());
 
         return templateService.renderTemplate("playwright",
                 language.name().toLowerCase().toLowerCase(),
