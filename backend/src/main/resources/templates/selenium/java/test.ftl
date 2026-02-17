@@ -1,9 +1,7 @@
-package generated.selenium;
-
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
-
+import java.util.HashMap;
 import java.util.Map;
 
 public class GeneratedTest {
@@ -14,9 +12,21 @@ public class GeneratedTest {
         String url = "${metadata.url}";
         String method = "${metadata.method}";
 
-        Map<String, String> headers = ${headers?json_string};
-        Map<String, String> queryParams = ${queryParams?json_string};
-        String requestBody = ${requestJson?json_string};
+        Map<String, String> headers = new HashMap<>();
+        <#if headers??>
+            <#list headers?keys as key>
+                headers.put("${key}", "${headers[key]}");
+            </#list>
+        </#if>
+
+        Map<String, String> queryParams = new HashMap<>();
+        <#if queryParams??>
+            <#list queryParams?keys as key>
+                queryParams.put("${key}", "${queryParams[key]}");
+            </#list>
+        </#if>
+
+        String requestBody = """${requestJson}""";
 
         Response response = RestAssured
                 .given()
