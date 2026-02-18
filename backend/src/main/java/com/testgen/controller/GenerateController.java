@@ -87,6 +87,13 @@ public class GenerateController {
             files.put(base + "client/" + framework.getResponseFileName(), framework.getResponseContent());
         }
 
+        files.put(base + "config/Config.java", generateConfigClass());
+        files.put(base + "config/ConfigLoader.java", generateConfigLoaderClass());
+
+        files.put("config/dev.json", generateDevConfig());
+        files.put("config/qa.json", generateQaConfig());
+        files.put("config/prod.json", generateProdConfig());
+
         files.put("pom.xml", generatePomXml());
 
         byte[] zipBytes = zipService.createZip(files);
@@ -115,9 +122,107 @@ public class GenerateController {
                 </properties>
 
                 <dependencies>
+                    <dependency>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-databind</artifactId>
+                        <version>2.17.0</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter</artifactId>
+                        <version>5.10.0</version>
+                        <scope>test</scope>
+                    </dependency>
                 </dependencies>
 
+                <build>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <version>3.1.2</version>
+                            <configuration>
+                                <useModulePath>false</useModulePath>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </build>
+
             </project>
+            """;
+    }
+
+    private String generateConfigClass() {
+        return """
+            package config;
+
+            import java.util.Map;
+
+            public class Config {
+
+                private String baseUrl;
+                private String authToken;
+                private Map<String, String> headers;
+
+                public String getBaseUrl() { return baseUrl; }
+                public String getAuthToken() { return authToken; }
+                public Map<String, String> getHeaders() { return headers; }
+            }
+            """;
+    }
+
+    private String generateConfigLoaderClass() {
+        return """
+            package config;
+
+            import com.fasterxml.jackson.databind.ObjectMapper;
+            import java.io.File;
+            import java.io.IOException;
+
+            public class ConfigLoader {
+
+                private static final ObjectMapper mapper = new ObjectMapper();
+
+                public static Config load(String env) {
+                    try {
+                        File file = new File("config/" + env + ".json");
+                        return mapper.readValue(file, Config.class);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to load environment config: " + env, e);
+                    }
+                }
+            }
+            """;
+    }
+
+    private String generateDevConfig() {
+        return """
+            {
+              "baseUrl": "https://dev-api.example.com",
+              "authToken": "",
+              "headers": {}
+            }
+            """;
+    }
+
+    private String generateQaConfig() {
+        return """
+            {
+              "baseUrl": "https://qa-api.example.com",
+              "authToken": "",
+              "headers": {}
+            }
+            """;
+    }
+
+    private String generateProdConfig() {
+        return """
+            {
+              "baseUrl": "https://api.example.com",
+              "authToken": "",
+              "headers": {}
+            }
             """;
     }
 

@@ -1,0 +1,7 @@
+{
+  "baseUrl": "https://dev-api.example.com",
+  "authToken": "REPLACE_WITH_DEV_TOKEN",
+  "headers": {
+    "X-Env": "dev"
+  }
+}

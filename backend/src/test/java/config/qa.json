@@ -1,0 +1,7 @@
+{
+  "baseUrl": "https://qa-api.example.com",
+  "authToken": "REPLACE_WITH_QA_TOKEN",
+  "headers": {
+    "X-Env": "qa"
+  }
+}
