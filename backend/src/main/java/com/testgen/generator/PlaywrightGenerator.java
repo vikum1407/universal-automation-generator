@@ -17,7 +17,8 @@ public class PlaywrightGenerator {
 
     private final TemplateService templateService;
 
-    public String generate(ApiMetadata metadata, LanguageType language) throws TemplateException, IOException {
+    public String generate(ApiMetadata metadata, LanguageType language)
+            throws TemplateException, IOException {
 
         Map<String, Object> model = new HashMap<>();
         model.put("metadata", metadata);
@@ -29,8 +30,10 @@ public class PlaywrightGenerator {
         model.put("expectedStatus", metadata.getExpectedStatus());
         model.put("expectedResponseJson", metadata.getExpectedResponseJson());
 
-        return templateService.renderTemplate("playwright",
-                language.name().toLowerCase().toLowerCase(),
-                model);
+        return templateService.renderTemplate(
+                "playwright",
+                language.name().toLowerCase(),
+                model
+        );
     }
 }

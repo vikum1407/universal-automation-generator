@@ -5,6 +5,7 @@ import com.testgen.model.ApiMetadata;
 import com.testgen.model.FrameworkType;
 import com.testgen.model.LanguageType;
 import com.testgen.packager.ZipService;
+import com.testgen.util.FileExtensionResolver;
 import com.testgen.util.NameSanitizer;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +73,12 @@ public class GenerateController {
         );
 
         // Dynamic file name based on sanitized test name
-        String fileName = metadata.getTestName() + ".java";
+        String extension = FileExtensionResolver.resolve(
+                request.getFrameworkType(),
+                request.getLanguageType()
+        );
+
+        String fileName = metadata.getTestName() + extension;
 
         byte[] zipBytes = zipService.createZip(fileName, generatedCode);
 
