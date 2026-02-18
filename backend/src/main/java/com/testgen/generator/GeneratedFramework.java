@@ -13,4 +13,6 @@ public class GeneratedFramework {
 
     private String responseFileName;
     private String responseContent;
+
+    private String environment;
 }

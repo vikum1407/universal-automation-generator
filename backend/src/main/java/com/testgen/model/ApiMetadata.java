@@ -19,4 +19,6 @@ public class ApiMetadata {
     private String expectedResponseJson;
 
     private String testName;
+
+    private String environment;
 }

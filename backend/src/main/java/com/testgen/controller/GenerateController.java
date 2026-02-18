@@ -40,11 +40,16 @@ public class GenerateController {
         metadata.setExpectedResponseJson(request.getExpectedResponseJson());
         metadata.setTestName(NameSanitizer.sanitize(request.getTestName()));
 
+        String environment = request.getEnvironment() != null ? request.getEnvironment() : "dev";
+        metadata.setEnvironment(environment);
+
         GeneratedFramework framework = frameworkGenerator.generate(
                 metadata,
                 request.getFrameworkType(),
                 request.getLanguageType()
         );
+
+        framework.setEnvironment(environment);
 
         GeneratedResponse response = new GeneratedResponse();
         response.setMetadata(metadata);
@@ -68,11 +73,16 @@ public class GenerateController {
         metadata.setExpectedResponseJson(request.getExpectedResponseJson());
         metadata.setTestName(NameSanitizer.sanitize(request.getTestName()));
 
+        String environment = request.getEnvironment() != null ? request.getEnvironment() : "dev";
+        metadata.setEnvironment(environment);
+
         GeneratedFramework framework = frameworkGenerator.generate(
                 metadata,
                 request.getFrameworkType(),
                 request.getLanguageType()
         );
+
+        framework.setEnvironment(environment);
 
         Map<String, String> files = new java.util.HashMap<>();
         String base = "src/test/java/";
@@ -243,6 +253,8 @@ public class GenerateController {
         private LanguageType languageType;
 
         private String testName;
+
+        private String environment;
     }
 
     @Data

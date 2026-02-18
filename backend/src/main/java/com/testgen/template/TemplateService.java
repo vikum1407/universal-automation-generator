@@ -18,13 +18,11 @@ public class TemplateService {
         this.freemarkerConfig = freemarkerConfig;
     }
 
-    public String renderTemplate(String frameworkType,
-                                 String languageType,
+    public String renderTemplate(String folder,
+                                 String templateName,
                                  Map<String, Object> model) throws IOException, TemplateException {
 
-        String templatePath = String.format("%s/%s/test.ftl",
-                frameworkType.toLowerCase(),
-                languageType.toLowerCase());
+        String templatePath = folder + "/" + templateName + ".ftl";
 
         Template template = freemarkerConfig.getTemplate(templatePath);
 

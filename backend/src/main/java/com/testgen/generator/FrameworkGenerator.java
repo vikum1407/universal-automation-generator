@@ -20,10 +20,14 @@ public class FrameworkGenerator {
     public GeneratedFramework generate(ApiMetadata metadata, FrameworkType framework, LanguageType language)
             throws TemplateException, IOException {
 
-        return switch (framework) {
+        GeneratedFramework generated = switch (framework) {
             case SELENIUM -> seleniumGenerator.generate(metadata, language);
             case CYPRESS -> cypressGenerator.generate(metadata, language);
             case PLAYWRIGHT -> playwrightGenerator.generate(metadata, language);
         };
+
+        generated.setEnvironment(metadata.getEnvironment());
+
+        return generated;
     }
 }

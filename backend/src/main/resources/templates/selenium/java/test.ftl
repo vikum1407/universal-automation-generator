@@ -17,7 +17,7 @@ public class ${metadata.testName} {
     public void runTest() throws Exception {
 
         // Load environment config (default: dev)
-        Config config = ConfigLoader.load("dev");
+        Config config = ConfigLoader.load("${environment}");
 
         ApiClient client = new ApiClient(config.getBaseUrl());
 

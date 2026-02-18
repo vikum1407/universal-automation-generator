@@ -10,4 +10,5 @@ public class GenerateRequest {
     private String responseJson;
     private String frameworkType;
     private String languageType;
+    private String environment;
 }

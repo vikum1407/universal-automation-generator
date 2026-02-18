@@ -20,6 +20,8 @@ public class SeleniumGenerator {
     public GeneratedFramework generate(ApiMetadata metadata, LanguageType language)
             throws TemplateException, IOException {
 
+        GeneratedFramework result = new GeneratedFramework();
+
         Map<String, Object> model = new HashMap<>();
         model.put("metadata", metadata);
         model.put("url", metadata.getUrl());
@@ -29,29 +31,29 @@ public class SeleniumGenerator {
         model.put("requestJson", metadata.getRequestJson());
         model.put("expectedStatus", metadata.getExpectedStatus());
         model.put("expectedResponseJson", metadata.getExpectedResponseJson());
+        model.put("environment", metadata.getEnvironment());
 
-        // Generate test file
+        // Test template
         String testContent = templateService.renderTemplate(
-                "selenium",
-                language.name().toLowerCase(),
+                "selenium/" + language.name().toLowerCase(),
+                "test",
                 model
         );
 
-        // Generate ApiClient
+        // ApiClient
         String clientContent = templateService.renderTemplate(
                 "selenium/java",
                 "ApiClient",
                 model
         );
 
-        // Generate ApiResponse
+        // ApiResponse
         String responseContent = templateService.renderTemplate(
                 "selenium/java",
                 "ApiResponse",
                 model
         );
 
-        GeneratedFramework result = new GeneratedFramework();
         result.setTestFileName(metadata.getTestName() + ".java");
         result.setTestContent(testContent);
 
