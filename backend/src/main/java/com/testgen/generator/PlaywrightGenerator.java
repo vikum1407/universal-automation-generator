@@ -17,7 +17,7 @@ public class PlaywrightGenerator {
 
     private final TemplateService templateService;
 
-    public String generate(ApiMetadata metadata, LanguageType language)
+    public GeneratedFramework generate(ApiMetadata metadata, LanguageType language)
             throws TemplateException, IOException {
 
         Map<String, Object> model = new HashMap<>();
@@ -30,10 +30,23 @@ public class PlaywrightGenerator {
         model.put("expectedStatus", metadata.getExpectedStatus());
         model.put("expectedResponseJson", metadata.getExpectedResponseJson());
 
-        return templateService.renderTemplate(
+        // Generate test file
+        String testContent = templateService.renderTemplate(
                 "playwright",
                 language.name().toLowerCase(),
                 model
         );
+
+        GeneratedFramework result = new GeneratedFramework();
+        result.setTestFileName(metadata.getTestName() + (language == LanguageType.TYPESCRIPT ? ".ts" : ".js"));
+        result.setTestContent(testContent);
+
+        // Playwright does NOT need ApiClient or ApiResponse
+        result.setClientFileName(null);
+        result.setClientContent(null);
+        result.setResponseFileName(null);
+        result.setResponseContent(null);
+
+        return result;
     }
 }

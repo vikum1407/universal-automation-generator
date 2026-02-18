@@ -17,7 +17,7 @@ public class FrameworkGenerator {
     private final CypressGenerator cypressGenerator;
     private final PlaywrightGenerator playwrightGenerator;
 
-    public String generate(ApiMetadata metadata, FrameworkType framework, LanguageType language)
+    public GeneratedFramework generate(ApiMetadata metadata, FrameworkType framework, LanguageType language)
             throws TemplateException, IOException {
 
         return switch (framework) {
