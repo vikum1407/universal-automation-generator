@@ -277,7 +277,7 @@ public class GenerateController {
         private String testName;
         private String environment;
 
-        // ⭐ Authentication fields
+        // Authentication fields
         private String authType;
 
         private String apiKeyName;
