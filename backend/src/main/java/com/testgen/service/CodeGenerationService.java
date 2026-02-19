@@ -28,8 +28,8 @@ public class CodeGenerationService {
         model.put("responseJson", request.getResponseJson());
 
         String code = templateService.renderTemplate(
-                request.getFrameworkType(),
-                request.getLanguageType(),
+                request.getFrameworkType().name().toLowerCase(),
+                request.getLanguageType().name().toLowerCase(),
                 model
         );
 

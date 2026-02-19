@@ -16,12 +16,9 @@ public class ${metadata.testName} {
     @Test
     public void runTest() throws Exception {
 
-        // Load environment config (default: dev)
         Config config = ConfigLoader.load("${environment}");
-
         ApiClient client = new ApiClient(config.getBaseUrl());
 
-        // Merge config headers + metadata headers + auth token
         Map<String, String> headers = new HashMap<>();
 
         // Config-level headers
@@ -36,32 +33,46 @@ public class ${metadata.testName} {
             </#list>
         </#if>
 
-        // Authorization header (Bearer token)
-        if (config.getAuthToken() != null && !config.getAuthToken().isEmpty()) {
-            headers.put("Authorization", "Bearer " + config.getAuthToken());
-        }
+        // AUTHENTICATION LOGIC
+        <#if metadata.authType == "BEARER">
+            if (config.getAuthToken() != null && !config.getAuthToken().isEmpty()) {
+                headers.put("Authorization", "Bearer " + config.getAuthToken());
+            }
+        <#elseif metadata.authType == "API_KEY_HEADER">
+            headers.put("${metadata.apiKeyName}", "${metadata.apiKeyValue}");
+        <#elseif metadata.authType == "API_KEY_QUERY">
+            // handled in query params
+        <#elseif metadata.authType == "BASIC">
+            String basicAuth = java.util.Base64.getEncoder()
+                .encodeToString(("${metadata.basicUsername}:${metadata.basicPassword}").getBytes());
+            headers.put("Authorization", "Basic " + basicAuth);
+        <#elseif metadata.authType == "CUSTOM_HEADER">
+            headers.put("${metadata.customHeaderName}", "${metadata.customHeaderValue}");
+        </#if>
 
         // Query params
-        Map<String, String> queryParams = <#if metadata.queryParams?has_content>
-            Map.of(
-                <#list metadata.queryParams?keys as key>
-                    "${key}", "${metadata.queryParams[key]}"<#if key_has_next>,</#if>
-                </#list>
-            );
-        <#else>
-            Map.of();
+        Map<String, String> queryParams = new HashMap<>();
+
+        <#if metadata.queryParams?has_content>
+            <#list metadata.queryParams?keys as key>
+                queryParams.put("${key}", "${metadata.queryParams[key]}");
+            </#list>
+        </#if>
+
+        <#if metadata.authType == "API_KEY_QUERY">
+            queryParams.put("${metadata.apiKeyQueryName}", "${metadata.apiKeyQueryValue}");
         </#if>
 
         // Request body
-        String requestBody = <#if metadata.requestJson?has_content>
-            """${metadata.requestJson}""";
-        <#else>
-            "";
-        </#if>;
+        String requestBody =
+            <#if metadata.requestJson?has_content>
+                """${metadata.requestJson}""";
+            <#else>
+                "";
+            </#if>;
 
         ApiResponse response;
 
-        // Execute request
         switch ("${metadata.method}") {
             case "GET" -> response = client.get("${metadata.url}", headers, queryParams);
             case "POST" -> response = client.post("${metadata.url}", headers, queryParams, requestBody);
@@ -71,10 +82,8 @@ public class ${metadata.testName} {
             default -> throw new IllegalArgumentException("Unsupported method: ${metadata.method}");
         }
 
-        // Validate status code
         assertEquals(${metadata.expectedStatus}, response.getStatus(), "Unexpected status code");
 
-        // Validate response body (basic contains check)
         <#if metadata.expectedResponseJson?has_content>
         String expectedJson = """${metadata.expectedResponseJson}""";
         assertTrue(

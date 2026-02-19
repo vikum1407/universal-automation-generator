@@ -40,6 +40,17 @@ public class GenerateController {
         metadata.setExpectedResponseJson(request.getExpectedResponseJson());
         metadata.setTestName(NameSanitizer.sanitize(request.getTestName()));
 
+        // Authentication mapping
+        metadata.setAuthType(request.getAuthType());
+        metadata.setApiKeyName(request.getApiKeyName());
+        metadata.setApiKeyValue(request.getApiKeyValue());
+        metadata.setApiKeyQueryName(request.getApiKeyQueryName());
+        metadata.setApiKeyQueryValue(request.getApiKeyQueryValue());
+        metadata.setBasicUsername(request.getBasicUsername());
+        metadata.setBasicPassword(request.getBasicPassword());
+        metadata.setCustomHeaderName(request.getCustomHeaderName());
+        metadata.setCustomHeaderValue(request.getCustomHeaderValue());
+
         String environment = request.getEnvironment() != null ? request.getEnvironment() : "dev";
         metadata.setEnvironment(environment);
 
@@ -72,6 +83,17 @@ public class GenerateController {
         metadata.setExpectedStatus(request.getExpectedStatus());
         metadata.setExpectedResponseJson(request.getExpectedResponseJson());
         metadata.setTestName(NameSanitizer.sanitize(request.getTestName()));
+
+        // Authentication mapping
+        metadata.setAuthType(request.getAuthType());
+        metadata.setApiKeyName(request.getApiKeyName());
+        metadata.setApiKeyValue(request.getApiKeyValue());
+        metadata.setApiKeyQueryName(request.getApiKeyQueryName());
+        metadata.setApiKeyQueryValue(request.getApiKeyQueryValue());
+        metadata.setBasicUsername(request.getBasicUsername());
+        metadata.setBasicPassword(request.getBasicPassword());
+        metadata.setCustomHeaderName(request.getCustomHeaderName());
+        metadata.setCustomHeaderValue(request.getCustomHeaderValue());
 
         String environment = request.getEnvironment() != null ? request.getEnvironment() : "dev";
         metadata.setEnvironment(environment);
@@ -253,8 +275,22 @@ public class GenerateController {
         private LanguageType languageType;
 
         private String testName;
-
         private String environment;
+
+        // ⭐ Authentication fields
+        private String authType;
+
+        private String apiKeyName;
+        private String apiKeyValue;
+
+        private String apiKeyQueryName;
+        private String apiKeyQueryValue;
+
+        private String basicUsername;
+        private String basicPassword;
+
+        private String customHeaderName;
+        private String customHeaderValue;
     }
 
     @Data

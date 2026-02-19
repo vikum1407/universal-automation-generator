@@ -17,6 +17,22 @@ export default function GeneratePage() {
   const [generatedCode, setGeneratedCode] = useState("");
 
   const [testName, setTestName] = useState("");
+  const [environment, setEnvironment] = useState("dev");
+
+  // ⭐ Authentication fields
+  const [authType, setAuthType] = useState("NONE");
+
+  const [apiKeyName, setApiKeyName] = useState("");
+  const [apiKeyValue, setApiKeyValue] = useState("");
+
+  const [apiKeyQueryName, setApiKeyQueryName] = useState("");
+  const [apiKeyQueryValue, setApiKeyQueryValue] = useState("");
+
+  const [basicUsername, setBasicUsername] = useState("");
+  const [basicPassword, setBasicPassword] = useState("");
+
+  const [customHeaderName, setCustomHeaderName] = useState("");
+  const [customHeaderValue, setCustomHeaderValue] = useState("");
 
   const safeParse = (value) => {
     try {
@@ -26,39 +42,39 @@ export default function GeneratePage() {
     }
   };
 
-  const generateCode = async () => {
-    const payload = { 
-      url, method, 
-      headers: safeParse(headers), 
-      queryParams: safeParse(queryParams), 
-      requestJson, 
-      responseJson, 
-      expectedStatus, 
-      expectedResponseJson, 
-      testName, 
-      frameworkType: framework, 
-      languageType: language 
-    };
+  const buildPayload = () => ({
+    url,
+    method,
+    headers: safeParse(headers),
+    queryParams: safeParse(queryParams),
+    requestJson,
+    responseJson,
+    expectedStatus,
+    expectedResponseJson,
+    testName,
+    frameworkType: framework,
+    languageType: language,
+    environment,
 
-    const res = await axios.post("http://localhost:8080/api/generate", payload);
+    // ⭐ Authentication fields
+    authType,
+    apiKeyName,
+    apiKeyValue,
+    apiKeyQueryName,
+    apiKeyQueryValue,
+    basicUsername,
+    basicPassword,
+    customHeaderName,
+    customHeaderValue
+  });
+
+  const generateCode = async () => {
+    const res = await axios.post("http://localhost:8080/api/generate", buildPayload());
     setGeneratedCode(res.data.generatedCode);
   };
 
   const downloadZip = async () => {
-    const payload = { 
-      url, method, 
-      headers: safeParse(headers), 
-      queryParams: safeParse(queryParams), 
-      requestJson, 
-      responseJson, 
-      expectedStatus, 
-      expectedResponseJson, 
-      testName, 
-      frameworkType: framework, 
-      languageType: language 
-    };
-
-    const res = await axios.post("http://localhost:8080/api/generate/zip", payload, {
+    const res = await axios.post("http://localhost:8080/api/generate/zip", buildPayload(), {
       responseType: "blob"
     });
 
@@ -92,6 +108,58 @@ export default function GeneratePage() {
       </div>
 
       <div>
+        <label>Environment:</label>
+        <select value={environment} onChange={e => setEnvironment(e.target.value)}>
+          <option value="dev">dev</option>
+          <option value="qa">qa</option>
+          <option value="prod">prod</option>
+        </select>
+      </div>
+
+      {/* ⭐ AUTH TYPE DROPDOWN */}
+      <div>
+        <label>Auth Type:</label>
+        <select value={authType} onChange={e => setAuthType(e.target.value)}>
+          <option value="NONE">None</option>
+          <option value="BEARER">Bearer Token (from config)</option>
+          <option value="API_KEY_HEADER">API Key (Header)</option>
+          <option value="API_KEY_QUERY">API Key (Query Param)</option>
+          <option value="BASIC">Basic Auth</option>
+          <option value="CUSTOM_HEADER">Custom Header</option>
+        </select>
+      </div>
+
+      {/* ⭐ CONDITIONAL AUTH FIELDS */}
+
+      {authType === "API_KEY_HEADER" && (
+        <>
+          <input placeholder="API Key Name" value={apiKeyName} onChange={e => setApiKeyName(e.target.value)} />
+          <input placeholder="API Key Value" value={apiKeyValue} onChange={e => setApiKeyValue(e.target.value)} />
+        </>
+      )}
+
+      {authType === "API_KEY_QUERY" && (
+        <>
+          <input placeholder="Query Param Name" value={apiKeyQueryName} onChange={e => setApiKeyQueryName(e.target.value)} />
+          <input placeholder="Query Param Value" value={apiKeyQueryValue} onChange={e => setApiKeyQueryValue(e.target.value)} />
+        </>
+      )}
+
+      {authType === "BASIC" && (
+        <>
+          <input placeholder="Username" value={basicUsername} onChange={e => setBasicUsername(e.target.value)} />
+          <input placeholder="Password" value={basicPassword} onChange={e => setBasicPassword(e.target.value)} />
+        </>
+      )}
+
+      {authType === "CUSTOM_HEADER" && (
+        <>
+          <input placeholder="Header Name" value={customHeaderName} onChange={e => setCustomHeaderName(e.target.value)} />
+          <input placeholder="Header Value" value={customHeaderValue} onChange={e => setCustomHeaderValue(e.target.value)} />
+        </>
+      )}
+
+      <div>
         <label>Headers (JSON):</label>
         <textarea
           rows="3"
@@ -113,20 +181,12 @@ export default function GeneratePage() {
 
       <div>
         <label>Request JSON:</label>
-        <textarea
-          rows="5"
-          value={requestJson}
-          onChange={e => setRequestJson(e.target.value)}
-        />
+        <textarea rows="5" value={requestJson} onChange={e => setRequestJson(e.target.value)} />
       </div>
 
       <div>
         <label>Expected Response JSON:</label>
-        <textarea
-          rows="5"
-          value={expectedResponseJson}
-          onChange={e => setExpectedResponseJson(e.target.value)}
-        />
+        <textarea rows="5" value={expectedResponseJson} onChange={e => setExpectedResponseJson(e.target.value)} />
       </div>
 
       <div>
@@ -138,9 +198,13 @@ export default function GeneratePage() {
         />
       </div>
 
-      <div> 
-        <label>Test Name:</label> 
-        <input placeholder="Example: CreatePostTest" value={testName} onChange={e => setTestName(e.target.value)} /> 
+      <div>
+        <label>Test Name:</label>
+        <input
+          placeholder="Example: CreatePostTest"
+          value={testName}
+          onChange={e => setTestName(e.target.value)}
+        />
       </div>
 
       <div>
