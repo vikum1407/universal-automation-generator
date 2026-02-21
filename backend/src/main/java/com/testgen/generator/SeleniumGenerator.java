@@ -32,25 +32,38 @@ public class SeleniumGenerator {
         model.put("expectedStatus", metadata.getExpectedStatus());
         model.put("expectedResponseJson", metadata.getExpectedResponseJson());
         model.put("environment", metadata.getEnvironment());
+        model.put("testName", metadata.getTestName());
+        model.put("authType", metadata.getAuthType());
 
-        // Test template
+        model.put("apiKeyName", metadata.getApiKeyName());
+        model.put("apiKeyValue", metadata.getApiKeyValue());
+        model.put("apiKeyQueryName", metadata.getApiKeyQueryName());
+        model.put("apiKeyQueryValue", metadata.getApiKeyQueryValue());
+
+        model.put("basicUsername", metadata.getBasicUsername());
+        model.put("basicPassword", metadata.getBasicPassword());
+
+        model.put("customHeaderName", metadata.getCustomHeaderName());
+        model.put("customHeaderValue", metadata.getCustomHeaderValue());
+
+        // Test template → templates/selenium/<language>/test.ftl
         String testContent = templateService.renderTemplate(
-                "selenium/" + language.name().toLowerCase(),
-                "test",
+                "selenium",
+                language.name().toLowerCase(),
                 model
         );
 
-        // ApiClient
+        // ApiClient → templates/selenium/java/ApiClient.ftl
         String clientContent = templateService.renderTemplate(
-                "selenium/java",
-                "ApiClient",
+                "selenium",
+                "java/ApiClient",
                 model
         );
 
-        // ApiResponse
+        // ApiResponse → templates/selenium/java/ApiResponse.ftl
         String responseContent = templateService.renderTemplate(
-                "selenium/java",
-                "ApiResponse",
+                "selenium",
+                "java/ApiResponse",
                 model
         );
 

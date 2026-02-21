@@ -5,7 +5,8 @@ import com.testgen.generator.GeneratedFramework;
 import com.testgen.model.ApiMetadata;
 import com.testgen.model.FrameworkType;
 import com.testgen.model.LanguageType;
-import com.testgen.packager.ZipService;
+import com.testgen.service.CypressZipService;
+import com.testgen.service.PlaywrightZipService;
 import com.testgen.util.NameSanitizer;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import freemarker.template.TemplateException;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
 @RestController
 @RequestMapping("/api/generate")
@@ -24,10 +27,12 @@ import java.util.Map;
 public class GenerateController {
 
     private final FrameworkGenerator frameworkGenerator;
-    private final ZipService zipService;
+    private final CypressZipService cypressZipService;
+    private final PlaywrightZipService playwrightZipService;
 
     @PostMapping
-    public GeneratedResponse generate(@RequestBody GenerateRequest request) throws TemplateException, IOException {
+    public GeneratedResponse generate(@RequestBody GenerateRequest request)
+            throws TemplateException, IOException {
 
         ApiMetadata metadata = new ApiMetadata();
         metadata.setUrl(request.getUrl());
@@ -40,7 +45,6 @@ public class GenerateController {
         metadata.setExpectedResponseJson(request.getExpectedResponseJson());
         metadata.setTestName(NameSanitizer.sanitize(request.getTestName()));
 
-        // Authentication mapping
         metadata.setAuthType(request.getAuthType());
         metadata.setApiKeyName(request.getApiKeyName());
         metadata.setApiKeyValue(request.getApiKeyValue());
@@ -71,7 +75,7 @@ public class GenerateController {
 
     @PostMapping("/zip")
     public ResponseEntity<byte[]> generateZip(@RequestBody GenerateRequest request)
-            throws TemplateException, IOException {
+            throws Exception {
 
         ApiMetadata metadata = new ApiMetadata();
         metadata.setUrl(request.getUrl());
@@ -84,7 +88,6 @@ public class GenerateController {
         metadata.setExpectedResponseJson(request.getExpectedResponseJson());
         metadata.setTestName(NameSanitizer.sanitize(request.getTestName()));
 
-        // Authentication mapping
         metadata.setAuthType(request.getAuthType());
         metadata.setApiKeyName(request.getApiKeyName());
         metadata.setApiKeyValue(request.getApiKeyValue());
@@ -98,42 +101,23 @@ public class GenerateController {
         String environment = request.getEnvironment() != null ? request.getEnvironment() : "dev";
         metadata.setEnvironment(environment);
 
-        GeneratedFramework framework = frameworkGenerator.generate(
-                metadata,
-                request.getFrameworkType(),
-                request.getLanguageType()
-        );
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos);
 
-        framework.setEnvironment(environment);
-
-        Map<String, String> files = new java.util.HashMap<>();
-        String base = "src/test/java/";
-
-        files.put(base + "tests/" + framework.getTestFileName(), framework.getTestContent());
-
-        if (framework.getClientContent() != null) {
-            files.put(base + "client/" + framework.getClientFileName(), framework.getClientContent());
+        if (request.getFrameworkType() == FrameworkType.CYPRESS) {
+            cypressZipService.generateCypressProject(request, zos);
+        } else if (request.getFrameworkType() == FrameworkType.PLAYWRIGHT) {
+            playwrightZipService.generatePlaywrightProject(request, zos);
+        } else {
+            throw new IllegalArgumentException("Unsupported framework: " + request.getFrameworkType());
         }
 
-        if (framework.getResponseContent() != null) {
-            files.put(base + "client/" + framework.getResponseFileName(), framework.getResponseContent());
-        }
-
-        files.put(base + "config/Config.java", generateConfigClass());
-        files.put(base + "config/ConfigLoader.java", generateConfigLoaderClass());
-
-        files.put("config/dev.json", generateDevConfig());
-        files.put("config/qa.json", generateQaConfig());
-        files.put("config/prod.json", generateProdConfig());
-
-        files.put("pom.xml", generatePomXml());
-
-        byte[] zipBytes = zipService.createZip(files);
+        zos.close();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=generated-framework.zip")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(zipBytes);
+                .body(baos.toByteArray());
     }
 
     private String generatePomXml() {
@@ -277,7 +261,6 @@ public class GenerateController {
         private String testName;
         private String environment;
 
-        // Authentication fields
         private String authType;
 
         private String apiKeyName;

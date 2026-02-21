@@ -29,8 +29,22 @@ public class CypressGenerator {
         model.put("requestJson", metadata.getRequestJson());
         model.put("expectedStatus", metadata.getExpectedStatus());
         model.put("expectedResponseJson", metadata.getExpectedResponseJson());
+        model.put("environment", metadata.getEnvironment());
+        model.put("testName", metadata.getTestName());
+        model.put("authType", metadata.getAuthType());
 
-        // Generate test file
+        model.put("apiKeyName", metadata.getApiKeyName());
+        model.put("apiKeyValue", metadata.getApiKeyValue());
+        model.put("apiKeyQueryName", metadata.getApiKeyQueryName());
+        model.put("apiKeyQueryValue", metadata.getApiKeyQueryValue());
+
+        model.put("basicUsername", metadata.getBasicUsername());
+        model.put("basicPassword", metadata.getBasicPassword());
+
+        model.put("customHeaderName", metadata.getCustomHeaderName());
+        model.put("customHeaderValue", metadata.getCustomHeaderValue());
+
+        // Generate test file (loads: templates/cypress/<language>/test.ftl)
         String testContent = templateService.renderTemplate(
                 "cypress",
                 language.name().toLowerCase(),
@@ -38,7 +52,9 @@ public class CypressGenerator {
         );
 
         GeneratedFramework result = new GeneratedFramework();
-        result.setTestFileName(metadata.getTestName() + (language == LanguageType.TYPESCRIPT ? ".ts" : ".js"));
+        result.setTestFileName(
+                metadata.getTestName() + (language == LanguageType.TYPESCRIPT ? ".ts" : ".js")
+        );
         result.setTestContent(testContent);
 
         // Cypress does NOT need ApiClient or ApiResponse

@@ -22,7 +22,14 @@ public class TemplateService {
                                  String templateName,
                                  Map<String, Object> model) throws IOException, TemplateException {
 
-        String templatePath = folder + "/" + templateName + ".ftl";
+        String templatePath;
+
+        // If templateName already includes a slash, treat it as a full path
+        if (templateName.contains("/")) {
+            templatePath = folder + "/" + templateName + ".ftl";
+        } else {
+            templatePath = folder + "/" + templateName + "/test.ftl";
+        }
 
         Template template = freemarkerConfig.getTemplate(templatePath);
 
