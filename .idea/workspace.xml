@@ -5,24 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f4e1a107-ee6d-4165-a968-80ae02610902" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/testgen/service/PlaywrightZipService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/playwright/javascript/apiHelper.ftl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/playwright/javascript/config.ftl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/playwright/typescript/apiHelper.ftl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/playwright/typescript/config.ftl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/testgen/controller/GenerateController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/testgen/controller/GenerateController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/testgen/generator/CypressGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/testgen/generator/CypressGenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/testgen/generator/PlaywrightGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/testgen/generator/PlaywrightGenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/testgen/generator/SeleniumGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/testgen/generator/SeleniumGenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/testgen/service/CypressZipService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/testgen/service/CypressZipService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/testgen/template/TemplateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/testgen/template/TemplateService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/playwright/javascript/test.ftl" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/playwright/javascript/test.ftl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/playwright/typescript/test.ftl" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/playwright/typescript/test.ftl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/testgen/ai/model/AiTestCaseRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/testgen/ai/model/AiTestCaseRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/GeneratePage.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/hooks/useGenerateForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/hooks/useGenerateForm.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

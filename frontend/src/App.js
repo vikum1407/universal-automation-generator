@@ -6,9 +6,11 @@ import TemplatesPage from "./TemplatesPage";
 import HistoryPage from "./HistoryPage";
 import SettingsPage from "./SettingsPage";
 import ConfigManagerPage from "./pages/ConfigManager/ConfigManagerPage";
+import TestCaseGeneratorPage from "./pages/TestCaseGeneratorPage";
 
 import TopBar from "./TopBar";
 import { ToastProvider } from "./ToastContext";
+import { Toaster } from "react-hot-toast";
 
 export default function App() {
   const [theme, setTheme] = useState("light");
@@ -54,6 +56,9 @@ export default function App() {
   return (
     <ToastProvider>
       <BrowserRouter>
+        {/* 🔥 REQUIRED for toast notifications */}
+        <Toaster position="top-right" />
+
         <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
           <Sidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
 
@@ -75,6 +80,11 @@ export default function App() {
                 <Route path="/templates" element={<TemplatesPage />} />
                 <Route path="/history" element={<HistoryPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+
+                <Route
+                  path="/ai-test-generator"
+                  element={<TestCaseGeneratorPage />}
+                />
               </Routes>
             </div>
           </div>
@@ -156,6 +166,15 @@ function Sidebar({ collapsed, toggleSidebar }) {
         onMouseLeave={(e) => Object.assign(e.target.style, itemStyle)}
       >
         🧪 {!collapsed && "Generate Tests"}
+      </Link>
+
+      <Link
+        to="/ai-test-generator"
+        style={{ ...itemStyle, ...iconOnly }}
+        onMouseEnter={(e) => Object.assign(e.target.style, itemHover)}
+        onMouseLeave={(e) => Object.assign(e.target.style, itemStyle)}
+      >
+        🤖 {!collapsed && "AI Test Generator"}
       </Link>
 
       <Link

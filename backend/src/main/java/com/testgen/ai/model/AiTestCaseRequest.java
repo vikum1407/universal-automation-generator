@@ -5,6 +5,7 @@ public class AiTestCaseRequest {
     private String input;          // user story / requirement / endpoint description
     private String context;        // optional: project/domain context
     private String sourceType;     // "TEXT", "SWAGGER", "POSTMAN", etc. (for later)
+    private String provider;
 
     public String getInput() {
         return input;
@@ -28,5 +29,13 @@ public class AiTestCaseRequest {
 
     public void setSourceType(String sourceType) {
         this.sourceType = sourceType;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 }

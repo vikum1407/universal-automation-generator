@@ -3,9 +3,13 @@ import axios from "axios";
 import { useToast } from "../ToastContext";
 import { useSearchParams } from "react-router-dom";
 
+
 export default function useGenerateForm(colors) {
   const { showToast } = useToast();
   const [searchParams] = useSearchParams();
+  const AUTOSAVE_KEY = "generateFormAutosave";
+  const [autosaveStatus, setAutosaveStatus] = useState("");
+  const [lastSavedAt, setLastSavedAt] = useState(null);
 
   // -----------------------------
   // STATE (flat)
@@ -46,6 +50,8 @@ export default function useGenerateForm(colors) {
 
   const [loadingGenerate, setLoadingGenerate] = useState(false);
   const [loadingZip, setLoadingZip] = useState(false);
+
+  const [autosaveEnabled, setAutosaveEnabled] = useState(true);
 
   const [errors, setErrors] = useState({
     headers: "",
@@ -291,7 +297,7 @@ export default function useGenerateForm(colors) {
   };
 
   // -----------------------------
-  // DUPLICATE CONFIG
+  // DUPLICATE CONFIG (fixed no-loop-func)
   // -----------------------------
   const duplicateConfig = (name) => {
     const cfg = savedConfigs.find((c) => c.name === name);
@@ -300,8 +306,9 @@ export default function useGenerateForm(colors) {
     let base = `${name} (copy)`;
     let finalName = base;
     let counter = 2;
+    const existingNames = new Set(savedConfigs.map((c) => c.name));
 
-    while (savedConfigs.some((c) => c.name === finalName)) {
+    while (existingNames.has(finalName)) {
       finalName = `${base} ${counter}`;
       counter++;
     }
@@ -356,10 +363,101 @@ export default function useGenerateForm(colors) {
 
     setOpenSection(null);
     showToast("Form reset", "success");
+    localStorage.removeItem(AUTOSAVE_KEY);
   };
 
+  useEffect(() => {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return;
+
+    try {
+      const data = JSON.parse(raw);
+
+      setUrl(data.url || "");
+      setMethod(data.method || "GET");
+      setHeaders(data.headers || "{}");
+      setQueryParams(data.queryParams || "{}");
+      setRequestJson(data.requestJson || "{}");
+      setExpectedResponseJson(data.expectedResponseJson || "{}");
+      setExpectedStatus(data.expectedStatus || 200);
+      setTestName(data.testName || "");
+      setFramework(data.framework || "");
+      setLanguage(data.language || "");
+      setEnvironment(data.environment || "dev");
+
+      setAuthType(data.authType || "NONE");
+      setApiKeyName(data.apiKeyName || "");
+      setApiKeyValue(data.apiKeyValue || "");
+      setApiKeyQueryName(data.apiKeyQueryName || "");
+      setApiKeyQueryValue(data.apiKeyQueryValue || "");
+      setBasicUsername(data.basicUsername || "");
+      setBasicPassword(data.basicPassword || "");
+      setCustomHeaderName(data.customHeaderName || "");
+      setCustomHeaderValue(data.customHeaderValue || "");
+    } catch {
+      // ignore corrupted autosave
+    }
+  }, []);
+
+useEffect(() => {
+  if (!autosaveEnabled) return;
+
+  const data = {
+    url,
+    method,
+    headers,
+    queryParams,
+    requestJson,
+    expectedResponseJson,
+    expectedStatus,
+    testName,
+    framework,
+    language,
+    environment,
+    authType,
+    apiKeyName,
+    apiKeyValue,
+    apiKeyQueryName,
+    apiKeyQueryValue,
+    basicUsername,
+    basicPassword,
+    customHeaderName,
+    customHeaderValue
+  };
+
+  localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
+
+  setAutosaveStatus("saved");
+  setLastSavedAt(new Date().toISOString());
+
+  const timer = setTimeout(() => setAutosaveStatus(""), 1500);
+  return () => clearTimeout(timer);
+}, [
+  autosaveEnabled,
+  url,
+  method,
+  headers,
+  queryParams,
+  requestJson,
+  expectedResponseJson,
+  expectedStatus,
+  testName,
+  framework,
+  language,
+  environment,
+  authType,
+  apiKeyName,
+  apiKeyValue,
+  apiKeyQueryName,
+  apiKeyQueryValue,
+  basicUsername,
+  basicPassword,
+  customHeaderName,
+  customHeaderValue
+]);
+
   // -----------------------------
-  // URL-BASED CONFIG LOADING
+  // URL-BASED CONFIG LOADING (fixed deps)
   // -----------------------------
   useEffect(() => {
     const loadName = searchParams.get("load");
@@ -370,10 +468,10 @@ export default function useGenerateForm(colors) {
 
     applyConfig(cfg.data);
     showToast(`Loaded config: ${loadName}`, "success");
-  }, [searchParams]);
+  }, [searchParams, savedConfigs, showToast]);
 
   // -----------------------------
-  // RETURN (Option B1)
+  // RETURN
   // -----------------------------
   return {
     state: {
@@ -402,6 +500,9 @@ export default function useGenerateForm(colors) {
       loadingZip,
       errors,
       generatedCode,
+      autosaveStatus, 
+      lastSavedAt,
+      autosaveEnabled,
 
       config: {
         configName,
@@ -434,7 +535,8 @@ export default function useGenerateForm(colors) {
       setOpenSection,
       setConfigName,
       setSelectedConfig,
-      setErrors,          // ← add this line
+      setErrors,
+      setAutosaveEnabled,
 
       toggle,
       handleJsonChange,
@@ -446,6 +548,6 @@ export default function useGenerateForm(colors) {
       renameConfig,
       duplicateConfig,
       resetForm
-    }    
+    }
   };
 }
