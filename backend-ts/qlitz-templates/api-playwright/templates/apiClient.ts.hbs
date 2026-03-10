@@ -1,0 +1,29 @@
+import { request } from '@playwright/test';
+import { loadEnv } from '../env';
+
+export function apiClient() {
+  const { baseURL, apiKey, bearerToken } = loadEnv();
+
+  const defaultHeaders: Record<string, string> = {};
+
+  if (apiKey) {
+    defaultHeaders['x-api-key'] = apiKey;
+  }
+
+  if (bearerToken) {
+    defaultHeaders['Authorization'] = `Bearer ${bearerToken}`;
+  }
+
+  async function context() {
+    return request.newContext({
+      extraHTTPHeaders: defaultHeaders
+    });
+  }
+
+  return {
+    get: async (path: string) => (await context()).get(baseURL + path),
+    post: async (path: string, data?: any) => (await context()).post(baseURL + path, { data }),
+    put: async (path: string, data?: any) => (await context()).put(baseURL + path, { data }),
+    delete: async (path: string) => (await context()).delete(baseURL + path)
+  };
+}

@@ -1,0 +1,10 @@
+import { defineConfig } from '@playwright/test';
+import { loadEnv } from './env';
+
+const { baseURL } = loadEnv();
+
+export default defineConfig({
+  use: {
+    baseURL,
+  },
+});

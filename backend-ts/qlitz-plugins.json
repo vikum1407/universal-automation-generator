@@ -1,0 +1,12 @@
+{
+  "api-playwright": {
+    "name": "Playwright API Tests",
+    "description": "Generate API tests using Playwright",
+    "path": "./qlitz-templates/api-playwright"
+  },
+  "ui-playwright": {
+    "name": "Playwright UI Tests",
+    "description": "Generate UI tests using Playwright",
+    "path": "./qlitz-templates/ui-playwright"
+  }
+}

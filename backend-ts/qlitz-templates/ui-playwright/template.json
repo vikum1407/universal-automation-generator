@@ -1,0 +1,6 @@
+{
+  "name": "ui-playwright",
+  "description": "Generate UI tests using Playwright",
+  "type": "ui",
+  "entry": "templates"
+}

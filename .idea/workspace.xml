@@ -5,6 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f4e1a107-ee6d-4165-a968-80ae02610902" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frontend/src/api/aiClient.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/InputPanel.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/ProviderSelector.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/ResultPanel.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/ScrollToTopButton.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/SkeletonCard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/TestCaseGenerator.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/index.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/common/Button.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/common/Card.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/common/TextArea.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/TestCaseGeneratorPage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/testgen/ai/model/AiTestCaseRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/testgen/ai/model/AiTestCaseRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />

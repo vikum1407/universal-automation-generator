@@ -1,0 +1,6 @@
+{
+  "name": "api-playwright",
+  "description": "Generate API tests using Playwright",
+  "type": "api",
+  "entry": "templates"
+}
