@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import InputPanel from "../components/TestCaseGenerator/InputPanel";
 import ResultPanel from "../components/TestCaseGenerator/ResultPanel";
 import ProviderSelector from "../components/TestCaseGenerator/ProviderSelector";
+import TestDataGenerator from "../components/TestCaseGenerator/TestDataGenerator";
+import BugReportGenerator from "../components/TestCaseGenerator/BugReportGenerator";
+import AutomationFrameworkGenerator from "../components/TestCaseGenerator/AutomationFrameworkGenerator";
 import { generateTestCases } from "../api/aiClient";
 import "../components/TestCaseGenerator/TestCaseGenerator.css";
 import toast from "react-hot-toast";
-import ScrollToTopButton from "../components/TestCaseGenerator/ScrollToTopButton";
 
 const formatTestCase = (tc, index) => {
   let output = `Test Case ${index + 1}: ${tc.title || ""}\n\n`;
@@ -30,16 +32,19 @@ const formatTestCase = (tc, index) => {
 };
 
 export default function TestCaseGeneratorPage() {
+  const [activeTab, setActiveTab] = useState("cases");
+
   const [input, setInput] = useState("");
   const [context, setContext] = useState("");
   const [provider, setProvider] = useState("groq");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ FIX: Define autosave state here
   const [autosaveEnabled, setAutosaveEnabled] = useState(false);
-  const [autosaveStatus] = useState(null); 
+  const [autosaveStatus] = useState(null);
   const [lastSavedAt] = useState(null);
+
+  const [theme, setTheme] = useState("light");
 
   const resultsRef = useRef(null);
 
@@ -93,16 +98,16 @@ export default function TestCaseGeneratorPage() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.key === "Enter") {
+      if (e.ctrlKey && e.key === "Enter" && activeTab === "cases") {
         onGenerate();
       }
 
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && activeTab === "cases") {
         clearResults();
       }
 
       if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c") {
-        if (results.length > 0) {
+        if (results.length > 0 && activeTab === "cases") {
           const text = results
             .map((tc, index) => formatTestCase(tc, index))
             .join("\n\n-------------------------\n\n");
@@ -115,54 +120,117 @@ export default function TestCaseGeneratorPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [results, clearResults, onGenerate]);
+  }, [results, clearResults, onGenerate, activeTab]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
 
   return (
-    <div className="page two-column">
-      <div className="left-panel">
-        <ProviderSelector provider={provider} setProvider={setProvider} />
+    <div className={`page-root ${theme === "dark" ? "theme-dark" : ""}`}>
+      <div className="module-tabs">
+        <button
+          className={`module-tab ${activeTab === "cases" ? "active" : ""}`}
+          onClick={() => setActiveTab("cases")}
+        >
+          Test Cases
+        </button>
+        <button
+          className={`module-tab ${activeTab === "data" ? "active" : ""}`}
+          onClick={() => setActiveTab("data")}
+        >
+          Test Data
+        </button>
+        <button
+          className={`module-tab ${activeTab === "bugs" ? "active" : ""}`}
+          onClick={() => setActiveTab("bugs")}
+        >
+          Bug Reports
+        </button>
+        <button
+          className={`module-tab ${activeTab === "framework" ? "active" : ""}`}
+          onClick={() => setActiveTab("framework")}
+        >
+          Automation Framework
+        </button>
+      </div>
 
-        <div className="autosave-toggle">
-          <label>
-            <input
-              type="checkbox"
-              checked={autosaveEnabled}
-              onChange={(e) => setAutosaveEnabled(e.target.checked)}
+      {activeTab === "cases" && (
+        <div className="page two-column">
+          <div className="left-panel">
+            <div className="theme-toggle">
+              <span>Theme</span>
+              <button
+                type="button"
+                className="theme-toggle-btn"
+                onClick={toggleTheme}
+              >
+                {theme === "dark" ? "🌙 Dark" : "☀️ Light"}
+              </button>
+            </div>
+
+            <ProviderSelector provider={provider} setProvider={setProvider} />
+
+            <div className="autosave-toggle">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={autosaveEnabled}
+                  onChange={(e) => setAutosaveEnabled(e.target.checked)}
+                />
+                Autosave
+              </label>
+            </div>
+
+            <InputPanel
+              input={input}
+              setInput={setInput}
+              context={context}
+              setContext={setContext}
+              onGenerate={onGenerate}
+              loading={loading}
             />
-            Autosave
-          </label>
-        </div>
 
-        <InputPanel
-          input={input}
-          setInput={setInput}
-          context={context}
-          setContext={setContext}
-          onGenerate={onGenerate}
-          loading={loading}
-        />
+            {autosaveStatus === "saved" && (
+              <div className="autosave-indicator">Draft saved</div>
+            )}
 
-        {autosaveStatus === "saved" && (
-          <div className="autosave-indicator">Draft saved</div>
-        )}
-
-        {lastSavedAt && (
-          <div className="autosave-timestamp">
-            Last saved at {new Date(lastSavedAt).toLocaleTimeString()}
+            {lastSavedAt && (
+              <div className="autosave-timestamp">
+                Last saved at {new Date(lastSavedAt).toLocaleTimeString()}
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      <div className="right-panel" ref={resultsRef}>
-        <ResultPanel
-          results={results}
-          clearResults={clearResults}
-          regenerateSingle={regenerateSingle}
-          loading={loading}
-        />
-      </div>
+          <div className="right-panel" ref={resultsRef}>
+            <ResultPanel
+              results={results}
+              setResults={setResults}
+              clearResults={clearResults}
+              regenerateSingle={regenerateSingle}
+              loading={loading}
+            />
+          </div>
+        </div>
+      )}
 
-      <ScrollToTopButton targetRef={resultsRef} />
+      {activeTab === "data" && (
+        <div className="page single-column">
+          <TestDataGenerator provider={provider} setProvider={setProvider} />
+        </div>
+      )}
+
+      {activeTab === "bugs" && (
+        <div className="page single-column">
+          <BugReportGenerator provider={provider} setProvider={setProvider} />
+        </div>
+      )}
+
+      {activeTab === "framework" && (
+        <div className="page single-column">
+          <AutomationFrameworkGenerator />
+        </div>
+      )}
     </div>
   );
 }

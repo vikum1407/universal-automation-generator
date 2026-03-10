@@ -1,0 +1,12 @@
+{
+  "name": "qlitz",
+  "version": "1.0.0",
+  "description": "Qlitz CLI for generating autonomous API test frameworks",
+  "bin": {
+    "qlitz": "./qlitz.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "yargs": "^17.7.2"
+  }
+}

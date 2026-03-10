@@ -7,6 +7,7 @@ import HistoryPage from "./HistoryPage";
 import SettingsPage from "./SettingsPage";
 import ConfigManagerPage from "./pages/ConfigManager/ConfigManagerPage";
 import TestCaseGeneratorPage from "./pages/TestCaseGeneratorPage";
+import UiScannerPage from "./pages/UiScannerPage";
 
 import TopBar from "./TopBar";
 import { ToastProvider } from "./ToastContext";
@@ -56,7 +57,6 @@ export default function App() {
   return (
     <ToastProvider>
       <BrowserRouter>
-        {/* 🔥 REQUIRED for toast notifications */}
         <Toaster position="top-right" />
 
         <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
@@ -84,6 +84,11 @@ export default function App() {
                 <Route
                   path="/ai-test-generator"
                   element={<TestCaseGeneratorPage />}
+                />
+
+                <Route
+                  path="/ui-scanner"
+                  element={<UiScannerPage />}
                 />
               </Routes>
             </div>
@@ -175,6 +180,15 @@ function Sidebar({ collapsed, toggleSidebar }) {
         onMouseLeave={(e) => Object.assign(e.target.style, itemStyle)}
       >
         🤖 {!collapsed && "AI Test Generator"}
+      </Link>
+
+      <Link
+        to="/ui-scanner"
+        style={{ ...itemStyle, ...iconOnly }}
+        onMouseEnter={(e) => Object.assign(e.target.style, itemHover)}
+        onMouseLeave={(e) => Object.assign(e.target.style, itemStyle)}
+      >
+        🕸 {!collapsed && "UI Scanner"}
       </Link>
 
       <Link
