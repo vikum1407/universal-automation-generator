@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 export interface UIScanNode {
   pageUrl: string;

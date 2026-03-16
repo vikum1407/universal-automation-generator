@@ -1,0 +1,23 @@
+{
+  "id": "run_1773516925782",
+  "project": "qlitz-demo",
+  "timestamp": "2026-03-14T19:35:25.782Z",
+  "rtm": null,
+  "execution": {
+    "project": "qlitz-demo",
+    "timestamp": 1773516925781,
+    "results": [],
+    "summary": {
+      "passed": 0,
+      "failed": 0,
+      "total": 0
+    },
+    "raw": {
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "analytics": null,
+  "insights": null,
+  "releaseReadinessScore": 0
+}

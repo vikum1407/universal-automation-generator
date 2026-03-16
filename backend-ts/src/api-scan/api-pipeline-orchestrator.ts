@@ -9,7 +9,10 @@ export class APIPipelineOrchestrator {
   private requirementGen = new APIRequirementGenerator();
   private writer = new APITestWriter();
 
-  async run(url: string, outputDir: string): Promise<RTMDocument> {
+  async run(url: string, outputDir: string): Promise<any> {
+    const pipelineStart = Date.now();
+    console.log(`[API] Starting API pipeline for ${url}`);
+
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext();
     const page = await context.newPage();
@@ -33,12 +36,13 @@ export class APIPipelineOrchestrator {
       }
     });
 
+    const captureStart = Date.now();
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForTimeout(2000);
-
     await browser.close();
+    const captureMs = Date.now() - captureStart;
+    console.log(`[API] Captured ${calls.length} API call(s) in ${captureMs} ms`);
 
-    // Convert raw calls → Requirement[]
     const apiRequirements: Requirement[] = calls.map((call, index) => ({
       id: `API-${index + 1}`,
       page: url,
@@ -54,14 +58,45 @@ export class APIPipelineOrchestrator {
 
     if (apiRequirements.length > 0) {
       this.writer.writeTests(apiRequirements, outputDir);
+      console.log('[API] API tests written');
     }
 
-    const rtm: RTMDocument = {
+    const rtmPath = path.join(outputDir, 'rtm.json');
+    let existingRtm: RTMDocument | null = null;
+
+    if (fs.existsSync(rtmPath)) {
+      existingRtm = JSON.parse(fs.readFileSync(rtmPath, 'utf-8'));
+    }
+
+    const mergedRtm: RTMDocument = {
       generatedAt: new Date().toISOString(),
-      requirements: apiRequirements
+      requirements: [
+        ...(existingRtm?.requirements ?? []),
+        ...apiRequirements
+      ]
     };
 
-    return rtm;
+    fs.writeFileSync(rtmPath, JSON.stringify(mergedRtm, null, 2));
+    console.log(`[API] RTM updated at ${rtmPath}`);
+
+    const totalMs = Date.now() - pipelineStart;
+    console.log(`[API] API pipeline completed in ${totalMs} ms`);
+
+    return {
+      status: 'success',
+      pipeline: 'api',
+      generatedAt: mergedRtm.generatedAt,
+      timings: {
+        totalMs,
+        captureMs
+      },
+      artifacts: {
+        outputDir,
+        rtm: rtmPath,
+        apiTestsDir: outputDir // your writer decides exact subfolder; this keeps it generic
+      },
+      requirements: mergedRtm.requirements
+    };
   }
 
   private ensureProject(outputDir: string) {

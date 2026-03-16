@@ -21,10 +21,16 @@ export class UIPipelineOrchestrator {
   private hybridGen = new FlowHybridTestGenerator();
   private hybridWriter = new HybridFlowTestWriter();
 
-  async run(startUrl: string, outputDir: string): Promise<RTMDocument> {
+  async run(startUrl: string, outputDir: string): Promise<any> {
+    const pipelineStart = Date.now();
     this.ensureProject(outputDir);
 
-    const crawledPages = await this.crawler.crawl(startUrl, 1);
+    console.log(`[UI] Starting UI pipeline for ${startUrl} (multi-page, depth=3, hybrid auto-login)`);
+
+    const crawlStart = Date.now();
+    const crawledPages = await this.crawler.crawl(startUrl, 3, 30);
+    const crawlMs = Date.now() - crawlStart;
+    console.log(`[UI] Crawled ${crawledPages.length} page(s) in ${crawlMs} ms`);
 
     const pagesDir = path.join(outputDir, 'pages');
     fs.mkdirSync(pagesDir, { recursive: true });
@@ -35,9 +41,9 @@ export class UIPipelineOrchestrator {
     });
 
     const allNodes = [];
-
     const allRequirements: Requirement[] = [];
 
+    const extractStart = Date.now();
     for (const page of crawledPages) {
       const nodes = this.extractor.extract(page.html, page.url);
       allNodes.push(...nodes);
@@ -69,25 +75,65 @@ export class UIPipelineOrchestrator {
         this.writer.writeTests(normalizedForWriter, outputDir);
       }
     }
+    const extractMs = Date.now() - extractStart;
+    console.log(`[UI] Extracted nodes + requirements in ${extractMs} ms`);
 
+    const flowStart = Date.now();
     const flowGraph = this.flowBuilder.build(crawledPages, allNodes);
+    const flowGraphPath = path.join(outputDir, 'flow-graph.json');
+    fs.writeFileSync(flowGraphPath, JSON.stringify(flowGraph, null, 2));
+    const flowMs = Date.now() - flowStart;
+    console.log(`[UI] Flow graph written to ${flowGraphPath} in ${flowMs} ms`);
 
-    fs.writeFileSync(
-      path.join(outputDir, 'flow-graph.json'),
-      JSON.stringify(flowGraph, null, 2)
-    );
-
+    const hybridStart = Date.now();
     const hybridFlows = this.hybridGen.generate(flowGraph, allNodes);
     if (hybridFlows.length > 0) {
       this.hybridWriter.writeTests(hybridFlows, outputDir);
+      console.log(`[UI] Hybrid-ready flows generated: ${hybridFlows.length}`);
     }
+    const hybridMs = Date.now() - hybridStart;
 
     const rtm: RTMDocument = {
       generatedAt: new Date().toISOString(),
       requirements: allRequirements
     };
 
-    return rtm;
+    const rtmPath = path.join(outputDir, 'rtm.json');
+    fs.writeFileSync(rtmPath, JSON.stringify(rtm, null, 2));
+    console.log(`[UI] RTM written to ${rtmPath}`);
+
+    const totalMs = Date.now() - pipelineStart;
+    console.log(`[UI] UI pipeline completed in ${totalMs} ms`);
+
+    const uniquePages = new Set(crawledPages.map(p => p.url)).size;
+    const transitionsDetected = flowGraph.edges.length;
+
+    return {
+      status: 'success',
+      pipeline: 'ui',
+      generatedAt: rtm.generatedAt,
+      timings: {
+        totalMs,
+        crawlMs,
+        extractMs,
+        flowMs,
+        hybridMs
+      },
+      stats: {
+        pagesCrawled: crawledPages.length,
+        uniquePages,
+        depthUsed: 3,
+        transitionsDetected
+      },
+      artifacts: {
+        outputDir,
+        pagesDir,
+        rtm: rtmPath,
+        flowGraph: flowGraphPath,
+        uiTestsDir: path.join(outputDir, 'ui-tests')
+      },
+      requirements: rtm.requirements
+    };
   }
 
   private ensureProject(outputDir: string) {

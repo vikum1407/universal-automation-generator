@@ -1,23 +1,22 @@
 import { Module } from '@nestjs/common';
-import { APIScanController } from './api-scan/api-scan.controller';
-import { UIScanController } from './ui-scan/ui-scan.controller';
-import { ExecutionController } from './execution/execution.controller';
-import { RTMController } from './rtm/rtm.controller';
-import { EnhanceController } from './enhance/enhance.controller';
-import { UIGenerateController } from './ui-scan/ui-generate.controller';
-import { UIRunController } from './ui-scan/ui-run.controller';
+
+import { OrchestratorModule } from './orchestrator/orchestrator.module';
+import { RTMModule } from './rtm/rtm.module';
+import { HistoryModule } from './history/history.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { ExecutionModule } from './execution/execution.module';
+
 import { UIFlowOrchestrator } from './ui-scan/ui-flow-orchestrator';
 
 @Module({
-  controllers: [
-    UIScanController,
-    APIScanController,
-    ExecutionController,
-    RTMController,
-    EnhanceController,
-    UIGenerateController,
-    UIRunController
+  imports: [
+    OrchestratorModule,
+    RTMModule,
+    HistoryModule,
+    DashboardModule,
+    ExecutionModule
   ],
+  controllers: [],   
   providers: [
     UIFlowOrchestrator
   ],

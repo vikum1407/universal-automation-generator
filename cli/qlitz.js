@@ -12,7 +12,7 @@ const { generateApiFramework } = require('./commands/generate-api-framework');
 const { generateFramework } = require('./commands/generate-framework');
 
 const { hybridRun } = require('./commands/hybrid-run');
-const { runUi } = require('./commands/run-ui');   // ✅ MISSING COMMAND ADDED
+const { runUi } = require('./commands/run-ui');  
 
 const { generateDashboard } = require('./dashboard');
 const { enhance } = require('./enhance');

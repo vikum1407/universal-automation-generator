@@ -1,16 +1,23 @@
 export interface Requirement {
+  // Unique ID for the requirement
   id: string;
+
+  // UI: page name | API: endpoint path
   page: string;
+
+  // Human-readable description
   description: string;
+
+  // Optional CSS selector (UI only)
   selector?: string;
 
-  // UI or API requirement
+  // Requirement type
   type: 'ui' | 'api';
 
-  // NEW: semantic UI action (click, login, add-to-cart, etc.)
+  // Optional semantic UI action (click, login, add-to-cart, etc.)
   action?: string;
 
-  // Traceability
+  // Test cases that cover this requirement
   coveredBy?: string[];
 
   // Source of requirement
@@ -27,7 +34,7 @@ export interface Requirement {
     }[];
   };
 
-  // API fields
+  // API-specific fields
   method?: string;
   url?: string;
   requestBody?: any;

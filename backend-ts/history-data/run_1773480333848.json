@@ -1,0 +1,96 @@
+{
+  "id": "run_1773480333848",
+  "project": "my-app",
+  "timestamp": "2026-03-14T09:25:33.848Z",
+  "rtm": {
+    "requirements": [
+      {
+        "id": "REQ-1",
+        "type": "ui",
+        "page": "LoginPage",
+        "coveredBy": [
+          "TC-1"
+        ],
+        "aiLogic": {
+          "steps": [
+            "Open login page"
+          ],
+          "assertions": [
+            "Verify login button visible"
+          ]
+        }
+      },
+      {
+        "id": "REQ-2",
+        "type": "api",
+        "url": "/api/login",
+        "coveredBy": [],
+        "aiLogic": {
+          "steps": [],
+          "assertions": []
+        }
+      }
+    ]
+  },
+  "execution": {
+    "results": [
+      {
+        "requirementId": "REQ-1",
+        "status": "passed"
+      },
+      {
+        "requirementId": "REQ-2",
+        "status": "failed"
+      }
+    ]
+  },
+  "analytics": {
+    "coverage": {
+      "totalRequirements": 2,
+      "covered": 1,
+      "uncovered": 1,
+      "coveragePercent": 50,
+      "uiTotal": 1,
+      "uiCovered": 1,
+      "uiCoveragePercent": 100,
+      "apiTotal": 1,
+      "apiCovered": 0,
+      "apiCoveragePercent": 0,
+      "aiEnrichedCount": 1
+    },
+    "execution": {
+      "hasExecution": true,
+      "totalExecuted": 2,
+      "passed": 1,
+      "failed": 1,
+      "notExecuted": 0,
+      "executionPercent": 100,
+      "flakyCandidates": []
+    },
+    "highRiskAreas": [
+      {
+        "id": "api:/api/login",
+        "label": "/api/login",
+        "type": "api",
+        "uncoveredCount": 1,
+        "failingCount": 1
+      }
+    ]
+  },
+  "insights": {
+    "executiveSummary": "Total requirements: 2. Coverage is 50.0%. Execution completion is 100.0%. Identified 1 high‑risk areas requiring attention.",
+    "coverageNarrative": "UI coverage is 100.0% (1/1). API coverage is 0.0% (0/1). 1 requirements are not covered by any test cases. 1 requirements include AI‑generated logic.",
+    "executionNarrative": "1 tests passed and 1 failed. 0 requirements have no execution results. No flaky tests detected.",
+    "riskNarrative": "High‑risk areas include: /api/login (1 uncovered, 1 failing).",
+    "recommendations": [
+      "Add test cases for the 1 uncovered requirements.",
+      "Investigate and fix the 1 failing tests.",
+      "Prioritize high‑risk areas such as /api/login."
+    ],
+    "priorityList": [
+      "Add missing tests for /api/login.",
+      "Fix failing tests in /api/login."
+    ]
+  },
+  "releaseReadinessScore": 58
+}
