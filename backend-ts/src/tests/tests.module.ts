@@ -1,31 +1,24 @@
 import { Module } from '@nestjs/common';
-
 import { TestsController } from './tests.controller';
-
-// Generators
+import { TestRunService } from './test-run.service';
 import { FrameworkGenerationOrchestrator } from '../generator/framework-generation-orchestrator';
 import { UnifiedTestCaseGenerator } from '../generator/unified-test-case-generator';
 
-// Ingestion orchestrator
-import { IngestionOrchestrator } from '../orchestrator/ingestion-orchestrator';
-
-// Correct module names
 import { UIScanModule } from '../ui-scan/ui-scan.module';
 import { APIScanModule } from '../api-scan/api-scan.module';
+import { OrchestratorModule } from '../orchestrator/orchestrator.module';
 
 @Module({
   imports: [
-    UIScanModule,   // provides UiIngestionService
-    APIScanModule   // provides ApiIngestionService
+    UIScanModule,
+    APIScanModule,
+    OrchestratorModule
   ],
   controllers: [TestsController],
   providers: [
+    TestRunService,
     FrameworkGenerationOrchestrator,
-    UnifiedTestCaseGenerator,
-    IngestionOrchestrator
-  ],
-  exports: [
-    FrameworkGenerationOrchestrator
+    UnifiedTestCaseGenerator
   ]
 })
 export class TestsModule {}
