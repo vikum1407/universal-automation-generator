@@ -13,14 +13,14 @@ html {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Global text color inheritance */
+/* Global text color */
 body {
   @apply text-gray-900 dark:text-slate-200;
 }
 
-/* Dark mode base background */
-.dark html,
-.dark body {
+/* Dark mode background */
+html.dark,
+body.dark {
   background-color: #0f172a; /* slate-900 */
   color: #e2e8f0; /* slate-200 */
 }

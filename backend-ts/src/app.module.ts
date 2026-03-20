@@ -7,6 +7,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { ExecutionModule } from './execution/execution.module';
 
 import { UIFlowOrchestrator } from './ui-scan/ui-flow-orchestrator';
+import { TestsModule } from './tests/tests.module';
 
 @Module({
   imports: [
@@ -14,11 +15,10 @@ import { UIFlowOrchestrator } from './ui-scan/ui-flow-orchestrator';
     RTMModule,
     HistoryModule,
     DashboardModule,
-    ExecutionModule
+    ExecutionModule,
+    TestsModule   // <-- ADD THIS
   ],
-  controllers: [],   
-  providers: [
-    UIFlowOrchestrator
-  ],
+  controllers: [],
+  providers: [UIFlowOrchestrator],
 })
 export class AppModule {}

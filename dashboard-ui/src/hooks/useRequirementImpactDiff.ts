@@ -1,0 +1,61 @@
+import { useStabilitySnapshot } from "../hooks/useStabilitySnapshot";
+import type {
+  RequirementStability,
+  HealingSignal,
+  ExecutionSummary,
+} from "../types/StabilitySnapshot";
+
+export function useRequirementImpactDiff(
+  project: string,
+  runA: string,
+  runB: string
+) {
+  const { data, loading, error } = useStabilitySnapshot(project);
+
+  if (loading || error || !data) {
+    return { impact: null, loading, error };
+  }
+
+  const runs = data.executions ?? [];
+  const a: ExecutionSummary | undefined = runs.find((r) => r.runId === runA);
+  const b: ExecutionSummary | undefined = runs.find((r) => r.runId === runB);
+
+  if (!a || !b) {
+    return { impact: null, loading, error };
+  }
+
+  const requirements: RequirementStability[] = data.requirements ?? [];
+  const healingSignals: HealingSignal[] = data.selfHealing ?? [];
+
+  const unstableA = new Set(
+    requirements.filter((r) => r.status === "unstable").map((r) => r.requirementId)
+  );
+
+  const unstableB = new Set(
+    requirements.filter((r) => r.status === "unstable").map((r) => r.requirementId)
+  );
+
+  const riskyA = new Set(
+    requirements.filter((r) => r.status === "risky").map((r) => r.requirementId)
+  );
+
+  const riskyB = new Set(
+    requirements.filter((r) => r.status === "risky").map((r) => r.requirementId)
+  );
+
+  const becameUnstable = [...unstableB].filter((id) => !unstableA.has(id));
+  const becameStable = [...unstableA].filter((id) => !unstableB.has(id));
+
+  const becameRisky = [...riskyB].filter((id) => !riskyA.has(id));
+  const recoveredFromRisk = [...riskyA].filter((id) => !riskyB.has(id));
+
+  const impact = {
+    becameUnstable,
+    becameStable,
+    becameRisky,
+    recoveredFromRisk,
+    healingSignals,
+  };
+
+  return { impact, loading, error };
+}

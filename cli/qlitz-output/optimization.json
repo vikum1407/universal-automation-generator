@@ -1,0 +1,1673 @@
+{
+  "testPlan": [
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourneysAll generated user journeys\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourneysAll generated user journeys\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourneysAll generated user journeys\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourneysAll generated user journeys\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Journeys\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Journeys\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Journeys\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Journeys\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Clusters\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Clusters\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Clusters\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Clusters\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Insights\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Insights\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Insights\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Insights\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Analytics\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Analytics\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Analytics\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Analytics\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Graph\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Graph\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Graph\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Graph\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Timeline\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Timeline\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Timeline\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Timeline\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Trends\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Trends\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Trends\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Trends\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Insights\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Insights\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Insights\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Execution Insights\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Readiness\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Readiness\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Readiness\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Readiness\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Heatmap\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Heatmap\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Heatmap\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Heatmap\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Story\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Story\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Story\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can navigate using link \"Release Story\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"Dark Mode\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"Dark Mode\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"Dark Mode\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"Dark Mode\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourney ClustersGrouped by similarity and intent\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourney ClustersGrouped by similarity and intent\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourney ClustersGrouped by similarity and intent\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourney ClustersGrouped by similarity and intent\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeInsightsAI‑generated QA insights\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeInsightsAI‑generated QA insights\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeInsightsAI‑generated QA insights\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeInsightsAI‑generated QA insights\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeAnalyticsRisk distribution and journey coverage insightsTotal Journeys0Risk DistributionP00 (0%)P10 (0%)P20 (0%)Unique Pages & Transitions0 pages0 transitions0 journeys in mapPage FrequencyNo page data available.Transition FrequencyNo transition data available.\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeAnalyticsRisk distribution and journey coverage insightsTotal Journeys0Risk DistributionP00 (0%)P10 (0%)P20 (0%)Unique Pages & Transitions0 pages0 transitions0 journeys in mapPage FrequencyNo page data available.Transition FrequencyNo transition data available.\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeAnalyticsRisk distribution and journey coverage insightsTotal Journeys0Risk DistributionP00 (0%)P10 (0%)P20 (0%)Unique Pages & Transitions0 pages0 transitions0 journeys in mapPage FrequencyNo page data available.Transition FrequencyNo transition data available.\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeAnalyticsRisk distribution and journey coverage insightsTotal Journeys0Risk DistributionP00 (0%)P10 (0%)P20 (0%)Unique Pages & Transitions0 pages0 transitions0 journeys in mapPage FrequencyNo page data available.Transition FrequencyNo transition data available.\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourney GraphCluster intelligence, comparison, AI summaries, recommendations, heatmaps, evolution, story mode, release intelligence, risk trends, flow evolution, anomaly detection, predictive risk forecasting & self‑healing transitions✦ Explain✦ RecommendJourney AJourney B⇄ CompareSelect Cluster✦ Analyze Cluster✦ EvolutionHeatmap: NoneChange IntensityRisk VolatilityCluster DriftTransition Fluctuation✦ Story Mode✦ Release Diff✦ Detect AnomaliesHeal Transitions▶ Play❚❚ Pause► Resume↺ Restart0.5×1×1.5×2×3×Evolution Timeline\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourney GraphCluster intelligence, comparison, AI summaries, recommendations, heatmaps, evolution, story mode, release intelligence, risk trends, flow evolution, anomaly detection, predictive risk forecasting & self‑healing transitions✦ Explain✦ RecommendJourney AJourney B⇄ CompareSelect Cluster✦ Analyze Cluster✦ EvolutionHeatmap: NoneChange IntensityRisk VolatilityCluster DriftTransition Fluctuation✦ Story Mode✦ Release Diff✦ Detect AnomaliesHeal Transitions▶ Play❚❚ Pause► Resume↺ Restart0.5×1×1.5×2×3×Evolution Timeline\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourney GraphCluster intelligence, comparison, AI summaries, recommendations, heatmaps, evolution, story mode, release intelligence, risk trends, flow evolution, anomaly detection, predictive risk forecasting & self‑healing transitions✦ Explain✦ RecommendJourney AJourney B⇄ CompareSelect Cluster✦ Analyze Cluster✦ EvolutionHeatmap: NoneChange IntensityRisk VolatilityCluster DriftTransition Fluctuation✦ Story Mode✦ Release Diff✦ Detect AnomaliesHeal Transitions▶ Play❚❚ Pause► Resume↺ Restart0.5×1×1.5×2×3×Evolution Timeline\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeJourney GraphCluster intelligence, comparison, AI summaries, recommendations, heatmaps, evolution, story mode, release intelligence, risk trends, flow evolution, anomaly detection, predictive risk forecasting & self‑healing transitions✦ Explain✦ RecommendJourney AJourney B⇄ CompareSelect Cluster✦ Analyze Cluster✦ EvolutionHeatmap: NoneChange IntensityRisk VolatilityCluster DriftTransition Fluctuation✦ Story Mode✦ Release Diff✦ Detect AnomaliesHeal Transitions▶ Play❚❚ Pause► Resume↺ Restart0.5×1×1.5×2×3×Evolution Timeline\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Explain\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Explain\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Explain\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Explain\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Recommend\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Recommend\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Recommend\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Recommend\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Journey A\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Journey A\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Journey A\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Journey A\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Journey B\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Journey B\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Journey B\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Journey B\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"⇄ Compare\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"⇄ Compare\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"⇄ Compare\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"⇄ Compare\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Select Cluster\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Select Cluster\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Select Cluster\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Select Cluster\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Analyze Cluster\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Analyze Cluster\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Analyze Cluster\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Analyze Cluster\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Evolution\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Evolution\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Evolution\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Evolution\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Heatmap: NoneChange IntensityRisk VolatilityCluster DriftTransition Fluctuation\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Heatmap: NoneChange IntensityRisk VolatilityCluster DriftTransition Fluctuation\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Heatmap: NoneChange IntensityRisk VolatilityCluster DriftTransition Fluctuation\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"Heatmap: NoneChange IntensityRisk VolatilityCluster DriftTransition Fluctuation\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Story Mode\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Story Mode\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Story Mode\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Story Mode\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Release Diff\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Release Diff\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Release Diff\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Release Diff\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Detect Anomalies\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Detect Anomalies\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Detect Anomalies\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"✦ Detect Anomalies\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"Heal Transitions\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"Heal Transitions\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"Heal Transitions\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"Heal Transitions\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"▶ Play\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"▶ Play\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"▶ Play\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"▶ Play\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"❚❚ Pause\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"❚❚ Pause\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"❚❚ Pause\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"❚❚ Pause\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"► Resume\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"► Resume\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"► Resume\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"► Resume\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"↺ Restart\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"↺ Restart\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"↺ Restart\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can click \"↺ Restart\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"0.5×1×1.5×2×3×\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"0.5×1×1.5×2×3×\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"0.5×1×1.5×2×3×\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can select an option using \"0.5×1×1.5×2×3×\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can type into \"input[type=\"range\"]\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can type into \"input[type=\"range\"]\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can type into \"input[type=\"range\"]\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can type into \"input[type=\"range\"]\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"#cluster-legend\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"#cluster-legend\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"#cluster-legend\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"#cluster-legend\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution TimelineLoading...\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution TimelineLoading...\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution TimelineLoading...\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution TimelineLoading...\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution TrendsLoading...\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution TrendsLoading...\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution TrendsLoading...\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution TrendsLoading...\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution InsightsNo insights available.\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution InsightsNo insights available.\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution InsightsNo insights available.\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeExecution InsightsNo insights available.\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeNo release readiness data available.\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeNo release readiness data available.\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeNo release readiness data available.\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeNo release readiness data available.\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeNo heatmap data available.\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeNo heatmap data available.\" - negative: invalid credentials",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeNo heatmap data available.\" - negative: add to cart without inventory",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "User can interact with \"Qlitz DashboardJourneysClustersInsightsAnalyticsGraphExecution TimelineExecution TrendsExecution InsightsRelease ReadinessRelease HeatmapRelease StoryQlitzDark ModeNo heatmap data available.\" - negative: checkout with missing data",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173 to http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/clusters to http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/insights to http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/analytics to http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/graph to http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution to http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/trends to http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/execution/insights to http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release to http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Navigate from http://localhost:5173/release/heatmap to http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Journeys\" → User can navigate using link \"Journeys\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Clusters\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Journeys\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Insights\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Analytics\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Graph\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Execution Timeline\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Execution Trends\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Execution Insights\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Release Readiness\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Release Heatmap\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Release Story\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Insights\" → User can navigate using link \"Insights\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Analytics\" → User can navigate using link \"Analytics\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Graph\" → User can navigate using link \"Graph\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Execution Timeline\" → User can navigate using link \"Execution Timeline\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Execution Trends\" → User can navigate using link \"Execution Trends\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Execution Insights\" → User can navigate using link \"Execution Insights\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Release Readiness\" → User can navigate using link \"Release Readiness\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Release Heatmap\" → User can navigate using link \"Release Heatmap\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Journey: User can navigate using link \"Release Story\" → User can navigate using link \"Release Story\"",
+      "priority": 3,
+      "reason": "Default priority."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Journeys\" → User can navigate using link \"Journeys\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Clusters\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Journeys\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Insights\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Analytics\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Graph\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Execution Timeline\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Execution Trends\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Execution Insights\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Release Readiness\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Release Heatmap\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Clusters\" → User can navigate using link \"Release Story\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Insights\" → User can navigate using link \"Insights\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Analytics\" → User can navigate using link \"Analytics\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Graph\" → User can navigate using link \"Graph\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Execution Timeline\" → User can navigate using link \"Execution Timeline\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Execution Trends\" → User can navigate using link \"Execution Trends\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Execution Insights\" → User can navigate using link \"Execution Insights\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Release Readiness\" → User can navigate using link \"Release Readiness\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Release Heatmap\" → User can navigate using link \"Release Heatmap\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "Scenario for Journey: User can navigate using link \"Release Story\" → User can navigate using link \"Release Story\"",
+      "priority": 3,
+      "reason": "Stable scenario."
+    },
+    {
+      "title": "State invariants for http://localhost:5173",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/journeys",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/clusters",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/analytics",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/graph",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/execution",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/execution/trends",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/execution/insights",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/release",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/release/heatmap",
+      "priority": 3,
+      "reason": "Stable state."
+    },
+    {
+      "title": "State invariants for http://localhost:5173/release/story",
+      "priority": 3,
+      "reason": "Stable state."
+    }
+  ],
+  "driftHotspots": [],
+  "explorationPlan": {
+    "targetUrls": [],
+    "maxDepth": 2,
+    "maxPages": 10,
+    "maxActionsPerPage": 10
+  },
+  "selectorEvolutionPlan": [],
+  "prunedScenarios": []
+}

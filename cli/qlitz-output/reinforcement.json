@@ -1,0 +1,2184 @@
+{
+  "selectors": [
+    {
+      "requirementId": "UI-1",
+      "selector": "#root",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.393Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-2",
+      "selector": "a:has-text(\"Journeys\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.393Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-3",
+      "selector": "a:has-text(\"Clusters\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.393Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-4",
+      "selector": "a:has-text(\"Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.393Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-5",
+      "selector": "a:has-text(\"Analytics\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.393Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-6",
+      "selector": "a:has-text(\"Graph\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.393Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-7",
+      "selector": "a:has-text(\"Execution Timeline\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.393Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-8",
+      "selector": "a:has-text(\"Execution Trends\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.393Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-9",
+      "selector": "a:has-text(\"Execution Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.393Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-10",
+      "selector": "a:has-text(\"Release Readiness\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.393Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-11",
+      "selector": "a:has-text(\"Release Heatmap\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-12",
+      "selector": "a:has-text(\"Release Story\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-13",
+      "selector": "button:has-text(\"Dark Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-27",
+      "selector": "#root",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-28",
+      "selector": "a:has-text(\"Journeys\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-29",
+      "selector": "a:has-text(\"Clusters\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-30",
+      "selector": "a:has-text(\"Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-31",
+      "selector": "a:has-text(\"Analytics\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-32",
+      "selector": "a:has-text(\"Graph\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-33",
+      "selector": "a:has-text(\"Execution Timeline\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-34",
+      "selector": "a:has-text(\"Execution Trends\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-35",
+      "selector": "a:has-text(\"Execution Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-36",
+      "selector": "a:has-text(\"Release Readiness\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-37",
+      "selector": "a:has-text(\"Release Heatmap\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-38",
+      "selector": "a:has-text(\"Release Story\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-39",
+      "selector": "button:has-text(\"Dark Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-40",
+      "selector": "#root",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-41",
+      "selector": "a:has-text(\"Journeys\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-42",
+      "selector": "a:has-text(\"Clusters\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-43",
+      "selector": "a:has-text(\"Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-44",
+      "selector": "a:has-text(\"Analytics\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-45",
+      "selector": "a:has-text(\"Graph\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-46",
+      "selector": "a:has-text(\"Execution Timeline\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-47",
+      "selector": "a:has-text(\"Execution Trends\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-48",
+      "selector": "a:has-text(\"Execution Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-49",
+      "selector": "a:has-text(\"Release Readiness\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-50",
+      "selector": "a:has-text(\"Release Heatmap\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-51",
+      "selector": "a:has-text(\"Release Story\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-52",
+      "selector": "button:has-text(\"Dark Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-53",
+      "selector": "#root",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-54",
+      "selector": "a:has-text(\"Journeys\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-55",
+      "selector": "a:has-text(\"Clusters\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-56",
+      "selector": "a:has-text(\"Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-57",
+      "selector": "a:has-text(\"Analytics\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-58",
+      "selector": "a:has-text(\"Graph\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-59",
+      "selector": "a:has-text(\"Execution Timeline\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-60",
+      "selector": "a:has-text(\"Execution Trends\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-61",
+      "selector": "a:has-text(\"Execution Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-62",
+      "selector": "a:has-text(\"Release Readiness\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-63",
+      "selector": "a:has-text(\"Release Heatmap\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-64",
+      "selector": "a:has-text(\"Release Story\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-65",
+      "selector": "button:has-text(\"Dark Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-66",
+      "selector": "#root",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-67",
+      "selector": "a:has-text(\"Journeys\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-68",
+      "selector": "a:has-text(\"Clusters\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-69",
+      "selector": "a:has-text(\"Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-70",
+      "selector": "a:has-text(\"Analytics\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-71",
+      "selector": "a:has-text(\"Graph\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-72",
+      "selector": "a:has-text(\"Execution Timeline\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-73",
+      "selector": "a:has-text(\"Execution Trends\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-74",
+      "selector": "a:has-text(\"Execution Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-75",
+      "selector": "a:has-text(\"Release Readiness\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-76",
+      "selector": "a:has-text(\"Release Heatmap\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-77",
+      "selector": "a:has-text(\"Release Story\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.394Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-78",
+      "selector": "button:has-text(\"Dark Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-79",
+      "selector": "button:has-text(\"✦ Explain\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-80",
+      "selector": "button:has-text(\"✦ Recommend\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-81",
+      "selector": "select:has-text(\"Journey A\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-82",
+      "selector": "select:has-text(\"Journey B\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-83",
+      "selector": "button:has-text(\"⇄ Compare\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-84",
+      "selector": "select:has-text(\"Select Cluster\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-85",
+      "selector": "button:has-text(\"✦ Analyze Cluster\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-86",
+      "selector": "button:has-text(\"✦ Evolution\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-87",
+      "selector": "select:has-text(\"Heatmap: NoneChange IntensityRisk VolatilityCluster DriftTransition Fluctuation\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-88",
+      "selector": "button:has-text(\"✦ Story Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-89",
+      "selector": "button:has-text(\"✦ Release Diff\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-90",
+      "selector": "button:has-text(\"✦ Detect Anomalies\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-91",
+      "selector": "button:has-text(\"Heal Transitions\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-92",
+      "selector": "button:has-text(\"▶ Play\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-93",
+      "selector": "button:has-text(\"❚❚ Pause\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-94",
+      "selector": "button:has-text(\"► Resume\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-95",
+      "selector": "button:has-text(\"↺ Restart\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-96",
+      "selector": "select:has-text(\"0.5×1×1.5×2×3×\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-97",
+      "selector": "input[type=\"range\"]",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-98",
+      "selector": "#cluster-legend",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-99",
+      "selector": "#root",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-100",
+      "selector": "a:has-text(\"Journeys\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-101",
+      "selector": "a:has-text(\"Clusters\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-102",
+      "selector": "a:has-text(\"Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-103",
+      "selector": "a:has-text(\"Analytics\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-104",
+      "selector": "a:has-text(\"Graph\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-105",
+      "selector": "a:has-text(\"Execution Timeline\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-106",
+      "selector": "a:has-text(\"Execution Trends\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-107",
+      "selector": "a:has-text(\"Execution Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-108",
+      "selector": "a:has-text(\"Release Readiness\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-109",
+      "selector": "a:has-text(\"Release Heatmap\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-110",
+      "selector": "a:has-text(\"Release Story\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-111",
+      "selector": "button:has-text(\"Dark Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-112",
+      "selector": "#root",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-113",
+      "selector": "a:has-text(\"Journeys\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-114",
+      "selector": "a:has-text(\"Clusters\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-115",
+      "selector": "a:has-text(\"Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-116",
+      "selector": "a:has-text(\"Analytics\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-117",
+      "selector": "a:has-text(\"Graph\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-118",
+      "selector": "a:has-text(\"Execution Timeline\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-119",
+      "selector": "a:has-text(\"Execution Trends\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-120",
+      "selector": "a:has-text(\"Execution Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-121",
+      "selector": "a:has-text(\"Release Readiness\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-122",
+      "selector": "a:has-text(\"Release Heatmap\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-123",
+      "selector": "a:has-text(\"Release Story\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-124",
+      "selector": "button:has-text(\"Dark Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-125",
+      "selector": "#root",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-126",
+      "selector": "a:has-text(\"Journeys\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-127",
+      "selector": "a:has-text(\"Clusters\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.395Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-128",
+      "selector": "a:has-text(\"Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.396Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-129",
+      "selector": "a:has-text(\"Analytics\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.396Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-130",
+      "selector": "a:has-text(\"Graph\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.396Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-131",
+      "selector": "a:has-text(\"Execution Timeline\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.396Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-132",
+      "selector": "a:has-text(\"Execution Trends\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.396Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-133",
+      "selector": "a:has-text(\"Execution Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.396Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-134",
+      "selector": "a:has-text(\"Release Readiness\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.396Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-135",
+      "selector": "a:has-text(\"Release Heatmap\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.396Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-136",
+      "selector": "a:has-text(\"Release Story\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-137",
+      "selector": "button:has-text(\"Dark Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-138",
+      "selector": "#root",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-139",
+      "selector": "a:has-text(\"Journeys\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-140",
+      "selector": "a:has-text(\"Clusters\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-141",
+      "selector": "a:has-text(\"Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-142",
+      "selector": "a:has-text(\"Analytics\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-143",
+      "selector": "a:has-text(\"Graph\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-144",
+      "selector": "a:has-text(\"Execution Timeline\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-145",
+      "selector": "a:has-text(\"Execution Trends\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-146",
+      "selector": "a:has-text(\"Execution Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-147",
+      "selector": "a:has-text(\"Release Readiness\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-148",
+      "selector": "a:has-text(\"Release Heatmap\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-149",
+      "selector": "a:has-text(\"Release Story\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-150",
+      "selector": "button:has-text(\"Dark Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-151",
+      "selector": "#root",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-152",
+      "selector": "a:has-text(\"Journeys\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-153",
+      "selector": "a:has-text(\"Clusters\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-154",
+      "selector": "a:has-text(\"Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-155",
+      "selector": "a:has-text(\"Analytics\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-156",
+      "selector": "a:has-text(\"Graph\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-157",
+      "selector": "a:has-text(\"Execution Timeline\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-158",
+      "selector": "a:has-text(\"Execution Trends\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-159",
+      "selector": "a:has-text(\"Execution Insights\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-160",
+      "selector": "a:has-text(\"Release Readiness\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-161",
+      "selector": "a:has-text(\"Release Heatmap\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-162",
+      "selector": "a:has-text(\"Release Story\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "requirementId": "UI-163",
+      "selector": "button:has-text(\"Dark Mode\")",
+      "failures": 0,
+      "successes": 1,
+      "lastUpdatedAt": "2026-03-14T16:35:39.397Z",
+      "lastOutcome": "passed"
+    }
+  ],
+  "scenarios": [
+    {
+      "scenarioId": "scenario-1",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-2",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-3",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-4",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-5",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-6",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-7",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-8",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-9",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-10",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-11",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-12",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-13",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-14",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-15",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-16",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-17",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-18",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-19",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-20",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-21",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-22",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-23",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-24",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-25",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-26",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-27",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-28",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-29",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-30",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-31",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-32",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-33",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-34",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-35",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-36",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-37",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-38",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-39",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-40",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-41",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-42",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.398Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-43",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-44",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-45",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-46",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-47",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-48",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-49",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-50",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-51",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-52",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-53",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-54",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-55",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-56",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-57",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-58",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-59",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-60",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-61",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-62",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-63",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-64",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-65",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-66",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-67",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-68",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-69",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-70",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-71",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-72",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-73",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-74",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-75",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-76",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-77",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-78",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-79",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-80",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-81",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-82",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-83",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-84",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-85",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-86",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-87",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.399Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-88",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-89",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-90",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-91",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-92",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-93",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-94",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-95",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-96",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-97",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-98",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-99",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-100",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-101",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-102",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-103",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-104",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-105",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-106",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-107",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-108",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-109",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "scenarioId": "scenario-110",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    }
+  ],
+  "states": [
+    {
+      "stateId": "state-1",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-2",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-3",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.400Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-4",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.401Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-5",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.401Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-6",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.401Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-7",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.401Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-8",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.401Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-9",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.401Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-10",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.401Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-11",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.401Z",
+      "lastOutcome": "passed"
+    },
+    {
+      "stateId": "state-12",
+      "failures": 0,
+      "successes": 1,
+      "driftScore": 0,
+      "lastUpdatedAt": "2026-03-14T16:35:39.401Z",
+      "lastOutcome": "passed"
+    }
+  ]
+}

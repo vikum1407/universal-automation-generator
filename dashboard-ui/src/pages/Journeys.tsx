@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { DashboardAPI } from "../api/dashboard";
 import { Card } from "../components/Card";
-import { PageHeader } from "../components/PageHeader";
 import { RiskBadge } from "../components/RiskBadge";
 
 interface Project {
@@ -22,11 +21,17 @@ export default function Journeys() {
   }, []);
 
   return (
-    <div>
-      <PageHeader title="Projects" subtitle="All tracked automation projects" />
+    <div className="space-y-6">
+
+      <div>
+        <h1 className="text-2xl font-semibold">Projects</h1>
+        <p className="text-gray-500 dark:text-slate-400">
+          All tracked automation projects
+        </p>
+      </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {projects.map(p => (
+        {projects.map((p) => (
           <Link key={p.id} to={`/journeys/${p.id}`}>
             <Card>
               <div className="flex justify-between items-center">

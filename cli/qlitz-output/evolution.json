@@ -1,0 +1,32 @@
+{
+  "history": [
+    {
+      "timestamp": "2026-03-14T16:35:39.444Z",
+      "reason": "Pipeline evolved based on failures=0, highPriorityTests=0, highRiskForecasts=0.",
+      "config": {
+        "maxDepth": 1,
+        "maxPages": 8,
+        "maxActionsPerPage": 8,
+        "enableExploration": true,
+        "enableJourneys": false,
+        "enableScenarios": false,
+        "enableStateGraph": false,
+        "enableOptimization": true,
+        "enableRegression": true,
+        "enableSelfRefactor": true
+      }
+    }
+  ],
+  "current": {
+    "maxDepth": 1,
+    "maxPages": 8,
+    "maxActionsPerPage": 8,
+    "enableExploration": true,
+    "enableJourneys": false,
+    "enableScenarios": false,
+    "enableStateGraph": false,
+    "enableOptimization": true,
+    "enableRegression": true,
+    "enableSelfRefactor": true
+  }
+}

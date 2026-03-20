@@ -1,12 +1,11 @@
-import { loadStabilityContext } from "./loadStabilityContext";
+import { Injectable } from "@nestjs/common";
+import { StabilityDataService } from "../data/stabilityData.service";
 
-export const loadStabilityScoreContext = async (project: string) => {
-  const guardrails = await loadStabilityContext(project);
+@Injectable()
+export class LoadStabilityScoreContext {
+  constructor(private readonly data: StabilityDataService) {}
 
-  return {
-    flakinessRate: 0,
-    avgRisk: 0,
-    healingEffectiveness: 0,
-    guardrails
-  };
-};
+  async execute(project: string) {
+    return this.data.loadStabilityScoreContext(project);
+  }
+}

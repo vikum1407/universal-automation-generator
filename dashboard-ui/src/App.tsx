@@ -20,6 +20,11 @@ import ReleaseRequirementDetails from "./pages/Release/RequirementExplorer/Relea
 import ReleaseSelfHealingOverview from "./pages/Release/SelfHealing/ReleaseSelfHealingOverview";
 import { ReleaseSelfHealingDetails } from "./pages/Release/SelfHealing/ReleaseSelfHealingDetails";
 
+import TestPage from "./pages/Release/test/TestPage";
+import DiffPage from "./pages/Release/test/DiffPage";
+import FlowPage from "./pages/Release/test/FlowPage";
+import SelectorPage from "./pages/Release/test/SelectorPage";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -40,7 +45,6 @@ export default function App() {
           <Route path="/release/heatmap" element={<ReleaseHeatmap />} />
           <Route path="/release/story" element={<ReleaseStory />} />
 
-          {/* C18 */}
           <Route
             path="/release/:project/requirements"
             element={<ReleaseRequirementExplorer />}
@@ -50,7 +54,6 @@ export default function App() {
             element={<ReleaseRequirementDetails />}
           />
 
-          {/* C19 */}
           <Route
             path="/release/:project/self-healing"
             element={<ReleaseSelfHealingOverview />}
@@ -59,6 +62,12 @@ export default function App() {
             path="/release/:project/self-healing/:suggestionId"
             element={<ReleaseSelfHealingDetails />}
           />
+
+          {/* TEST INTELLIGENCE ROUTES */}
+          <Route path="/release/test/:testId" element={<TestPage />} />
+          <Route path="/release/test/:testId/diff" element={<DiffPage />} />
+          <Route path="/release/test/:testId/flow" element={<FlowPage />} />
+          <Route path="/release/test/:testId/selectors" element={<SelectorPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
