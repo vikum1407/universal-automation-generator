@@ -16,7 +16,12 @@ const CRUMB_MAP: Record<string, { label: string; icon: string }> = {
 function formatCrumb(seg: string) {
   if (/^REQ/i.test(seg)) return { label: `Requirement ${seg}`, icon: "📄" };
   if (/^\d+$/.test(seg)) return { label: `Run ${seg}`, icon: "🔎" };
-  return CRUMB_MAP[seg] || { label: seg.charAt(0).toUpperCase() + seg.slice(1), icon: "📁" };
+  return (
+    CRUMB_MAP[seg] || {
+      label: seg.charAt(0).toUpperCase() + seg.slice(1),
+      icon: "📁"
+    }
+  );
 }
 
 export default function Breadcrumbs() {
@@ -30,23 +35,26 @@ export default function Breadcrumbs() {
   });
 
   return (
-    <nav className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-300">
-      <Link to="/" className="flex items-center gap-1 hover:underline">
+    <nav className="flex items-center gap-2 text-sm text-neutral-mid">
+      <Link to="/" className="flex items-center gap-1 hover:text-neutral-dark">
         <span className="text-base">🏠</span>
         <span className="font-medium">Qlitz</span>
       </Link>
 
       {crumbs.map((crumb, i) => (
         <div key={crumb.path} className="flex items-center gap-2">
-          <span className="text-gray-400">/</span>
+          <span className="text-neutral-light">/</span>
 
           {i === crumbs.length - 1 ? (
-            <span className="flex items-center gap-1 font-semibold">
+            <span className="flex items-center gap-1 font-semibold text-neutral-dark">
               <span>{crumb.icon}</span>
               <span>{crumb.label}</span>
             </span>
           ) : (
-            <Link to={crumb.path} className="flex items-center gap-1 hover:underline">
+            <Link
+              to={crumb.path}
+              className="flex items-center gap-1 hover:text-neutral-dark"
+            >
               <span>{crumb.icon}</span>
               <span>{crumb.label}</span>
             </Link>

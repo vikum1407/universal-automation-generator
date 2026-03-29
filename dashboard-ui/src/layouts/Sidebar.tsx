@@ -15,15 +15,16 @@ export default function Sidebar({
     <aside
       className={`
         fixed left-0 top-0 h-full z-30 flex flex-col
-        bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700
+        bg-[var(--card-bg)] border-r border-[var(--card-border)]
         transition-all duration-300
         ${open ? "w-64" : "w-20"}
       `}
     >
-      <div className="h-14 border-b dark:border-slate-700 flex items-center px-4 gap-3">
+      {/* HEADER */}
+      <div className="h-14 border-b border-[var(--card-border)] flex items-center px-4 gap-3">
         <button
           onClick={() => setOpen(!open)}
-          className="text-2xl px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700"
+          className="text-2xl px-2 py-1 rounded hover:bg-neutral-light dark:hover:bg-slate-700 transition"
         >
           ☰
         </button>
@@ -39,7 +40,8 @@ export default function Sidebar({
         </span>
       </div>
 
-      <div className="p-4 border-b dark:border-slate-700">
+      {/* PROJECT SELECTOR */}
+      <div className="p-4 border-b border-[var(--card-border)]">
         <div className="flex items-center gap-2">
           <span className="text-xl">📁</span>
 
@@ -47,7 +49,7 @@ export default function Sidebar({
             value={project}
             onChange={(e) => setProject(e.target.value)}
             className={`
-              bg-gray-100 dark:bg-slate-700 rounded px-2 py-1 text-sm w-full
+              bg-neutral-light dark:bg-slate-700 rounded px-2 py-1 text-sm w-full
               transition-opacity duration-300
               ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
             `}
@@ -61,6 +63,7 @@ export default function Sidebar({
         </div>
       </div>
 
+      {/* NAVIGATION */}
       <nav className="flex-1 p-3 space-y-2">
         <NavItem to="/journeys" label="Projects" icon="📁" open={open} />
 
@@ -71,12 +74,14 @@ export default function Sidebar({
         <NavItem to="/release" label="Release Readiness" icon="🚦" open={open} />
         <NavItem to="/release/heatmap" label="Release Heatmap" icon="🔥" open={open} />
         <NavItem to="/release/story" label="Release Story" icon="📘" open={open} />
+
         <NavItem
           to={`/release/${project}/requirements`}
           label="Requirements"
           icon="📋"
           open={open}
         />
+
         <NavItem
           to={`/release/${project}/self-healing`}
           label="Self‑Healing"
@@ -101,23 +106,28 @@ function NavItem({
 }) {
   const location = useLocation();
   const path = location.pathname.replace(/\/+$/, "");
-
-  // ✅ FIX: Simple exact match for all items — each tab highlights only itself
   const isActive = path === to;
 
   return (
     <Link
       to={to}
       className={`
-        group relative flex items-center gap-3 px-3 py-2 rounded transition border-l-4
+        group relative flex items-center gap-3 px-3 py-2 rounded-lg transition-all border-l-4
         ${
           isActive
-            ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-blue-500"
-            : "text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 border-transparent"
+            ? "bg-brand-primary/15 text-brand-primary border-brand-primary shadow-sm"
+            : "text-gray-700 dark:text-slate-300 hover:bg-neutral-light dark:hover:bg-slate-700 border-transparent"
         }
       `}
     >
-      <span className="text-xl">{icon}</span>
+      <span
+        className={`
+          text-xl transition-transform duration-200
+          ${isActive ? "scale-110" : "group-hover:scale-110"}
+        `}
+      >
+        {icon}
+      </span>
 
       <span
         className={`
@@ -132,7 +142,7 @@ function NavItem({
         <span
           className="
             absolute left-full ml-2 px-2 py-1 rounded bg-gray-800 text-white text-xs
-            opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap
+            opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap shadow-lg
           "
         >
           {label}
