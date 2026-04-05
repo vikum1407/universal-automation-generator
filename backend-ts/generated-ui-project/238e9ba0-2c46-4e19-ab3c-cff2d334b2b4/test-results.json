@@ -1,9 +1,0 @@
-{
-  "status": "failed",
-  "timestamp": "2026-04-05T11:01:46.717Z",
-  "failures": [
-    {
-      "message": "Error: No tests found\n\n"
-    }
-  ]
-}
