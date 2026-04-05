@@ -1,4 +1,4 @@
-import db from "../../core/db";
+import { db } from "../../core/db";
 import { SQL } from "./tests.sql";
 
 export const TestsRepository = {

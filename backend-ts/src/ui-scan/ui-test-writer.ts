@@ -42,11 +42,10 @@ export class UITestWriter {
     optimization?: GlobalOptimizationResult,
     regression?: RegressionMemory,
     rootCause?: RootCauseMemory
-  )
-: { name: string; content: string }[] {
+  ): { name: string; content: string }[] {
     if (!Array.isArray(requirements) || requirements.length === 0) return [];
 
-    const testsRoot = path.join(outputDir, 'ui-tests');
+    const testsRoot = outputDir;
     if (!fs.existsSync(testsRoot)) fs.mkdirSync(testsRoot, { recursive: true });
 
     const byPage: Record<string, RequirementLike[]> = {};

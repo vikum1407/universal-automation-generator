@@ -1,8 +1,19 @@
-export function Skeleton({ height }: { height: number }) {
+import React from "react";
+
+type SkeletonProps = React.HTMLAttributes<HTMLDivElement> & {
+  height: number;
+};
+
+export function Skeleton({ height, className = "", ...props }: SkeletonProps) {
   return (
     <div
-      className="w-full bg-neutral-light animate-pulse rounded-card"
-      style={{ height }}
+      {...props}
+      className={`
+        animate-pulse rounded-card
+        bg-neutral-light dark:bg-slate-700
+        ${className}
+      `}
+      style={{ height, ...(props.style || {}) }}
     />
   );
 }

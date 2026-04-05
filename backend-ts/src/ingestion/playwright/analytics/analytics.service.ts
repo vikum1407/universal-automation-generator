@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import db from "../../../core/db";
+import { db } from "../../../core/db";
 
 @Injectable()
 export class AnalyticsService {

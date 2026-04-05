@@ -34,9 +34,20 @@ interface LoginForm {
 }
 
 export class UIMultiPageCrawler {
-  // Depth 3 + crawl budget + hybrid auto-login
   async crawl(startUrl: string, maxDepth: number = 3, maxPages: number = 30): Promise<CrawledPage[]> {
-    const browser = await chromium.launch({ headless: true });
+    const browser = await chromium.launch({
+      headless: true,
+      args: [
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-blink-features=AutomationControlled',
+        '--window-size=1280,720'
+      ]
+    });
+
+
     try {
       return await this.crawlInternal(browser, startUrl, maxDepth, maxPages);
     } finally {
@@ -66,8 +77,13 @@ export class UIMultiPageCrawler {
       visited.add(normalizedUrl);
 
       const page = await browser.newPage();
+
+      await page.addInitScript(() => {
+        Object.defineProperty(navigator, 'webdriver', { get: () => false });
+      });
+
       try {
-        await this.gotoWithHybridWait(page, normalizedUrl);
+        await this.gotoSafe(page, normalizedUrl);
 
         const html = await page.content();
         const components = await this.extractComponents(page);
@@ -86,35 +102,6 @@ export class UIMultiPageCrawler {
           continue;
         }
 
-        // Hybrid auto-login: detect and attempt login if a form is present
-        const loginForm = await this.detectLoginForm(page);
-        if (loginForm) {
-          const loggedInUrl = await this.tryAutoLogin(page, normalizedUrl, loginForm);
-          if (loggedInUrl) {
-            const normalizedLoggedIn = this.normalizeUrl(loggedInUrl);
-            if (
-              new URL(normalizedLoggedIn).origin === root.origin &&
-              !visited.has(normalizedLoggedIn) &&
-              results.length < maxPages
-            ) {
-              queue.push({
-                url: normalizedLoggedIn,
-                depth: depth + 1,
-                trace: [
-                  ...trace,
-                  {
-                    from: normalizedUrl,
-                    to: normalizedLoggedIn,
-                    selector: loginForm.buttonSelector,
-                    action: 'login'
-                  }
-                ]
-              });
-            }
-          }
-        }
-
-        // Follow anchor links (same-origin, non-asset, not visited)
         const links = await page.$$eval('a[href]', anchors =>
           anchors
             .map(a => ({
@@ -155,7 +142,6 @@ export class UIMultiPageCrawler {
           });
         }
       } catch {
-        // ignore navigation errors
       } finally {
         await page.close();
       }
@@ -174,123 +160,12 @@ export class UIMultiPageCrawler {
     }
   }
 
-  private async gotoWithHybridWait(page: Page, url: string) {
+  private async gotoSafe(page: Page, url: string) {
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 10000 });
-    } catch {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
-    }
-    await page.waitForTimeout(500);
-  }
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 8000 });
+    } catch {}
 
-  private async detectLoginForm(page: Page): Promise<LoginForm | null> {
-    const url = page.url();
-
-    // SauceDemo-specific detection
-    if (url.includes('saucedemo.com')) {
-      const hasUser = await page.$('#user-name');
-      const hasPass = await page.$('#password');
-      const hasButton = await page.$('#login-button');
-
-      if (hasUser && hasPass && hasButton) {
-        return {
-          usernameSelector: '#user-name',
-          passwordSelector: '#password',
-          buttonSelector: '#login-button',
-          usernameValue: 'standard_user',
-          passwordValue: 'secret_sauce'
-        };
-      }
-    }
-
-    // Generic login detection
-    const passwordInput = await page.$('input[type="password"]');
-    if (!passwordInput) return null;
-
-    const usernameInput =
-      (await page.$('input[type="email"]')) ||
-      (await page.$('input[name*="user" i]')) ||
-      (await page.$('input[name*="email" i]')) ||
-      (await page.$('input[type="text"]'));
-
-    const loginButton =
-      (await page.$('button:has-text("login")')) ||
-      (await page.$('button:has-text("sign in")')) ||
-      (await page.$('input[type="submit"]')) ||
-      (await page.$('button'));
-
-    if (!usernameInput || !loginButton) return null;
-
-    const usernameSelector = await this.buildElementSelector(page, usernameInput);
-    const passwordSelector = await this.buildElementSelector(page, passwordInput);
-    const buttonSelector = await this.buildElementSelector(page, loginButton);
-
-    if (!usernameSelector || !passwordSelector || !buttonSelector) return null;
-
-    return {
-      usernameSelector,
-      passwordSelector,
-      buttonSelector,
-      usernameValue: 'test@example.com',
-      passwordValue: 'Password123!'
-    };
-  }
-
-  private async buildElementSelector(page: Page, handle: any): Promise<string | null> {
-    try {
-      const selector = await page.evaluate(e => {
-        const path: string[] = [];
-        while (e && e.nodeType === Node.ELEMENT_NODE) {
-          let selector = (e as HTMLElement).nodeName.toLowerCase();
-          if ((e as HTMLElement).id) {
-            selector += `#${(e as HTMLElement).id}`;
-            path.unshift(selector);
-            break;
-          } else {
-            let sib = e;
-            let nth = 1;
-            while ((sib = (sib.previousElementSibling as HTMLElement | null)) != null) nth++;
-            selector += `:nth-child(${nth})`;
-          }
-          path.unshift(selector);
-          e = e.parentElement as HTMLElement | null;
-        }
-        return path.join(' > ');
-      }, handle);
-      return selector || null;
-    } catch {
-      return null;
-    }
-  }
-
-  private async tryAutoLogin(page: Page, currentUrl: string, form: LoginForm): Promise<string | null> {
-    try {
-      const beforeUrl = page.url();
-
-      await page.fill(form.usernameSelector, form.usernameValue);
-      await page.fill(form.passwordSelector, form.passwordValue);
-
-      const [nav] = await Promise.all([
-        (async () => {
-          try {
-            await page.waitForLoadState('networkidle', { timeout: 8000 });
-          } catch {
-            await page.waitForLoadState('domcontentloaded', { timeout: 8000 });
-          }
-        })(),
-        page.click(form.buttonSelector)
-      ]);
-
-      await page.waitForTimeout(500);
-
-      const afterUrl = page.url();
-      if (afterUrl && afterUrl !== beforeUrl && afterUrl !== currentUrl) {
-        return afterUrl;
-      }
-    } catch {
-      // ignore login failures
-    }
-    return null;
+    await page.waitForTimeout(300);
   }
 
   private async extractComponents(page: Page): Promise<ComponentMeta[]> {

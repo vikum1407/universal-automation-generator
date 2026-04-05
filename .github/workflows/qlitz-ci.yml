@@ -1,0 +1,46 @@
+name: Qlitz CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  qlitz-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install deps
+        run: npm install
+
+      - name: Run Qlitz Tests
+        run: |
+          cd generated-ui-project || cd generated-api-project
+          npx playwright install --with-deps
+          npx playwright test --reporter=json > qlitz-report.json
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: qlitz-report
+          path: |
+            generated-ui-project/**/qlitz-report.json
+            generated-api-project/**/qlitz-report.json
+
+      - name: Auto PR Fixes
+        if: failure()
+        run: |
+          git config user.name "qlitz-bot"
+          git config user.email "bot@qlitz.dev"
+          git checkout -b qlitz-auto-fix
+          git add .
+          git commit -m "QLITZ AUTO FIX: Healing selectors / endpoints"
+          git push origin qlitz-auto-fix

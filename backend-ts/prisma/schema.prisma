@@ -1,13 +1,286 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
-}
-
+// ------------------------------------------------------
+//  Datasource & Generator
+// ------------------------------------------------------
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ------------------------------------------------------
+//  ENUMS
+// ------------------------------------------------------
+enum ProjectType {
+  ui
+  api
+}
+
+enum RunStatus {
+  pending
+  running
+  passed
+  failed
+  flaky
+  aborted
+}
+
+enum RequirementStatus {
+  open
+  in_progress
+  completed
+}
+
+enum SuggestionStatus {
+  pending
+  applied
+  rejected
+}
+
+// ------------------------------------------------------
+//  PROJECTS
+// ------------------------------------------------------
+model Project {
+  id              String      @id @default(uuid())
+  type            ProjectType
+  url             String?
+  username        String?
+  password        String?
+  crawlDepth      Int?
+  env             String?
+  status          String
+  swaggerUrl      String?
+  swaggerFilePath String?
+  authToken       String?
+  createdAt       DateTime    @default(now())
+
+  flows        Flow[]
+  endpoints    Endpoint[]
+  testRuns     TestRun[]
+  requirements Requirement[]
+  suggestions  Suggestion[]
+  releases     Release[]
+  histories    History[]
+  analytics    Analytics?
+  stability    Stability?
+  cloudSync    CloudSync?
+
+  // NEW RELATIONS FOR FLOW ENGINE
+  pages       Page[]
+  transitions Transition[]
+
+  @@index([type])
+  @@index([createdAt])
+}
+
+// ------------------------------------------------------
+//  FLOWS
+// ------------------------------------------------------
+model Flow {
+  id        String   @id @default(uuid())
+  projectId String
+  name      String
+  createdAt DateTime @default(now())
+
+  project   Project    @relation(fields: [projectId], references: [id])
+  endpoints Endpoint[]
+
+  @@index([projectId])
+}
+
+// ------------------------------------------------------
+//  ENDPOINTS
+// ------------------------------------------------------
+model Endpoint {
+  id        String   @id @default(uuid())
+  projectId String
+  flowId    String?
+  method    String
+  path      String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+  flow    Flow?   @relation(fields: [flowId], references: [id])
+
+  @@index([projectId])
+  @@index([flowId])
+}
+
+// ------------------------------------------------------
+//  PAGE (NEW)
+// ------------------------------------------------------
+model Page {
+  id        String   @id @default(uuid())
+  projectId String
+  url       String
+  title     String?
+  createdAt DateTime @default(now())
+
+  project   Project      @relation(fields: [projectId], references: [id])
+  fromEdges Transition[] @relation("FromPage")
+  toEdges   Transition[] @relation("ToPage")
+
+  @@unique([projectId, url], name: "projectId_url")
+  @@index([projectId])
+  @@index([url])
+}
+
+// ------------------------------------------------------
+//  TRANSITION (NEW)
+// ------------------------------------------------------
+model Transition {
+  id        String   @id @default(uuid())
+  projectId String
+  fromId    String
+  toId      String
+  action    String
+  selector  String?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+  from    Page    @relation("FromPage", fields: [fromId], references: [id])
+  to      Page    @relation("ToPage", fields: [toId], references: [id])
+
+  @@index([projectId])
+  @@index([fromId])
+  @@index([toId])
+}
+
+// ------------------------------------------------------
+//  TEST RUNS
+// ------------------------------------------------------
+model TestRun {
+  id         String    @id @default(uuid())
+  projectId  String
+  testId     String?
+  status     RunStatus
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+
+  project Project      @relation(fields: [projectId], references: [id])
+  results TestResult[]
+
+  @@index([projectId])
+  @@index([status])
+}
+
+// ------------------------------------------------------
+//  TEST RESULTS
+// ------------------------------------------------------
+model TestResult {
+  id        String   @id @default(uuid())
+  runId     String
+  step      Int
+  message   String?
+  passed    Boolean
+  createdAt DateTime @default(now())
+
+  run TestRun @relation(fields: [runId], references: [id])
+
+  @@index([runId])
+}
+
+// ------------------------------------------------------
+//  REQUIREMENTS
+// ------------------------------------------------------
+model Requirement {
+  id          String            @id @default(uuid())
+  projectId   String
+  title       String
+  description String?
+  status      RequirementStatus @default(open)
+  createdAt   DateTime          @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+// ------------------------------------------------------
+//  SELF-HEALING SUGGESTIONS
+// ------------------------------------------------------
+model Suggestion {
+  id          String           @id @default(uuid())
+  projectId   String
+  description String
+  status      SuggestionStatus @default(pending)
+  createdAt   DateTime         @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+// ------------------------------------------------------
+//  RELEASE INTELLIGENCE
+// ------------------------------------------------------
+model Release {
+  id        String   @id @default(uuid())
+  projectId String
+  version   String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+// ------------------------------------------------------
+//  HISTORY
+// ------------------------------------------------------
+model History {
+  id        String   @id @default(uuid())
+  projectId String
+  event     String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+// ------------------------------------------------------
+//  ANALYTICS
+// ------------------------------------------------------
+model Analytics {
+  id          String   @id @default(uuid())
+  projectId   String   @unique
+  passRate    Float?
+  failRate    Float?
+  flakyRate   Float?
+  avgDuration Float?
+  lastUpdated DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+}
+
+// ------------------------------------------------------
+//  STABILITY
+// ------------------------------------------------------
+model Stability {
+  id         String   @id @default(uuid())
+  projectId  String   @unique
+  score      Float?
+  readiness  Float?
+  guardrails Json?
+  updatedAt  DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+}
+
+// ------------------------------------------------------
+//  CLOUD SYNC
+// ------------------------------------------------------
+model CloudSync {
+  id           String    @id @default(uuid())
+  projectId    String    @unique
+  lastUpload   DateTime?
+  lastDownload DateTime?
+  bucketPath   String?
+
+  project Project @relation(fields: [projectId], references: [id])
 }

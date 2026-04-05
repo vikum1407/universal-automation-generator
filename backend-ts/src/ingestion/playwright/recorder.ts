@@ -1,4 +1,4 @@
-import db from "../../core/db";
+import { db } from "../../core/db";
 
 export const PlaywrightRecorder = {
   async record(payload: any) {

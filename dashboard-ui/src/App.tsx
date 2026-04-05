@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DashboardLayout from "./layouts/DashboardLayout";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 import Journeys from "./pages/Journeys";
 import JourneyDetails from "./pages/JourneyDetails";
@@ -25,51 +26,76 @@ import DiffPage from "./pages/Release/test/DiffPage";
 import FlowPage from "./pages/Release/test/FlowPage";
 import SelectorPage from "./pages/Release/test/SelectorPage";
 
+import NewProjectType from "./pages/projects/NewProjectType";
+import NewUIProject from "./pages/projects/NewUIProject";
+import NewAPIProject from "./pages/projects/NewAPIProject";
+import NewProjectSummary from "./pages/projects/NewProjectSummary";
+import InitializingProject from "./pages/projects/InitializingProject";
+
+import ProjectDetails from "@/dashboard/pages/projects/ProjectDetails";
+import ProjectsList from "./pages/projects/ProjectsList";
+
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<DashboardLayout />}>
-          <Route path="/" element={<Navigate to="/journeys" replace />} />
+      <ErrorBoundary>
+        <Routes>
+          <Route element={<DashboardLayout />}>
+            <Route path="/" element={<Navigate to="/journeys" replace />} />
 
-          <Route path="/journeys" element={<Journeys />} />
-          <Route path="/journeys/:id" element={<JourneyDetails />} />
+            {/* PROJECT CREATION WIZARD */}
+            <Route path="/projects/new" element={<NewProjectType />} />
+            <Route path="/projects/new/ui" element={<NewUIProject />} />
+            <Route path="/projects/new/api" element={<NewAPIProject />} />
+            <Route path="/projects/new/summary" element={<NewProjectSummary />} />
+            <Route path="/projects/:id/initializing" element={<InitializingProject />} />
 
-          <Route path="/execution" element={<ExecutionTimeline />} />
-          <Route path="/execution/:id" element={<ExecutionRunDetails />} />
-          <Route path="/execution/trends" element={<ExecutionTrendsPanel />} />
-          <Route path="/execution/insights" element={<ExecutionInsightsPanel />} />
-          <Route path="/execution/compare" element={<ExecutionComparePanel />} />
+            {/* PROJECT LIST + DETAILS */}
+            <Route path="/projects" element={<ProjectsList />} />
+            <Route path="/projects/:id" element={<ProjectDetails />} />
 
-          <Route path="/release" element={<ReleaseReadinessDashboard />} />
-          <Route path="/release/heatmap" element={<ReleaseHeatmap />} />
-          <Route path="/release/story" element={<ReleaseStory />} />
+            {/* JOURNEYS */}
+            <Route path="/journeys" element={<Journeys />} />
+            <Route path="/journeys/:id" element={<JourneyDetails />} />
 
-          <Route
-            path="/release/:project/requirements"
-            element={<ReleaseRequirementExplorer />}
-          />
-          <Route
-            path="/release/:project/requirements/:requirementId"
-            element={<ReleaseRequirementDetails />}
-          />
+            {/* EXECUTION */}
+            <Route path="/execution" element={<ExecutionTimeline />} />
+            <Route path="/execution/:id" element={<ExecutionRunDetails />} />
+            <Route path="/execution/trends" element={<ExecutionTrendsPanel />} />
+            <Route path="/execution/insights" element={<ExecutionInsightsPanel />} />
+            <Route path="/execution/compare" element={<ExecutionComparePanel />} />
 
-          <Route
-            path="/release/:project/self-healing"
-            element={<ReleaseSelfHealingOverview />}
-          />
-          <Route
-            path="/release/:project/self-healing/:suggestionId"
-            element={<ReleaseSelfHealingDetails />}
-          />
+            {/* RELEASE */}
+            <Route path="/release" element={<ReleaseReadinessDashboard />} />
+            <Route path="/release/heatmap" element={<ReleaseHeatmap />} />
+            <Route path="/release/story" element={<ReleaseStory />} />
 
-          {/* TEST INTELLIGENCE ROUTES */}
-          <Route path="/release/test/:testId" element={<TestPage />} />
-          <Route path="/release/test/:testId/diff" element={<DiffPage />} />
-          <Route path="/release/test/:testId/flow" element={<FlowPage />} />
-          <Route path="/release/test/:testId/selectors" element={<SelectorPage />} />
-        </Route>
-      </Routes>
+            <Route
+              path="/release/:project/requirements"
+              element={<ReleaseRequirementExplorer />}
+            />
+            <Route
+              path="/release/:project/requirements/:requirementId"
+              element={<ReleaseRequirementDetails />}
+            />
+
+            <Route
+              path="/release/:project/self-healing"
+              element={<ReleaseSelfHealingOverview />}
+            />
+            <Route
+              path="/release/:project/self-healing/:suggestionId"
+              element={<ReleaseSelfHealingDetails />}
+            />
+
+            {/* TEST INTELLIGENCE */}
+            <Route path="/release/test/:testId" element={<TestPage />} />
+            <Route path="/release/test/:testId/diff" element={<DiffPage />} />
+            <Route path="/release/test/:testId/flow" element={<FlowPage />} />
+            <Route path="/release/test/:testId/selectors" element={<SelectorPage />} />
+          </Route>
+        </Routes>
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }

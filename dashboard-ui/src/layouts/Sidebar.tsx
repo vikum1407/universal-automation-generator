@@ -1,5 +1,206 @@
-import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+
+/* ---------- Types ---------- */
+
+type AICommandResponse =
+  | {
+      intent: "navigate";
+      target: string;
+      params?: Record<string, any>;
+    }
+  | {
+      intent: "action";
+      action: string;
+      projectId?: string;
+      payload?: Record<string, any>;
+    }
+  | {
+      intent: "search";
+      results: { type: string; id: string; label: string; target?: string }[];
+    };
+
+type Command = {
+  label: string;
+  action: () => void;
+};
+
+/* ---------- Utils ---------- */
+
+function fuzzyMatch(text: string, query: string) {
+  return text.toLowerCase().includes(query.toLowerCase());
+}
+
+/* ---------- Command Palette (AI + local) ---------- */
+
+function CommandPalette({
+  open,
+  setOpen,
+  localCommands
+}: {
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  localCommands: Command[];
+}) {
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [index, setIndex] = useState(0);
+  const [aiResults, setAiResults] = useState<Command[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const localFiltered = useMemo(
+    () => localCommands.filter((c) => fuzzyMatch(c.label, query)),
+    [localCommands, query]
+  );
+
+  const combined = [...localFiltered, ...aiResults];
+
+  useEffect(() => {
+    if (!open) {
+      setQuery("");
+      setIndex(0);
+      setAiResults([]);
+      setLoading(false);
+      return;
+    }
+  }, [open]);
+
+  // Call backend AI when query changes (debounced)
+  useEffect(() => {
+    if (!open || !query.trim()) {
+      setAiResults([]);
+      setLoading(false);
+      return;
+    }
+
+    const handle = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await fetch("/ai/command", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query })
+        });
+
+        if (!res.ok) {
+          setLoading(false);
+          return;
+        }
+
+        const data: AICommandResponse = await res.json();
+
+        if (data.intent === "search") {
+          setAiResults(
+            (data.results || []).map((r) => ({
+              label: `${r.label} (${r.type})`,
+              action: () => {
+                if (r.target) navigate(r.target);
+              }
+            }))
+          );
+        } else if (data.intent === "navigate") {
+          setAiResults([
+            {
+              label: `Go to ${data.target}`,
+              action: () => navigate(data.target)
+            }
+          ]);
+        } else if (data.intent === "action") {
+          setAiResults([
+            {
+              label: `Run action: ${data.action}`,
+              action: () => {
+                // You can later wire specific actions here
+              }
+            }
+          ]);
+        }
+      } catch {
+        // fail silently for now
+      } finally {
+        setLoading(false);
+      }
+    }, 250);
+
+    return () => clearTimeout(handle);
+  }, [open, query, navigate]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!open) return;
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setIndex((i) => Math.min(i + 1, Math.max(combined.length - 1, 0)));
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setIndex((i) => Math.max(i - 1, 0));
+      }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        combined[index]?.action();
+        setOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [open, combined, index, setOpen]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[999] flex items-start justify-center pt-32">
+      <div className="w-[500px] bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-xl overflow-hidden">
+        <input
+          autoFocus
+          placeholder="Ask Qlitz or type a command…"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setIndex(0);
+          }}
+          className="w-full px-4 py-3 bg-transparent border-b border-[var(--card-border)] outline-none text-lg"
+        />
+
+        <div className="max-h-[320px] overflow-y-auto">
+          {combined.map((cmd, i) => (
+            <div
+              key={cmd.label + i}
+              className={`
+                px-4 py-3 cursor-pointer transition
+                ${
+                  i === index
+                    ? "bg-brand-primary/20"
+                    : "hover:bg-neutral-light dark:hover:bg-slate-700"
+                }
+              `}
+              onClick={() => {
+                cmd.action();
+                setOpen(false);
+              }}
+            >
+              {cmd.label}
+            </div>
+          ))}
+
+          {loading && (
+            <div className="px-4 py-3 text-gray-500 text-sm">Thinking…</div>
+          )}
+
+          {!loading && !combined.length && (
+            <div className="px-4 py-3 text-gray-500 text-sm">No results</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Sidebar v5 ---------- */
 
 export default function Sidebar({
   open,
@@ -8,90 +209,274 @@ export default function Sidebar({
   open: boolean;
   setOpen: (v: boolean) => void;
 }) {
+  const navigate = useNavigate();
   const [project, setProject] = useState("my-app");
-  const projects = ["my-app", "qlitz-demo", "enterprise-suite"];
+
+  const pinned = ["qlitz-demo"];
+  const recent = ["my-app", "enterprise-suite"];
+
+  const [search, setSearch] = useState("");
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  // Cmd/Ctrl + K → open palette
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  const localCommands: Command[] = useMemo(
+    () => [
+      { label: "New Project", action: () => navigate("/projects/new") },
+      { label: "All Projects", action: () => navigate("/projects") },
+      { label: "Execution Timeline", action: () => navigate("/execution") },
+      { label: "Release Readiness", action: () => navigate("/release") }
+    ],
+    [navigate]
+  );
 
   return (
-    <aside
+    <>
+      <CommandPalette
+        open={paletteOpen}
+        setOpen={setPaletteOpen}
+        localCommands={localCommands}
+      />
+
+      <aside
+        className={`
+          fixed left-0 top-0 h-full z-30 flex flex-col
+          bg-[var(--card-bg)] border-r border-[var(--card-border)]
+          transition-all duration-300
+          ${open ? "w-64" : "w-20"}
+        `}
+      >
+        {/* HEADER */}
+        <div className="h-14 border-b border-[var(--card-border)] flex items-center px-4 gap-3">
+          <button
+            onClick={() => setOpen(!open)}
+            className="text-2xl px-2 py-1 rounded hover:bg-neutral-light dark:hover:bg-slate-700 transition"
+          >
+            ☰
+          </button>
+
+          <span
+            className={`
+              font-semibold text-base whitespace-nowrap overflow-hidden
+              transition-all duration-300 delay-150
+              ${open ? "opacity-100 max-w-xs" : "opacity-0 max-w-0"}
+            `}
+          >
+            Qlitz Dashboard
+          </span>
+        </div>
+
+        {/* SEARCH */}
+        <div className="p-3 border-b border-[var(--card-border)]">
+          <input
+            id="sidebar-search"
+            type="text"
+            placeholder="Search…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={`
+              bg-neutral-light dark:bg-slate-700 rounded px-3 py-2 text-sm w-full
+              transition-all duration-300
+              ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
+            `}
+          />
+        </div>
+
+        {/* PINNED PROJECTS */}
+        <SidebarSection open={open} label="Pinned Projects">
+          {pinned.map((p) => (
+            <ProjectItem key={p} name={p} open={open} />
+          ))}
+        </SidebarSection>
+
+        {/* RECENT PROJECTS */}
+        <SidebarSection open={open} label="Recent Projects">
+          {recent.map((p) => (
+            <ProjectItem key={p} name={p} open={open} />
+          ))}
+        </SidebarSection>
+
+        {/* NAVIGATION */}
+        <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
+          <SidebarGroup
+            open={open}
+            label="Projects"
+            items={[
+              { to: "/projects", label: "All Projects", icon: "📁" },
+              { to: "/projects/new", label: "New Project", icon: "✨" }
+            ]}
+            search={search}
+          />
+
+          <SidebarGroup
+            open={open}
+            label="Execution"
+            items={[
+              { to: "/execution", label: "Timeline", icon: "⏱️" },
+              { to: "/execution/trends", label: "Trends", icon: "📈" },
+              { to: "/execution/insights", label: "Insights", icon: "💡" }
+            ]}
+            search={search}
+          />
+
+          <SidebarGroup
+            open={open}
+            label="Release"
+            items={[
+              { to: "/release", label: "Readiness", icon: "🚦" },
+              { to: "/release/heatmap", label: "Heatmap", icon: "🔥" },
+              { to: "/release/story", label: "Story", icon: "📘" },
+              {
+                to: `/release/${project}/requirements`,
+                label: "Requirements",
+                icon: "📋"
+              },
+              {
+                to: `/release/${project}/self-healing`,
+                label: "Self‑Healing",
+                icon: "🛠️"
+              }
+            ]}
+            search={search}
+          />
+        </nav>
+      </aside>
+    </>
+  );
+}
+
+/* ---------- Section Wrapper ---------- */
+
+function SidebarSection({
+  open,
+  label,
+  children
+}: {
+  open: boolean;
+  label: string;
+  children: any;
+}) {
+  return (
+    <div className="border-b border-[var(--card-border)] pb-3 mb-3">
+      <div
+        className={`
+          px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400
+          transition-opacity duration-300
+          ${open ? "opacity-100" : "opacity-0"}
+        `}
+      >
+        {label}
+      </div>
+      <div className="space-y-1 px-2">{children}</div>
+    </div>
+  );
+}
+
+/* ---------- Project Item ---------- */
+
+function ProjectItem({ name, open }: { name: string; open: boolean }) {
+  const initials = name
+    .split("-")
+    .map((n) => n[0]?.toUpperCase())
+    .join("");
+
+  return (
+    <div
       className={`
-        fixed left-0 top-0 h-full z-30 flex flex-col
-        bg-[var(--card-bg)] border-r border-[var(--card-border)]
-        transition-all duration-300
-        ${open ? "w-64" : "w-20"}
+        flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer
+        hover:bg-neutral-light dark:hover:bg-slate-700 transition-all
       `}
     >
-      {/* HEADER */}
-      <div className="h-14 border-b border-[var(--card-border)] flex items-center px-4 gap-3">
-        <button
-          onClick={() => setOpen(!open)}
-          className="text-2xl px-2 py-1 rounded hover:bg-neutral-light dark:hover:bg-slate-700 transition"
-        >
-          ☰
-        </button>
+      <div className="w-8 h-8 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary font-bold">
+        {initials}
+      </div>
+
+      <span
+        className={`
+          text-sm whitespace-nowrap transition-opacity duration-300
+          ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
+        `}
+      >
+        {name}
+      </span>
+    </div>
+  );
+}
+
+/* ---------- Collapsible Group ---------- */
+
+function SidebarGroup({
+  open,
+  label,
+  items,
+  search
+}: {
+  open: boolean;
+  label: string;
+  items: { to: string; label: string; icon: string }[];
+  search: string;
+}) {
+  const location = useLocation();
+  const active = items.some((i) => location.pathname.startsWith(i.to));
+  const [expanded, setExpanded] = useState(active);
+
+  useEffect(() => {
+    if (active) setExpanded(true);
+  }, [active]);
+
+  const filtered = items.filter((i) => fuzzyMatch(i.label, search));
+
+  if (!filtered.length) return null;
+
+  return (
+    <div>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400"
+      >
+        <span className={`${open ? "opacity-100" : "opacity-0"} transition-opacity`}>
+          {label}
+        </span>
 
         <span
           className={`
-            font-semibold text-base whitespace-nowrap overflow-hidden
-            transition-all duration-300 delay-150
-            ${open ? "opacity-100 max-w-xs" : "opacity-0 max-w-0"}
+            text-sm transition-transform duration-300
+            ${expanded ? "rotate-90" : ""}
+            ${open ? "opacity-100" : "opacity-0"}
           `}
         >
-          Qlitz Dashboard
+          ▶
         </span>
-      </div>
+      </button>
 
-      {/* PROJECT SELECTOR */}
-      <div className="p-4 border-b border-[var(--card-border)]">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">📁</span>
-
-          <select
-            value={project}
-            onChange={(e) => setProject(e.target.value)}
-            className={`
-              bg-neutral-light dark:bg-slate-700 rounded px-2 py-1 text-sm w-full
-              transition-opacity duration-300
-              ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
-            `}
-          >
-            {projects.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
+      {expanded && (
+        <div className="mt-1 space-y-1">
+          {filtered.map((item) => (
+            <NavItem
+              key={item.to}
+              to={item.to}
+              label={item.label}
+              icon={item.icon}
+              open={open}
+            />
+          ))}
         </div>
-      </div>
-
-      {/* NAVIGATION */}
-      <nav className="flex-1 p-3 space-y-2">
-        <NavItem to="/journeys" label="Projects" icon="📁" open={open} />
-
-        <NavItem to="/execution" label="Execution Timeline" icon="⏱️" open={open} />
-        <NavItem to="/execution/trends" label="Execution Trends" icon="📈" open={open} />
-        <NavItem to="/execution/insights" label="Execution Insights" icon="💡" open={open} />
-
-        <NavItem to="/release" label="Release Readiness" icon="🚦" open={open} />
-        <NavItem to="/release/heatmap" label="Release Heatmap" icon="🔥" open={open} />
-        <NavItem to="/release/story" label="Release Story" icon="📘" open={open} />
-
-        <NavItem
-          to={`/release/${project}/requirements`}
-          label="Requirements"
-          icon="📋"
-          open={open}
-        />
-
-        <NavItem
-          to={`/release/${project}/self-healing`}
-          label="Self‑Healing"
-          icon="🛠️"
-          open={open}
-        />
-      </nav>
-    </aside>
+      )}
+    </div>
   );
 }
+
+/* ---------- Nav Item ---------- */
 
 function NavItem({
   to,

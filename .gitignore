@@ -35,3 +35,4 @@ backend-ts/qlitz-output/
 backend-ts/node_modules/
 
 backend/src/main/resources/application.properties
+/generated/prisma
