@@ -1,4 +1,5 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, Inject, forwardRef } from "@nestjs/common";
+import * as fs from "fs";
 import { PrismaService } from "../../prisma/prisma.service";
 
 import { UiUrlIngestor } from "../ui-scan/ui-url-ingestor";
@@ -10,10 +11,7 @@ import { APIParser } from "../api-scan/api-parser";
 import { ApiTestGenerationService } from "./api/api-test-generation.service";
 
 import { Requirement, RTMDocument } from "../rtm/rtm.model";
-import * as fs from "fs";
-
 import { ProjectService } from "./project.service";
-import { Inject, forwardRef } from "@nestjs/common";
 
 @Injectable()
 export class ProjectOrchestratorService {
@@ -47,8 +45,44 @@ export class ProjectOrchestratorService {
 
       const base = `./generated-ui-project/${project.id}`;
       if (!fs.existsSync(base)) fs.mkdirSync(base, { recursive: true });
-      fs.writeFileSync(`${base}/flow-graph.json`, JSON.stringify(flowGraph, null, 2));
 
+      // Build element-level nodes
+      const elementNodes = pages.flatMap(page =>
+        page.nodes.map((n: any, index: number) => ({
+          id: `${page.url}#${n.selector || "root"}-${index}`,
+          pageUrl: page.url,
+          selector: n.selector,
+          text: n.text,
+          role: n.role,
+          interactive: n.componentType === "interactive"
+        }))
+      );
+
+      // Map page-level edges to element-level edges (use first interactive node on each page)
+      const findFirstNodeForPage = (pageUrl: string) =>
+        elementNodes.find(n => n.pageUrl === pageUrl) || null;
+
+      const elementEdges = flowGraph.edges.map((e: any, index: number) => {
+        const fromNode = findFirstNodeForPage(e.from);
+        const toNode = findFirstNodeForPage(e.to);
+
+        return {
+          id: `edge-${index}`,
+          from: fromNode ? fromNode.id : e.from,
+          to: toNode ? toNode.id : e.to,
+          action: e.action || "navigate",
+          selector: e.selector
+        };
+      });
+
+      const elementFlowGraph = {
+        nodes: elementNodes,
+        edges: elementEdges
+      };
+
+      fs.writeFileSync(`${base}/flow-graph.json`, JSON.stringify(elementFlowGraph, null, 2));
+
+      // Persist flow steps at page level (unchanged)
       for (const edge of flowGraph.edges) {
         await this.projectService.recordFlowStep(
           project.id,
@@ -59,10 +93,11 @@ export class ProjectOrchestratorService {
         );
       }
 
-      const requirements: Requirement[] = flowGraph.edges.map((edge, index) => ({
+      // Element-level RTM
+      const requirements: Requirement[] = elementEdges.map((edge, index) => ({
         id: `ui-flow-${project.id}-${index}`,
         page: edge.from,
-        description: edge.action || `Navigate from ${edge.from} to ${edge.to}`,
+        description: edge.action || `Interaction from ${edge.from} to ${edge.to}`,
         selector: edge.selector,
         type: "ui",
         action: edge.action,
@@ -93,13 +128,13 @@ export class ProjectOrchestratorService {
     }
   }
 
-  private toUIScanNodes(components: ComponentMeta[], pageUrl: string) {
+    private toUIScanNodes(components: ComponentMeta[], pageUrl: string) {
     return components.map(c => ({
       pageUrl,
       selector: c.selector,
       text: c.text,
       role: c.role,
-      attributes: {},
+      attributes: c.attributes || {},
       componentType: c.interactive ? "interactive" : "element"
     }));
   }

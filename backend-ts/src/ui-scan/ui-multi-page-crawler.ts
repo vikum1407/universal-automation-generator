@@ -16,6 +16,7 @@ export interface ComponentMeta {
   boundingBox?: { x: number; y: number; width: number; height: number };
   visible: boolean;
   interactive: boolean;
+  attributes?: Record<string, string>;
 }
 
 export interface NavigationTrace {
@@ -46,7 +47,6 @@ export class UIMultiPageCrawler {
         '--window-size=1280,720'
       ]
     });
-
 
     try {
       return await this.crawlInternal(browser, startUrl, maxDepth, maxPages);
@@ -202,13 +202,22 @@ export class UIMultiPageCrawler {
         return path.join(' > ');
       }, el);
 
+      const attributes = await page.evaluate(e => {
+        const attrs: Record<string, string> = {};
+        for (const attr of (e as HTMLElement).attributes) {
+          attrs[attr.name] = attr.value;
+        }
+        return attrs;
+      }, el);
+
       components.push({
         selector,
         text,
         role: role || undefined,
         boundingBox: box || undefined,
         visible,
-        interactive
+        interactive,
+        attributes
       });
     }
 

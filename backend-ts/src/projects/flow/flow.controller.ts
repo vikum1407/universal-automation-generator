@@ -3,6 +3,15 @@ import * as fs from "fs";
 
 @Controller("projects/:id/flow")
 export class FlowController {
+  @Get()
+  async getFlow(@Param("id") id: string) {
+    const file = `./generated-ui-project/${id}/flow-graph.json`;
+    if (!fs.existsSync(file)) {
+      return { nodes: [], edges: [] };
+    }
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  }
+
   // RTM (UI or API auto-detect)
   @Get("rtm")
   async getRTM(@Param("id") id: string) {
@@ -15,54 +24,86 @@ export class FlowController {
     return JSON.parse(fs.readFileSync(file, "utf8"));
   }
 
-  // Coverage
+  // Coverage (element-level UI + API)
   @Get("coverage")
   async getCoverage(@Param("id") id: string) {
-    const uiFlow = `./generated-ui-project/${id}/flow-graph.json`;
-    const apiEndpoints = `./generated-api-project/${id}/endpoints.json`;
+    const uiFlowFile = `./generated-ui-project/${id}/flow-graph.json`;
+    const apiEndpointsFile = `./generated-api-project/${id}/endpoints.json`;
 
     const rtmFile = fs.existsSync(`./generated-ui-project/${id}/rtm.json`)
       ? `./generated-ui-project/${id}/rtm.json`
       : `./generated-api-project/${id}/rtm.json`;
 
+    if (!fs.existsSync(rtmFile)) {
+      return [];
+    }
+
     const rtm = JSON.parse(fs.readFileSync(rtmFile, "utf8"));
     let items: any[] = [];
 
-    if (fs.existsSync(uiFlow)) {
-      const flow = JSON.parse(fs.readFileSync(uiFlow, "utf8"));
-      items = flow.edges.map((e: any) => ({
-        id: `${e.from}->${e.to}`,
-        label: `${e.action || "navigate"} (${e.from} → ${e.to})`
-      }));
+    // UI: use element-level edges
+    if (fs.existsSync(uiFlowFile)) {
+      const flow = JSON.parse(fs.readFileSync(uiFlowFile, "utf8"));
+      const edges = flow.edges || [];
+
+      items = items.concat(
+        edges.map((e: any) => ({
+          id: `${e.from}->${e.to}`,
+          label: `${e.action || "interaction"} (${e.from} → ${e.to})`,
+          type: "ui"
+        }))
+      );
     }
 
-    if (fs.existsSync(apiEndpoints)) {
-      const endpoints = JSON.parse(fs.readFileSync(apiEndpoints, "utf8"));
-      items = endpoints.map((ep: any) => ({
-        id: `${ep.method} ${ep.path}`,
-        label: `${ep.method} ${ep.path}`
-      }));
+    // API: endpoints
+    if (fs.existsSync(apiEndpointsFile)) {
+      const endpoints = JSON.parse(
+        fs.readFileSync(apiEndpointsFile, "utf8")
+      );
+      items = items.concat(
+        endpoints.map((ep: any) => ({
+          id: `${ep.method} ${ep.path}`,
+          label: `${ep.method} ${ep.path}`,
+          type: "api"
+        }))
+      );
     }
 
     const coverage = items.map(item => {
-      const req = rtm.requirements.find((r: any) =>
-        item.label.includes(r.description) ||
-        item.id.includes(r.page) ||
-        item.id.includes(r.url)
-      );
+      const req = rtm.requirements.find((r: any) => {
+        if (item.type === "ui") {
+          return (
+            item.id.includes(r.page) ||
+            (r.selector && item.label.includes(r.selector)) ||
+            item.label.includes(r.description)
+          );
+        }
+
+        if (item.type === "api") {
+          return (
+            (r.method && item.id.startsWith(r.method)) ||
+            (r.url && item.id.includes(r.url)) ||
+            item.label.includes(r.description)
+          );
+        }
+
+        return false;
+      });
 
       return {
         id: item.id,
         label: item.label,
-        covered: !!req,
-        coveredBy: req?.coveredBy || []
+        type: item.type,
+        covered: !!req && req.coveredBy && req.coveredBy.length > 0,
+        coveredBy: req?.coveredBy || [],
+        requirementId: req?.id || null
       };
     });
 
     return coverage;
   }
 
-  // Analytics
+  // Analytics (kept here for convenience; ProjectService has same logic)
   @Get("analytics")
   async getAnalytics(@Param("id") id: string) {
     const isUI = fs.existsSync(`./generated-ui-project/${id}`);
@@ -82,11 +123,15 @@ export class FlowController {
       ciStatus: "not-run"
     };
 
-    // Tests
-    const testFiles = fs.readdirSync(base).filter(f => f.endsWith(".spec.ts"));
+    if (!fs.existsSync(base)) {
+      return analytics;
+    }
+
+    const testFiles = fs
+      .readdirSync(base)
+      .filter(f => f.endsWith(".spec.ts"));
     analytics.tests = testFiles.length;
 
-    // Test results
     const resultsFile = `${base}/test-results.json`;
     if (fs.existsSync(resultsFile)) {
       const results = JSON.parse(fs.readFileSync(resultsFile, "utf8"));
@@ -96,35 +141,37 @@ export class FlowController {
         analytics.passed = analytics.tests;
       } else {
         analytics.failed = results.failures?.length || 1;
-        analytics.passed = analytics.tests - analytics.failed;
+        analytics.passed = Math.max(analytics.tests - analytics.failed, 0);
       }
     }
 
-    // RTM
     const rtmFile = `${base}/rtm.json`;
     if (fs.existsSync(rtmFile)) {
       const rtm = JSON.parse(fs.readFileSync(rtmFile, "utf8"));
       analytics.requirements = rtm.requirements?.length || 0;
 
-      const covered = rtm.requirements.filter((r: any) => r.coveredBy?.length > 0);
-      analytics.coverage = Math.round((covered.length / analytics.requirements) * 100);
+      if (analytics.requirements > 0) {
+        const covered = rtm.requirements.filter(
+          (r: any) => r.coveredBy && r.coveredBy.length > 0
+        );
+        analytics.coverage = Math.round(
+          (covered.length / analytics.requirements) * 100
+        );
+      }
     }
 
-    // AI suggestions
     const aiFile = `${base}/ai-suggestions.json`;
     if (fs.existsSync(aiFile)) {
       const ai = JSON.parse(fs.readFileSync(aiFile, "utf8"));
-      analytics.aiSuggestions = ai.length;
+      analytics.aiSuggestions = Array.isArray(ai) ? ai.length : 0;
     }
 
-    // Auto-heal
     const healFile = `${base}/autoheal-log.json`;
     if (fs.existsSync(healFile)) {
       const heal = JSON.parse(fs.readFileSync(healFile, "utf8"));
-      analytics.autoHealed = heal.length;
+      analytics.autoHealed = Array.isArray(heal) ? heal.length : 0;
     }
 
-    // CI status
     const ciFile = `${base}/qlitz-report.json`;
     if (fs.existsSync(ciFile)) {
       const ci = JSON.parse(fs.readFileSync(ciFile, "utf8"));

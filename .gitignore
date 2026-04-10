@@ -36,3 +36,11 @@ backend-ts/node_modules/
 
 backend/src/main/resources/application.properties
 /generated/prisma
+
+backend-ts/.qlitz-snapshots/
+backend-ts/generated-ui-project/
+backend-ts/generated-api-project/
+
+backend-ts/generated/
+backend-ts/generated/prisma/
+backend-ts/playwright.config.ts

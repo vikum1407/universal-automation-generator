@@ -2,40 +2,13 @@ import { useEffect, useState } from "react";
 
 const API_BASE = "http://localhost:3000";
 
-const MOCK_COVERAGE = [
-  {
-    id: "login-flow",
-    label: "Login flow (Landing → Dashboard)",
-    covered: true,
-    coveredBy: ["login.spec.ts"]
-  },
-  {
-    id: "signup-flow",
-    label: "Signup flow (Landing → Verify Email)",
-    covered: false,
-    coveredBy: []
-  },
-  {
-    id: "healthcheck",
-    label: "GET /health",
-    covered: true,
-    coveredBy: ["healthcheck.spec.ts"]
-  }
-];
-
 export default function CoverageHeatmap({ projectId }: { projectId: string }) {
   const [coverage, setCoverage] = useState<any[]>([]);
 
   useEffect(() => {
     fetch(`${API_BASE}/projects/${projectId}/flow/coverage`)
       .then(res => res.json())
-      .then(data => {
-        if (!data || !data.length) {
-          setCoverage(MOCK_COVERAGE);
-        } else {
-          setCoverage(data);
-        }
-      });
+      .then(data => setCoverage(data || []));
   }, [projectId]);
 
   if (!coverage.length) return null;
@@ -54,6 +27,7 @@ export default function CoverageHeatmap({ projectId }: { projectId: string }) {
       >
         {coverage.map((item, i) => {
           const bg = item.covered ? "#2FF7D1" : "#FF4F4F";
+          const textColor = item.covered ? "#00332A" : "#3B0000";
 
           return (
             <div
@@ -62,19 +36,33 @@ export default function CoverageHeatmap({ projectId }: { projectId: string }) {
                 padding: "16px",
                 borderRadius: "12px",
                 background: bg,
-                color: "#000",
-                fontWeight: 600
+                color: textColor,
+                fontWeight: 600,
+                boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
+                fontSize: "13px"
               }}
             >
+              <div style={{ opacity: 0.8, marginBottom: 4 }}>
+                {item.type === "ui" ? "UI Interaction" : "API Endpoint"}
+              </div>
               <div>{item.label}</div>
 
-              {item.covered ? (
-                <div style={{ marginTop: "8px", fontSize: "12px" }}>
-                  Covered by: {item.coveredBy.join(", ")}
-                </div>
-              ) : (
-                <div style={{ marginTop: "8px", fontSize: "12px" }}>
-                  No tests cover this requirement
+              <div style={{ marginTop: "8px", fontSize: "12px" }}>
+                {item.covered ? (
+                  <>
+                    Covered by:{" "}
+                    {item.coveredBy && item.coveredBy.length
+                      ? item.coveredBy.join(", ")
+                      : "tests"}
+                  </>
+                ) : (
+                  "No tests cover this yet"
+                )}
+              </div>
+
+              {item.requirementId && (
+                <div style={{ marginTop: "6px", fontSize: "11px", opacity: 0.8 }}>
+                  Requirement: {item.requirementId}
                 </div>
               )}
             </div>

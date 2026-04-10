@@ -10,7 +10,7 @@ export default function ProjectAnalytics({ projectId }: { projectId: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/projects/${projectId}/analytics`)
+    fetch(`${API_BASE}/projects/${projectId}/flow/analytics`)
       .then(res => res.json())
       .then(d => {
         setData(d);
@@ -55,6 +55,13 @@ export default function ProjectAnalytics({ projectId }: { projectId: string }) {
     </div>
   );
 
+  const ciColor =
+    data.ciStatus === "failed"
+      ? theme.colors.danger
+      : data.ciStatus === "passed"
+      ? theme.colors.success
+      : theme.colors.textLight;
+
   return (
     <div style={{ marginTop: theme.spacing.xl }}>
       <h3 style={{ color: theme.colors.primary }}>Project Analytics</h3>
@@ -74,7 +81,11 @@ export default function ProjectAnalytics({ projectId }: { projectId: string }) {
         {card("Requirements", data.requirements)}
         {card("AI Suggestions", data.aiSuggestions)}
         {card("Auto‑Healed", data.autoHealed)}
-        {card("Last Run", data.lastRun ? new Date(data.lastRun).toLocaleString() : "—")}
+        {card(
+          "Last Run",
+          data.lastRun ? new Date(data.lastRun).toLocaleString() : "—"
+        )}
+        {card("CI Status", data.ciStatus || "not-run", ciColor)}
       </div>
     </div>
   );

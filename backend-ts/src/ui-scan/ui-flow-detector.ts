@@ -25,17 +25,23 @@ export class UIFlowDetector {
       for (const node of page.nodes) {
         if (!node.selector) continue;
 
-        if (node.selector.startsWith('a:has-text') || node.selector.startsWith('a[')) {
-          const href = node.attributes?.href;
-          if (href && this.isValidNavigation(href)) {
-            edges.push({
-              from: page.url,
-              to: this.normalizeUrl(page.url, href),
-              action: node.text || 'navigate',
-              selector: node.selector
-            });
-          }
-        }
+        const tagIsLink =
+          node.selector.includes('> a') ||
+          node.selector.startsWith('a') ||
+          node.selector.includes('a:nth-child');
+
+        const href = node.attributes?.href;
+
+        if (!tagIsLink && !href) continue;
+        if (!href) continue;
+        if (!this.isValidNavigation(href)) continue;
+
+        edges.push({
+          from: page.url,
+          to: this.normalizeUrl(page.url, href),
+          action: node.action || node.text || 'navigate',
+          selector: node.selector
+        });
       }
     }
 

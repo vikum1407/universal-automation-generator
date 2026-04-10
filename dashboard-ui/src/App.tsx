@@ -35,9 +35,14 @@ import InitializingProject from "./pages/projects/InitializingProject";
 import ProjectDetails from "@/dashboard/pages/projects/ProjectDetails";
 import ProjectsList from "./pages/projects/ProjectsList";
 
+import { Toaster } from "react-hot-toast";
+
 export default function App() {
   return (
     <BrowserRouter>
+      {/* 🔥 Toast notifications available globally */}
+      <Toaster position="top-right" />
+
       <ErrorBoundary>
         <Routes>
           <Route element={<DashboardLayout />}>

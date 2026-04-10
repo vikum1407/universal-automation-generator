@@ -25,11 +25,12 @@ import { UiRefactorService } from "./ui-actions/ui-refactor.service";
 import { CloudSyncController } from "./ui-actions/cloud-sync.controller";
 import { CloudSyncService } from "./ui-actions/cloud-sync.service";
 
+import { ProjectGateway } from './project.gateway';   // ✅ ADD THIS
+
 @Module({
   imports: [
     UiModule,
-    ApiModule,
-    forwardRef(() => ProjectModule)
+    ApiModule
   ],
   controllers: [
     ProjectController,
@@ -47,17 +48,16 @@ import { CloudSyncService } from "./ui-actions/cloud-sync.service";
   ],
   providers: [
     ProjectService,
-    {
-      provide: ProjectOrchestratorService,
-      useClass: ProjectOrchestratorService
-    },
+    ProjectOrchestratorService,
     CloudService,
     PrismaService,
     RefactorService,
 
     UiRecrawlService,
     UiRefactorService,
-    CloudSyncService
+    CloudSyncService,
+
+    ProjectGateway   // ✅ ADD THIS
   ],
   exports: [
     ProjectService,
