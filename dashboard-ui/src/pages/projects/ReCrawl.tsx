@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Button from "../../dashboard/components/Button";
-import { socket, joinProjectRoom } from "@/ai/ws";
+import { socket } from "../../socket";
 import { toast } from "react-hot-toast";
 
 const API_BASE = "http://localhost:3000";
@@ -9,7 +9,7 @@ export default function ReCrawl({ projectId }: { projectId: string }) {
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    joinProjectRoom(projectId);
+    socket.emit("join", projectId);
 
     const handler = (msg: any) => {
       if (msg.event === "recrawl-completed" || msg.event === "recrawl-failed") {
@@ -18,7 +18,6 @@ export default function ReCrawl({ projectId }: { projectId: string }) {
     };
 
     socket.on("recrawl-event", handler);
-
     return () => {
       socket.off("recrawl-event", handler);
     };
@@ -29,7 +28,7 @@ export default function ReCrawl({ projectId }: { projectId: string }) {
     toast("Re‑crawl requested");
 
     await fetch(`${API_BASE}/projects/${projectId}/recrawl`, {
-      method: "POST",
+      method: "POST"
     });
   };
 

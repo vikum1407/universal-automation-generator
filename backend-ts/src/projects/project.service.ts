@@ -3,8 +3,8 @@ import { randomUUID } from "crypto";
 import { ProjectOrchestratorService } from "./project-orchestrator.service";
 import { CloudService } from "../cloud/cloud.service";
 import { PrismaService } from "../../prisma/prisma.service";
-import { ProjectGateway } from './project.gateway';
 import * as fs from "fs";
+import { ReCrawlService } from "../services/ReCrawlService";
 
 @Injectable()
 export class ProjectService {
@@ -12,8 +12,11 @@ export class ProjectService {
     private readonly orchestrator: ProjectOrchestratorService,
     private readonly cloud: CloudService,
     private readonly prisma: PrismaService,
-    private readonly gateway: ProjectGateway
-  ) {}
+    private readonly recrawlService: ReCrawlService
+  ) {
+    fs.mkdirSync('./generated-ui-project', { recursive: true });
+    fs.mkdirSync('./generated-api-project', { recursive: true });
+  }
 
   async createUIProject(data: any) {
     const id = randomUUID();
@@ -67,9 +70,6 @@ export class ProjectService {
     });
   }
 
-  // ------------------------------------------------------
-  // SAFE PROJECT DELETE (NO FK ERRORS)
-  // ------------------------------------------------------
   async delete(id: string) {
     await this.prisma.transition.deleteMany({ where: { projectId: id } });
     await this.prisma.page.deleteMany({ where: { projectId: id } });
@@ -87,9 +87,6 @@ export class ProjectService {
     return { deleted: true };
   }
 
-  // ------------------------------------------------------
-  // ANALYTICS
-  // ------------------------------------------------------
   async getCIStatus(projectId: string) {
     const uiBase = `./generated-ui-project/${projectId}`;
     const apiBase = `./generated-api-project/${projectId}`;
@@ -182,9 +179,6 @@ export class ProjectService {
     return analytics;
   }
 
-  // ------------------------------------------------------
-  // RE-CRAWL (WITH LOGS + EVENTS + SAFE DB RESET)
-  // ------------------------------------------------------
   async runReCrawl(projectId: string) {
     const project = await this.prisma.project.findUnique({
       where: { id: projectId }
@@ -192,79 +186,7 @@ export class ProjectService {
 
     if (!project) return { error: "Project not found" };
 
-    const base =
-      project.type === "ui"
-        ? `./generated-ui-project/${projectId}`
-        : `./generated-api-project/${projectId}`;
-
-    this.gateway.emitRecrawlEvent(projectId, 'recrawl-started', { type: project.type });
-    this.gateway.emitStatus(projectId, 'initializing');
-
-    this.appendRecrawlLog(projectId, {
-      stage: 'start',
-      message: 'Recrawl requested',
-    });
-
-    if (fs.existsSync(base)) {
-      fs.rmSync(base, { recursive: true, force: true });
-      this.appendRecrawlLog(projectId, {
-        stage: 'cleanup',
-        message: 'Old generated folder removed',
-      });
-    }
-
-    fs.mkdirSync(base, { recursive: true });
-
-    await this.prisma.transition.deleteMany({ where: { projectId } });
-    await this.prisma.page.deleteMany({ where: { projectId } });
-
-    this.appendRecrawlLog(projectId, {
-      stage: 'db-reset',
-      message: 'Pages and transitions cleared',
-    });
-
-    await this.prisma.project.update({
-      where: { id: projectId },
-      data: { status: "initializing" }
-    });
-
-    if (project.type === "ui") {
-      this.orchestrator.runUIInitialization(project)
-        .then(() => {
-          this.gateway.emitRecrawlEvent(projectId, 'recrawl-completed', { type: 'ui' });
-          this.gateway.emitStatus(projectId, 'ready');
-          this.appendRecrawlLog(projectId, {
-            stage: 'complete',
-            message: 'UI recrawl completed',
-          });
-        })
-        .catch(err => {
-          this.gateway.emitRecrawlEvent(projectId, 'recrawl-failed', { error: err?.message });
-          this.gateway.emitStatus(projectId, 'failed');
-          this.appendRecrawlLog(projectId, {
-            stage: 'error',
-            message: `UI recrawl failed: ${err?.message || 'unknown error'}`,
-          });
-        });
-    } else {
-      this.orchestrator.runAPIInitialization(project)
-        .then(() => {
-          this.gateway.emitRecrawlEvent(projectId, 'recrawl-completed', { type: 'api' });
-          this.gateway.emitStatus(projectId, 'ready');
-          this.appendRecrawlLog(projectId, {
-            stage: 'complete',
-            message: 'API recrawl completed',
-          });
-        })
-        .catch(err => {
-          this.gateway.emitRecrawlEvent(projectId, 'recrawl-failed', { error: err?.message });
-          this.gateway.emitStatus(projectId, 'failed');
-          this.appendRecrawlLog(projectId, {
-            stage: 'error',
-            message: `API recrawl failed: ${err?.message || 'unknown error'}`,
-          });
-        });
-    }
+    this.recrawlService.recrawl(projectId).catch(() => {});
 
     return {
       recrawl: "started",
@@ -273,36 +195,6 @@ export class ProjectService {
     };
   }
 
-  private appendRecrawlLog(projectId: string, entry: { stage: string; message: string }) {
-    const uiBase = `./generated-ui-project/${projectId}`;
-    const apiBase = `./generated-api-project/${projectId}`;
-    const dir = fs.existsSync(uiBase) ? uiBase : apiBase;
-
-    fs.mkdirSync(dir, { recursive: true });
-
-    const logFile = `${dir}/recrawl-log.json`;
-    let log: any[] = [];
-
-    if (fs.existsSync(logFile)) {
-      try {
-        log = JSON.parse(fs.readFileSync(logFile, 'utf8'));
-        if (!Array.isArray(log)) log = [];
-      } catch {
-        log = [];
-      }
-    }
-
-    log.push({
-      ...entry,
-      timestamp: new Date().toISOString(),
-    });
-
-    fs.writeFileSync(logFile, JSON.stringify(log, null, 2));
-  }
-
-  // ------------------------------------------------------
-  // FLOW GRAPH
-  // ------------------------------------------------------
   async getEndpoints(projectId: string) {
     return this.prisma.endpoint.findMany({
       where: { projectId },

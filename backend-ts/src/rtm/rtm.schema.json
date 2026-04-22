@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Requirements Traceability Matrix",
+  "type": "object",
+  "properties": {
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "project": { "type": "string" },
+    "version": { "type": "string" },
+
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+
+          "type": {
+            "type": "string",
+            "enum": ["ui", "api"]
+          },
+
+          "source": {
+            "type": "object",
+            "properties": {
+              "pageName": { "type": "string" },
+              "endpointPath": { "type": "string" },
+              "method": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+
+          "businessPriority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+
+          "riskLevel": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+
+          "coveredBy": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+
+          "aiLogic": {
+            "type": "object",
+            "properties": {
+              "primarySelector": { "type": "string" },
+              "primaryAction": { "type": "string" },
+
+              "steps": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+
+              "assertions": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+
+              "negativeTests": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "case": { "type": "string" },
+                    "steps": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "assertions": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  },
+                  "required": ["case", "steps", "assertions"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": ["steps", "assertions", "negativeTests"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "title", "description", "type", "source", "aiLogic"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["generatedAt", "requirements"],
+  "additionalProperties": false
+}

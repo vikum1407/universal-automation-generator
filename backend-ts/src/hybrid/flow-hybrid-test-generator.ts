@@ -3,9 +3,9 @@ import { Requirement } from '../rtm/rtm.model';
 import { UIScanNode } from '../ui-scan/ui-selector-extractor';
 
 export interface HybridFlow {
-  steps: string[];      // sequence of page URLs
-  selectors: string[];  // selector used for each hop
-  actions: string[];    // semantic action per hop
+  steps: string[];
+  selectors: string[];
+  actions: string[];
 }
 
 interface EdgeHop {
@@ -15,7 +15,7 @@ interface EdgeHop {
 }
 
 export class FlowHybridTestGenerator {
-  private readonly MAX_DEPTH = 4; // up to 5 pages per journey
+  private readonly MAX_DEPTH = 4;
 
   generate(flow: FlowGraph, uiNodes: UIScanNode[] = []): HybridFlow[] {
     const hybridFlows: HybridFlow[] = [];
@@ -60,7 +60,7 @@ export class FlowHybridTestGenerator {
 
       const nextHops = adjacency[current] || [];
       for (const hop of nextHops) {
-        if (steps.includes(hop.to)) continue; // avoid cycles
+        if (steps.includes(hop.to)) continue;
 
         dfs(
           hop.to,
@@ -89,10 +89,13 @@ export class FlowHybridTestGenerator {
   toRequirements(flows: HybridFlow[]): Requirement[] {
     return flows.map((flow, index) => ({
       id: `HYBRID-FLOW-${index + 1}`,
-      page: flow.steps[0],
+      title: `Hybrid flow ${index + 1}`,
       description: `User can complete flow: ${flow.steps.join(' → ')}`,
       type: 'ui',
-      source: 'UI'
+      source: {
+        pageName: flow.steps[0]
+      },
+      coveredBy: []
     }));
   }
 }

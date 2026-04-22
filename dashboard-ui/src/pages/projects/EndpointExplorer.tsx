@@ -1,9 +1,22 @@
 import { useEffect, useState } from "react";
+import { theme } from "@/theme";
 
 const API_BASE = "http://localhost:3000";
 
 export default function EndpointExplorer({ projectId }: { projectId: string }) {
   const [endpoints, setEndpoints] = useState<any[]>([]);
+
+  const surface =
+    theme.mode === "dark" ? theme.colors.darkSurface : theme.colors.background;
+
+  const border =
+    theme.mode === "dark" ? theme.colors.darkBorder : theme.colors.border;
+
+  const text =
+    theme.mode === "dark" ? theme.colors.darkText : theme.colors.textDark;
+
+  const textLight =
+    theme.mode === "dark" ? theme.colors.darkTextLight : theme.colors.textLight;
 
   useEffect(() => {
     fetch(`${API_BASE}/projects/${projectId}/api/endpoints`)
@@ -11,18 +24,23 @@ export default function EndpointExplorer({ projectId }: { projectId: string }) {
       .then(setEndpoints);
   }, [projectId]);
 
-  if (!endpoints.length) return <p>No endpoints found.</p>;
+  if (!endpoints.length)
+    return (
+      <p style={{ color: textLight, marginTop: "16px" }}>
+        No endpoints found.
+      </p>
+    );
 
   const methodColor = (method: string) => {
     switch (method) {
       case "GET":
-        return "#2FF7D1";
+        return theme.colors.success;
       case "POST":
-        return "#7B2FF7";
+        return theme.colors.primary;
       case "PUT":
         return "#FFA726";
       case "DELETE":
-        return "#EF5350";
+        return theme.colors.danger;
       default:
         return "#90CAF9";
     }
@@ -30,47 +48,103 @@ export default function EndpointExplorer({ projectId }: { projectId: string }) {
 
   return (
     <div style={{ marginTop: "24px" }}>
-      <h3 style={{ color: "#7B2FF7" }}>API Endpoints</h3>
+      <h3 style={{ color: theme.colors.primary }}>API Endpoints</h3>
 
-      <div style={{ display: "grid", gap: "16px", marginTop: "16px" }}>
+      <div
+        style={{
+          display: "grid",
+          gap: "16px",
+          marginTop: "16px"
+        }}
+      >
         {endpoints.map((ep, i) => (
           <div
             key={i}
             style={{
-              padding: "16px",
+              padding: "18px",
               borderRadius: "12px",
-              border: "1px solid #eee",
-              background: "#F8F4FF",
-              cursor: "pointer"
+              border: `1px solid ${border}`,
+              background: surface,
+              cursor: "pointer",
+              transition: "all 0.15s ease",
+              boxShadow: theme.shadow.card
             }}
-            onClick={() => navigator.clipboard.writeText(`${ep.method} ${ep.path}`)}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLDivElement).style.boxShadow =
+                "0 6px 14px rgba(0,0,0,0.18)";
+              (e.currentTarget as HTMLDivElement).style.transform =
+                "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLDivElement).style.boxShadow =
+                theme.shadow.card;
+              (e.currentTarget as HTMLDivElement).style.transform =
+                "translateY(0)";
+            }}
+            onClick={() =>
+              navigator.clipboard.writeText(`${ep.method} ${ep.path}`)
+            }
             title="Click to copy"
           >
-            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            {/* METHOD + PATH */}
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                alignItems: "center"
+              }}
+            >
               <span
                 style={{
-                  padding: "4px 10px",
+                  padding: "4px 12px",
                   borderRadius: "8px",
                   background: methodColor(ep.method),
-                  fontWeight: 600
+                  fontWeight: 700,
+                  color: "#000",
+                  fontSize: "12px"
                 }}
               >
                 {ep.method}
               </span>
 
-              <strong style={{ color: "#7B2FF7" }}>{ep.path}</strong>
+              <strong
+                style={{
+                  color: theme.colors.primary,
+                  fontSize: "15px"
+                }}
+              >
+                {ep.path}
+              </strong>
             </div>
 
+            {/* SUMMARY */}
             {ep.summary && (
-              <p style={{ marginTop: "8px", color: "#555" }}>{ep.summary}</p>
+              <p
+                style={{
+                  marginTop: "8px",
+                  color: textLight,
+                  fontSize: "13px"
+                }}
+              >
+                {ep.summary}
+              </p>
             )}
 
+            {/* PARAMETERS */}
             {ep.parameters?.length > 0 && (
               <>
-                <h4 style={{ marginTop: "12px", color: "#2FF7D1" }}>Parameters</h4>
-                <ul>
+                <h4
+                  style={{
+                    marginTop: "14px",
+                    color: theme.colors.secondary,
+                    fontSize: "14px"
+                  }}
+                >
+                  Parameters
+                </h4>
+                <ul style={{ marginTop: "6px", color: text }}>
                   {ep.parameters.map((p: any, idx: number) => (
-                    <li key={idx}>
+                    <li key={idx} style={{ marginBottom: "4px" }}>
                       <strong>{p.name}</strong> ({p.in}) — {p.description}
                     </li>
                   ))}
@@ -78,19 +152,65 @@ export default function EndpointExplorer({ projectId }: { projectId: string }) {
               </>
             )}
 
+            {/* REQUEST BODY */}
             {ep.requestBody && (
               <>
-                <h4 style={{ marginTop: "12px", color: "#2FF7D1" }}>Request Body</h4>
-                <pre style={{ background: "#fff", padding: "12px", borderRadius: "8px" }}>
+                <h4
+                  style={{
+                    marginTop: "14px",
+                    color: theme.colors.secondary,
+                    fontSize: "14px"
+                  }}
+                >
+                  Request Body
+                </h4>
+                <pre
+                  style={{
+                    background:
+                      theme.mode === "dark"
+                        ? theme.colors.darkBackground
+                        : "#fff",
+                    padding: "12px",
+                    borderRadius: "8px",
+                    border: `1px solid ${border}`,
+                    marginTop: "6px",
+                    color: text,
+                    fontSize: "12px",
+                    overflowX: "auto"
+                  }}
+                >
                   {JSON.stringify(ep.requestBody, null, 2)}
                 </pre>
               </>
             )}
 
+            {/* RESPONSES */}
             {ep.responses && (
               <>
-                <h4 style={{ marginTop: "12px", color: "#2FF7D1" }}>Responses</h4>
-                <pre style={{ background: "#fff", padding: "12px", borderRadius: "8px" }}>
+                <h4
+                  style={{
+                    marginTop: "14px",
+                    color: theme.colors.secondary,
+                    fontSize: "14px"
+                  }}
+                >
+                  Responses
+                </h4>
+                <pre
+                  style={{
+                    background:
+                      theme.mode === "dark"
+                        ? theme.colors.darkBackground
+                        : "#fff",
+                    padding: "12px",
+                    borderRadius: "8px",
+                    border: `1px solid ${border}`,
+                    marginTop: "6px",
+                    color: text,
+                    fontSize: "12px",
+                    overflowX: "auto"
+                  }}
+                >
                   {JSON.stringify(ep.responses, null, 2)}
                 </pre>
               </>

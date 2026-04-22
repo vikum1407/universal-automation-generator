@@ -1,24 +1,40 @@
-import { Module } from '@nestjs/common';
-import { RTMController } from './rtm.controller';
+import { Module } from "@nestjs/common";
 
-import { RTMGenerationOrchestrator } from './rtm-generation-orchestrator';
-import { IngestionOrchestrator } from '../orchestrator/ingestion-orchestrator';
-import { UnifiedTestCaseGenerator } from '../generator/unified-test-case-generator';
+import { RTMController } from "./rtm.controller";
 
-import { OrchestratorModule } from '../orchestrator/orchestrator.module';
-import { HistoryModule } from '../history/history.module';
+import { RTMBuilder } from "./rtm.builder";
+import { RTMGenerationOrchestrator } from "./rtm-generation-orchestrator";
+
+import { RTMAnalyticsService } from "./rtm.analytics";
+import { RTMInsightsEngine } from "./rtm.insights";
+import { RTMDashboardService } from "./rtm.dashboard";
+
+import { RTMMarkdownService } from "./rtm.markdown";
+import { RTMWriter } from "./rtm-writer";
+
+import { RTMService } from "./rtm.service";
 
 @Module({
-  imports: [
-    OrchestratorModule,
-    HistoryModule   // <-- REQUIRED FIX
-  ],
   controllers: [RTMController],
   providers: [
+    RTMService,
+    RTMBuilder,
     RTMGenerationOrchestrator,
-    IngestionOrchestrator,
-    UnifiedTestCaseGenerator
+    RTMAnalyticsService,
+    RTMInsightsEngine,
+    RTMDashboardService,
+    RTMMarkdownService,
+    RTMWriter
   ],
-  exports: [RTMGenerationOrchestrator]
+  exports: [
+    RTMService,
+    RTMBuilder,
+    RTMGenerationOrchestrator,
+    RTMAnalyticsService,
+    RTMInsightsEngine,
+    RTMDashboardService,
+    RTMMarkdownService,
+    RTMWriter
+  ]
 })
 export class RTMModule {}

@@ -1,4 +1,9 @@
 export interface GeneratedTestLogic {
+  // NEW FIELDS REQUIRED BY UI TEST GENERATION
+  primarySelector?: string;
+  primaryAction?: string;
+
+  // REQUIRED BY RTM MODEL
   steps: string[];
   assertions: string[];
   negativeTests: {
@@ -84,6 +89,8 @@ export class AITestLogicService {
     }
 
     return {
+      primarySelector: undefined,
+      primaryAction: undefined,
       steps,
       assertions,
       negativeTests

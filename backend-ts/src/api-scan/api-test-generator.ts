@@ -2,15 +2,19 @@ import { Requirement } from '../rtm/rtm.model';
 
 export class APITestGenerator {
   generate(requirement: Requirement): string {
+    const method = requirement.source.method?.toLowerCase() ?? 'get';
+    const url = requirement.source.endpointPath ?? '';
+    const expectedStatus = 200;
+
     return `
 import { test, expect } from '@playwright/test';
 
 test('${requirement.id}: ${this.sanitize(requirement.description)}', async ({ request }) => {
-  const response = await request.${requirement.method?.toLowerCase()}('${requirement.url}', {
-    data: ${this.formatBody(requirement.requestBody)}
+  const response = await request.${method}('${url}', {
+    data: undefined
   });
 
-  expect(response.status()).toBe(${requirement.expectedStatus});
+  expect(response.status()).toBe(${expectedStatus});
 
   const json = await response.json().catch(() => null);
   expect(json).not.toBeNull();
@@ -23,14 +27,5 @@ test('${requirement.id}: ${this.sanitize(requirement.description)}', async ({ re
       .replace(/`/g, '\\`')
       .replace(/"/g, '\\"')
       .replace(/'/g, "\\'");
-  }
-
-  private formatBody(body: any): string {
-    if (!body) return 'undefined';
-    try {
-      return JSON.stringify(body, null, 2);
-    } catch {
-      return 'undefined';
-    }
   }
 }

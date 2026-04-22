@@ -1,33 +1,83 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { theme } from "../../theme";
+import { socket } from "@/socket";
+import ProgressModal from "@/components/ProgressModal";
 
 export default function CreateProject() {
   const [type, setType] = useState<"ui" | "api">("ui");
   const [form, setForm] = useState<any>({});
+  const [progress, setProgress] = useState({
+    open: false,
+    percent: 0,
+    step: "Starting…"
+  });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const statusHandler = (data: any) => {
+      if (data.progressPercent === undefined) return;
+      if (data.progressPercent === 0 && data.progressStep === "Starting…") return;
+
+      setProgress({
+        open: data.progressPercent < 100,
+        percent: data.progressPercent,
+        step: data.progressStep
+      });
+    };
+
+    const progressHandler = (data: any) => {
+      setProgress({
+        open: true,
+        percent: data.percent,
+        step: data.step
+      });
+    };
+
+    const eventHandler = () => {
+      setProgress({
+        open: false,
+        percent: 100,
+        step: "Completed"
+      });
+    };
+
+    socket.on("project-status", statusHandler);
+    socket.on("recrawl-progress", progressHandler);
+    socket.on("recrawl-event", eventHandler);
+
+    return () => {
+      socket.off("project-status", statusHandler);
+      socket.off("recrawl-progress", progressHandler);
+      socket.off("recrawl-event", eventHandler);
+    };
+  }, []);
 
   const update = (k: string, v: any) =>
     setForm((f: any) => ({ ...f, [k]: v }));
 
   const create = async () => {
-    const endpoint = type === "ui" ? "/projects/ui" : "/projects/api";
+    setProgress({ open: true, percent: 0, step: "Starting…" });
 
-    const res = await fetch(endpoint, {
+    const res = await fetch("http://localhost:3000/projects", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
+      body: JSON.stringify({ ...form, type })
     });
 
     const project = await res.json();
-    navigate(`/projects/${project.id}`);
+
+    socket.emit("join", project.id);
+
+    setTimeout(() => navigate(`/projects/${project.id}`), 1200);
   };
 
   return (
     <div style={{ padding: theme.spacing.xl }}>
+      <ProgressModal open={progress.open} percent={progress.percent} step={progress.step} />
+
       <h1 style={{ color: theme.colors.primary }}>Create Project</h1>
 
-      {/* Project Type */}
       <div style={{ marginTop: theme.spacing.md }}>
         <label>Project Type</label>
         <select
@@ -44,7 +94,6 @@ export default function CreateProject() {
         </select>
       </div>
 
-      {/* UI Project Form */}
       {type === "ui" && (
         <div style={{ marginTop: theme.spacing.lg }}>
           <label>URL</label>
@@ -84,7 +133,6 @@ export default function CreateProject() {
         </div>
       )}
 
-      {/* API Project Form */}
       {type === "api" && (
         <div style={{ marginTop: theme.spacing.lg }}>
           <label>Swagger URL</label>
@@ -117,7 +165,6 @@ export default function CreateProject() {
         </div>
       )}
 
-      {/* Submit */}
       <button
         onClick={create}
         style={{

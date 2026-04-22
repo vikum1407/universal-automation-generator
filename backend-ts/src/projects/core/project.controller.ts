@@ -16,6 +16,12 @@ export class ProjectController {
     return { error: "Invalid project type" };
   }
 
+  @Post("scan-ui")
+  async scanUI(@Body() body: any) {
+    const project = await this.projectService.createUIProject(body);
+    return { projectId: project.id };
+  }
+
   @Get()
   async findAll() {
     return this.projectService.listProjects();

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Button from "../../dashboard/components/Button";
-import { theme } from "../../theme";
+import { theme } from "@/theme";
 
 const API_BASE = "http://localhost:3000";
 

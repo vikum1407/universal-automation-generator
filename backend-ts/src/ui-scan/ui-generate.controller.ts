@@ -9,8 +9,10 @@ export class UIGenerateController {
     const grouped: Record<string, Requirement[]> = {};
 
     for (const req of body.requirements) {
-      if (!grouped[req.page]) grouped[req.page] = [];
-      grouped[req.page].push(req);
+      const page = req.source.pageName ?? 'unknown';
+
+      if (!grouped[page]) grouped[page] = [];
+      grouped[page].push(req);
     }
 
     const generator = new UIFrameworkGenerator();

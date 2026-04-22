@@ -26,14 +26,6 @@ export interface NavigationTrace {
   action?: string;
 }
 
-interface LoginForm {
-  usernameSelector: string;
-  passwordSelector: string;
-  buttonSelector: string;
-  usernameValue: string;
-  passwordValue: string;
-}
-
 export class UIMultiPageCrawler {
   async crawl(startUrl: string, maxDepth: number = 3, maxPages: number = 30): Promise<CrawledPage[]> {
     const browser = await chromium.launch({
@@ -98,7 +90,6 @@ export class UIMultiPageCrawler {
         });
 
         if (depth >= maxDepth) {
-          await page.close();
           continue;
         }
 
@@ -143,7 +134,9 @@ export class UIMultiPageCrawler {
         }
       } catch {
       } finally {
-        await page.close();
+        if (!page.isClosed()) {
+          await page.close();
+        }
       }
     }
 

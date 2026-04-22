@@ -45,19 +45,29 @@ export class APIPipelineOrchestrator {
 
     const apiRequirements: Requirement[] = calls.map((call, index) => ({
       id: `API-${index + 1}`,
-      page: url,
+      title: `API ${call.method} ${call.endpoint}`,
       description: `API call detected: [${call.method}] ${call.endpoint}`,
       type: 'api',
-      source: 'API',
-      method: call.method,
-      url: call.endpoint,
-      expectedStatus: 200
+      source: {
+        endpointPath: call.endpoint,
+        method: call.method
+      },
+      coveredBy: []
     }));
 
     this.ensureProject(outputDir);
 
     if (apiRequirements.length > 0) {
-      this.writer.writeTests(apiRequirements, outputDir);
+      const forWriter = apiRequirements.map(r => ({
+        id: r.id,
+        description: r.description,
+        method: r.source.method ?? 'GET',
+        url: r.source.endpointPath ?? '',
+        requestBody: null,
+        expectedStatus: 200
+      }));
+
+      this.writer.writeTests(forWriter, outputDir);
       console.log('[API] API tests written');
     }
 
@@ -93,7 +103,7 @@ export class APIPipelineOrchestrator {
       artifacts: {
         outputDir,
         rtm: rtmPath,
-        apiTestsDir: outputDir // your writer decides exact subfolder; this keeps it generic
+        apiTestsDir: outputDir
       },
       requirements: mergedRtm.requirements
     };
@@ -131,7 +141,13 @@ export default defineConfig({
 });
 `;
 
-    fs.writeFileSync(path.join(outputDir, 'package.json'), JSON.stringify(pkg, null, 2));
-    fs.writeFileSync(path.join(outputDir, 'playwright.config.ts'), config.trim() + '\n');
+    fs.writeFileSync(
+      path.join(outputDir, 'package.json'),
+      JSON.stringify(pkg, null, 2)
+    );
+    fs.writeFileSync(
+      path.join(outputDir, 'playwright.config.ts'),
+      config.trim() + '\n'
+    );
   }
 }

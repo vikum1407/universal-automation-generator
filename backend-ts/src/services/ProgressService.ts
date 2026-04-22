@@ -1,40 +1,38 @@
 class ProgressService {
-  private progress: Record<string, {
-    percent: number;
-    step: string;
-    status: string;
-  }> = {};
+  private map = new Map<
+    string,
+    { status: string; percent: number; step: string }
+  >();
 
   init(projectId: string, status: string) {
-    this.progress[projectId] = {
-      percent: 0,
-      step: "Starting…",
+    this.map.set(projectId, {
       status,
-    };
+      percent: 0,
+      step: "Starting…"
+    });
   }
 
   update(projectId: string, percent: number, step: string) {
-    if (!this.progress[projectId]) return;
-    this.progress[projectId].percent = percent;
-    this.progress[projectId].step = step;
+    const entry = this.map.get(projectId);
+    if (!entry) return;
+    entry.percent = percent;
+    entry.step = step;
   }
 
   complete(projectId: string) {
-    if (!this.progress[projectId]) return;
-    this.progress[projectId].percent = 100;
-    this.progress[projectId].step = "Completed";
-    this.progress[projectId].status = "ready";
+    const entry = this.map.get(projectId);
+    if (!entry) return;
+    entry.percent = 100;
+    entry.step = "Completed";
+    entry.status = "completed";
   }
 
-  fail(projectId: string, step: string) {
-    if (!this.progress[projectId]) return;
-    this.progress[projectId].percent = 100;
-    this.progress[projectId].step = step;
-    this.progress[projectId].status = "failed";
+  clear(projectId: string) {
+    this.map.delete(projectId);
   }
 
   get(projectId: string) {
-    return this.progress[projectId] || null;
+    return this.map.get(projectId) || null;
   }
 }
 

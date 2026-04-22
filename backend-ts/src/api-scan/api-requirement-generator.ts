@@ -12,21 +12,21 @@ export class APIRequirementGenerator {
 
     return endpoints.map((ep, index) => {
       const tags: string[] = ep.spec?.tags || [];
-      const summary: string = ep.spec?.summary || `${ep.method.toUpperCase()} ${ep.path}`;
-      const operationId: string = ep.spec?.operationId || `op_${index + 1}`;
+      const summary: string =
+        ep.spec?.summary || `${ep.method.toUpperCase()} ${ep.path}`;
 
       return {
         id: `API-${index + 1}`,
-        page: ep.path,
+        title: summary,
         description: summary,
-        selector: ep.path,
         type: 'api',
-        source: 'API',
-        method: ep.method,
-        spec: ep.spec,
+        source: {
+          endpointPath: ep.path,
+          method: ep.method
+        },
         tags,
-        operationId
-      } as any;
+        coveredBy: []
+      };
     });
   }
 }

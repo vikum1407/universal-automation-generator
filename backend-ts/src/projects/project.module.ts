@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 import { ProjectService } from './project.service';
 import { ProjectOrchestratorService } from './project-orchestrator.service';
@@ -25,7 +25,9 @@ import { UiRefactorService } from "./ui-actions/ui-refactor.service";
 import { CloudSyncController } from "./ui-actions/cloud-sync.controller";
 import { CloudSyncService } from "./ui-actions/cloud-sync.service";
 
-import { ProjectGateway } from './project.gateway';   // ✅ ADD THIS
+import { ProjectGateway } from './project.gateway';
+import { ProgressGateway } from '../gateways/progress.gateway';
+import { ReCrawlService } from '../services/ReCrawlService';
 
 @Module({
   imports: [
@@ -57,11 +59,14 @@ import { ProjectGateway } from './project.gateway';   // ✅ ADD THIS
     UiRefactorService,
     CloudSyncService,
 
-    ProjectGateway   // ✅ ADD THIS
+    ProjectGateway,
+    ProgressGateway,
+    ReCrawlService
   ],
   exports: [
     ProjectService,
-    ProjectOrchestratorService
+    ProjectOrchestratorService,
+    ReCrawlService
   ]
 })
 export class ProjectModule {}

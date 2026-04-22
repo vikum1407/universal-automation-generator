@@ -10,8 +10,10 @@ import { UiTestGenerationService } from "../projects/ui/ui-test-generation.servi
 import { APIParser } from "../api-scan/api-parser";
 import { ApiTestGenerationService } from "./api/api-test-generation.service";
 
-import { Requirement, RTMDocument } from "../rtm/rtm.model";
+import { Requirement } from "../rtm/rtm.model";
 import { ProjectService } from "./project.service";
+import { ProgressGateway } from "../gateways/progress.gateway";
+import { progressService } from "../services/ProgressService";
 
 @Injectable()
 export class ProjectOrchestratorService {
@@ -21,20 +23,35 @@ export class ProjectOrchestratorService {
     private readonly uiTestGen: UiTestGenerationService,
     private readonly apiTestGen: ApiTestGenerationService,
     private readonly prisma: PrismaService,
+    private readonly gateway: ProgressGateway,
     @Inject(forwardRef(() => ProjectService))
     private readonly projectService: ProjectService
   ) {}
 
+  private emit(projectId: string, percent: number, step: string) {
+    progressService.update(projectId, percent, step);
+    this.gateway.emitProjectStatus(projectId);
+  }
+
   async runUIInitialization(project: any) {
+    progressService.init(project.id, "initializing");
+    this.gateway.emitProjectStatus(project.id);
+
     try {
       this.logger.log(`UI initialization started for project ${project.id}`);
 
+      const base = `./generated-ui-project/${project.id}`;
+      fs.mkdirSync(base, { recursive: true });
+
+      this.emit(project.id, 10, "Scanning website…");
       const ingestor = new UiUrlIngestor();
       await ingestor.ingest(project.url);
 
+      this.emit(project.id, 25, "Crawling pages…");
       const crawler = new UIMultiPageCrawler();
       const crawled = await crawler.crawl(project.url, project.crawlDepth);
 
+      this.emit(project.id, 40, "Detecting flows…");
       const pages: UIPage[] = crawled.map(p => ({
         url: p.url,
         nodes: this.toUIScanNodes(p.components || [], p.url)
@@ -43,10 +60,6 @@ export class ProjectOrchestratorService {
       const flowDetector = new UIFlowDetector();
       const flowGraph = flowDetector.detect(pages);
 
-      const base = `./generated-ui-project/${project.id}`;
-      if (!fs.existsSync(base)) fs.mkdirSync(base, { recursive: true });
-
-      // Build element-level nodes
       const elementNodes = pages.flatMap(page =>
         page.nodes.map((n: any, index: number) => ({
           id: `${page.url}#${n.selector || "root"}-${index}`,
@@ -58,14 +71,12 @@ export class ProjectOrchestratorService {
         }))
       );
 
-      // Map page-level edges to element-level edges (use first interactive node on each page)
       const findFirstNodeForPage = (pageUrl: string) =>
         elementNodes.find(n => n.pageUrl === pageUrl) || null;
 
       const elementEdges = flowGraph.edges.map((e: any, index: number) => {
         const fromNode = findFirstNodeForPage(e.from);
         const toNode = findFirstNodeForPage(e.to);
-
         return {
           id: `edge-${index}`,
           from: fromNode ? fromNode.id : e.from,
@@ -75,14 +86,12 @@ export class ProjectOrchestratorService {
         };
       });
 
-      const elementFlowGraph = {
-        nodes: elementNodes,
-        edges: elementEdges
-      };
+      fs.writeFileSync(
+        `${base}/flow-graph.json`,
+        JSON.stringify({ nodes: elementNodes, edges: elementEdges }, null, 2)
+      );
 
-      fs.writeFileSync(`${base}/flow-graph.json`, JSON.stringify(elementFlowGraph, null, 2));
-
-      // Persist flow steps at page level (unchanged)
+      this.emit(project.id, 55, "Recording flow steps…");
       for (const edge of flowGraph.edges) {
         await this.projectService.recordFlowStep(
           project.id,
@@ -93,34 +102,42 @@ export class ProjectOrchestratorService {
         );
       }
 
-      // Element-level RTM
+      this.emit(project.id, 70, "Building requirements…");
       const requirements: Requirement[] = elementEdges.map((edge, index) => ({
         id: `ui-flow-${project.id}-${index}`,
-        page: edge.from,
+        title: edge.action
+          ? `${edge.action} from ${edge.from} to ${edge.to}`
+          : `Interaction from ${edge.from} to ${edge.to}`,
         description: edge.action || `Interaction from ${edge.from} to ${edge.to}`,
-        selector: edge.selector,
         type: "ui",
-        action: edge.action,
-        source: "UI",
+        source: {
+          pageName: edge.from
+        },
         coveredBy: []
       }));
 
-      const rtm: RTMDocument = {
-        generatedAt: new Date().toISOString(),
-        requirements
-      };
+      fs.writeFileSync(
+        `${base}/rtm.json`,
+        JSON.stringify(
+          { generatedAt: new Date().toISOString(), requirements },
+          null,
+          2
+        )
+      );
 
-      fs.writeFileSync(`${base}/rtm.json`, JSON.stringify(rtm, null, 2));
-
+      this.emit(project.id, 85, "Generating tests…");
       await this.uiTestGen.generateTests(base);
 
+      this.emit(project.id, 95, "Finalizing…");
       await this.prisma.project.update({
         where: { id: project.id },
         data: { status: "ready" }
       });
+
+      progressService.complete(project.id);
+      this.gateway.emitProjectStatus(project.id);
     } catch (err) {
       this.logger.error(err);
-
       await this.prisma.project.update({
         where: { id: project.id },
         data: { status: "failed" }
@@ -128,7 +145,7 @@ export class ProjectOrchestratorService {
     }
   }
 
-    private toUIScanNodes(components: ComponentMeta[], pageUrl: string) {
+  private toUIScanNodes(components: ComponentMeta[], pageUrl: string) {
     return components.map(c => ({
       pageUrl,
       selector: c.selector,
@@ -140,48 +157,64 @@ export class ProjectOrchestratorService {
   }
 
   async runAPIInitialization(project: any) {
+    progressService.init(project.id, "initializing");
+    this.gateway.emitProjectStatus(project.id);
+
     try {
       this.logger.log(`API initialization started for project ${project.id}`);
 
+      const base = `./generated-api-project/${project.id}`;
+      fs.mkdirSync(base, { recursive: true });
+
+      this.emit(project.id, 15, "Parsing Swagger…");
       const parser = new APIParser();
       const schema = await parser.loadSchema(project.swaggerUrl);
 
+      this.emit(project.id, 35, "Extracting endpoints…");
       const endpoints = parser.extractEndpoints(schema);
 
-      const base = `./generated-api-project/${project.id}`;
-      if (!fs.existsSync(base)) fs.mkdirSync(base, { recursive: true });
+      fs.writeFileSync(
+        `${base}/endpoints.json`,
+        JSON.stringify(endpoints, null, 2)
+      );
 
-      fs.writeFileSync(`${base}/endpoints.json`, JSON.stringify(endpoints, null, 2));
+      this.emit(project.id, 60, "Building requirements…");
+      const requirements: Requirement[] = endpoints.map(
+        (ep: any, index: number) => ({
+          id: `api-${project.id}-${index}`,
+          title: ep.summary || `${ep.method} ${ep.path}`,
+          description: ep.summary || `${ep.method} ${ep.path}`,
+          type: "api",
+          source: {
+            endpointPath: ep.path,
+            method: ep.method
+          },
+          coveredBy: []
+        })
+      );
 
-      const requirements: Requirement[] = endpoints.map((ep: any, index: number) => ({
-        id: `api-${project.id}-${index}`,
-        page: ep.path,
-        description: ep.summary || `${ep.method} ${ep.path}`,
-        type: "api",
-        method: ep.method,
-        url: ep.path,
-        requestBody: ep.requestBody,
-        expectedStatus: 200,
-        source: "API",
-        coveredBy: []
-      }));
+      fs.writeFileSync(
+        `${base}/rtm.json`,
+        JSON.stringify(
+          { generatedAt: new Date().toISOString(), requirements },
+          null,
+          2
+        )
+      );
 
-      const rtm: RTMDocument = {
-        generatedAt: new Date().toISOString(),
-        requirements
-      };
-
-      fs.writeFileSync(`${base}/rtm.json`, JSON.stringify(rtm, null, 2));
-
+      this.emit(project.id, 80, "Generating tests…");
       await this.apiTestGen.generateTests(base);
 
+      this.emit(project.id, 95, "Finalizing…");
       await this.prisma.project.update({
         where: { id: project.id },
         data: { status: "ready" }
       });
+
+      progressService.complete(project.id);
+      this.gateway.emitProjectStatus(project.id);
     } catch (err) {
       this.logger.error(err);
-
       await this.prisma.project.update({
         where: { id: project.id },
         data: { status: "failed" }

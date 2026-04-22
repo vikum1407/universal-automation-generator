@@ -1,48 +1,60 @@
+import type { GeneratedTestLogic } from '../ai/ai-test-logic.service';
+
+export type RequirementType = 'ui' | 'api';
+
+export interface RequirementSource {
+  // UI: human-readable page or screen name
+  pageName?: string;
+
+  // API: endpoint path (e.g. /users/{id})
+  endpointPath?: string;
+
+  // API: HTTP method (e.g. GET, POST)
+  method?: string;
+}
+
 export interface Requirement {
-  // Unique ID for the requirement
+  // Unique business-level requirement ID
   id: string;
 
-  // UI: page name | API: endpoint path
-  page: string;
+  // Short, human-readable title
+  title: string;
 
-  // Human-readable description
+  // Business-readable description of the requirement
   description: string;
 
-  // Optional CSS selector (UI only)
-  selector?: string;
+  // Requirement type (UI or API)
+  type: RequirementType;
 
-  // Requirement type
-  type: 'ui' | 'api';
+  // Where this requirement comes from (page or endpoint)
+  source: RequirementSource;
 
-  // Optional semantic UI action (click, login, add-to-cart, etc.)
-  action?: string;
+  // Optional tags (e.g. "auth", "checkout", "critical")
+  tags?: string[];
 
-  // Test cases that cover this requirement
+  // Optional business priority
+  businessPriority?: 'low' | 'medium' | 'high' | 'critical';
+
+  // Optional risk level (used by analytics/insights)
+  riskLevel?: 'low' | 'medium' | 'high';
+
+  // Test case identifiers that cover this requirement
   coveredBy?: string[];
 
-  // Source of requirement
-  source?: 'UI' | 'API';
-
-  // Optional AI logic block
-  aiLogic?: {
-    steps: string[];
-    assertions: string[];
-    negativeTests: {
-      case: string;
-      steps: string[];
-      assertions: string[];
-    }[];
-  };
-
-  // API-specific fields
-  method?: string;
-  url?: string;
-  requestBody?: any;
-  expectedStatus?: number;
-  expectedResponse?: any;
+  // AI-enriched logic (matches AITestLogicService output)
+  aiLogic?: GeneratedTestLogic;
 }
 
 export interface RTMDocument {
+  // When this RTM snapshot was generated
   generatedAt: string;
+
+  // Optional project identifier
+  project?: string;
+
+  // Optional RTM version
+  version?: string;
+
+  // Business-readable requirements
   requirements: Requirement[];
 }

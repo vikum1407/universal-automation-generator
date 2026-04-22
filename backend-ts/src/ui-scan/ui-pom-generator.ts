@@ -8,17 +8,17 @@ export class UIPOMGenerator {
 
 export class ${className} {
   constructor(private page: Page) {}
-
 `;
 
     for (const req of requirements) {
-      if (!req.selector) continue;
+      const selector = req.aiLogic?.primarySelector;
+      if (!selector) continue;
 
       const methodName = this.buildMethodName(req);
 
       content += `
   async ${methodName}() {
-    return this.page.locator('${req.selector}');
+    return this.page.locator('${selector}');
   }
 `;
     }

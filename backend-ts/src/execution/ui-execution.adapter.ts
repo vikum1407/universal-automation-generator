@@ -5,23 +5,27 @@ import { ExecutionResult, TestResult } from './execution.model';
 @Injectable()
 export class UIExecutionAdapter {
   async runPlaywright(project: string, frameworkPath: string): Promise<ExecutionResult> {
-    const start = Date.now();
-
     let stdout = '';
     let stderr = '';
 
-    const npxPath = 'C:\\Users\\Pavithra Herath\\AppData\\Roaming\\npm\\npx.cmd';
-    const command = `"${npxPath}" playwright test --reporter=line`;
+    const proc = spawn('npx', ['playwright', 'test', '--reporter=line'], {
+      cwd: frameworkPath,
+      shell: true
+    });
+
+    proc.stdout.on('data', (d) => {
+      const text = d.toString();
+      stdout += text;
+      console.log(text);
+    });
+
+    proc.stderr.on('data', (d) => {
+      const text = d.toString();
+      stderr += text;
+      console.log(text);
+    });
 
     await new Promise<void>((resolve) => {
-      const proc = spawn('powershell.exe', ['-Command', command], {
-        cwd: frameworkPath,
-        shell: true
-      });
-
-      proc.stdout.on('data', (d) => (stdout += d.toString()));
-      proc.stderr.on('data', (d) => (stderr += d.toString()));
-
       proc.on('close', () => resolve());
     });
 
@@ -41,32 +45,91 @@ export class UIExecutionAdapter {
   }
 
   private parse(output: string): TestResult[] {
-    const lines = output.split('\n');
     const results: TestResult[] = [];
 
-    for (const line of lines) {
-      const passMatch = line.match(/✓ (.+?) \((\d+)ms\)/);
-      const failMatch = line.match(/✘ (.+?) \((\d+)ms\)/);
+    // Remove ANSI escape codes WITHOUT regex
+    const clean = output
+      .split('\u001b')
+      .map(part => {
+        const idx = part.indexOf('m');
+        return idx !== -1 ? part.substring(idx + 1) : part;
+      })
+      .join('');
 
-      if (passMatch) {
+    const lines = clean.split('\n');
+
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
+
+      // PASS: [1/69] ... › Test name (532ms)
+      if (line.includes('›') && line.includes('(') && line.includes(')')) {
+        const parts = line.split('›');
+        if (parts.length < 2) continue;
+
+        const right = parts[1].trim();
+        const name = right.substring(0, right.lastIndexOf('(')).trim();
+        const durationText = right.substring(
+          right.lastIndexOf('(') + 1,
+          right.lastIndexOf(')')
+        );
+
+        let durationMs = 0;
+        if (durationText.endsWith('ms')) {
+          durationMs = Number(durationText.replace('ms', ''));
+        } else if (durationText.endsWith('s')) {
+          durationMs = Number(durationText.replace('s', '')) * 1000;
+        }
+
         results.push({
-          name: passMatch[1],
+          name,
           status: 'pass',
-          durationMs: Number(passMatch[2]),
+          durationMs,
           error: null
         });
+
+        continue;
       }
 
-      if (failMatch) {
+      // FAIL: "1) ... › Test name"
+      if (line.startsWith('1)') || this.startsWithNumberParen(line)) {
+        const parts = line.split('›');
+        if (parts.length < 2) continue;
+
+        const name = parts[1].trim();
+
         results.push({
-          name: failMatch[1],
+          name,
           status: 'fail',
-          durationMs: Number(failMatch[2]),
+          durationMs: 0,
           error: 'Test failed'
         });
+
+        continue;
+      }
+
+      // FAIL: "✘ Test name"
+      if (line.startsWith('✘')) {
+        const name = line.replace('✘', '').trim();
+
+        results.push({
+          name,
+          status: 'fail',
+          durationMs: 0,
+          error: 'Test failed'
+        });
+
+        continue;
       }
     }
 
     return results;
+  }
+
+  private startsWithNumberParen(line: string): boolean {
+    if (line.length < 2) return false;
+    const first = line[0];
+    const second = line[1];
+    return !isNaN(Number(first)) && second === ')';
   }
 }

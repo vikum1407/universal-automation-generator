@@ -36,18 +36,25 @@ export default function ProjectSidebar({
   collapsed: boolean;
   setCollapsed: (v: boolean) => void;
 }) {
+  const bg = theme.mode === "dark" ? theme.colors.darkBackground : theme.colors.background;
+  const border = theme.mode === "dark" ? theme.colors.darkBorder : theme.colors.border;
+  const text = theme.mode === "dark" ? theme.colors.darkText : theme.colors.textDark;
+  const textLight = theme.mode === "dark" ? theme.colors.darkTextLight : theme.colors.textLight;
+
   return (
     <div
       style={{
         width: collapsed ? "64px" : "220px",
         transition: "width 0.2s ease",
-        borderRight: `1px solid ${theme.colors.border}`,
-        background: theme.colors.background,
+        borderRight: `1px solid ${border}`,
+        background: bg,
         padding: collapsed ? "12px 8px" : "16px 12px",
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
-        gap: theme.spacing.md
+        gap: theme.spacing.md,
+        position: "relative",
+        zIndex: 5
       }}
     >
       <button
@@ -58,7 +65,7 @@ export default function ProjectSidebar({
           border: "none",
           background: "transparent",
           cursor: "pointer",
-          color: theme.colors.textLight,
+          color: textLight,
           fontSize: "18px"
         }}
       >
@@ -72,7 +79,7 @@ export default function ProjectSidebar({
               fontSize: "12px",
               textTransform: "uppercase",
               letterSpacing: "0.08em",
-              color: theme.colors.textLight,
+              color: textLight,
               marginBottom: "4px"
             }}
           >
@@ -81,7 +88,7 @@ export default function ProjectSidebar({
           <div style={{ fontWeight: 600, color: theme.colors.primary }}>
             {project.type.toUpperCase()}
           </div>
-          <div style={{ fontSize: "12px", color: theme.colors.textLight }}>
+          <div style={{ fontSize: "12px", color: textLight }}>
             {project.type === "ui" ? project.url : project.swaggerUrl}
           </div>
         </div>
@@ -90,25 +97,45 @@ export default function ProjectSidebar({
       <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         {TABS.map(tab => {
           const active = tab.id === activeTab;
+
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               style={{
                 border: "none",
-                textAlign: "left",
-                padding: collapsed ? "8px 6px" : "8px 10px",
+                textAlign: collapsed ? "center" : "left",
+                padding: collapsed ? "8px 6px" : "10px 12px",
                 borderRadius: theme.radii.md,
-                background: active ? "#EDE4FF" : "transparent",
-                color: active ? theme.colors.primary : theme.colors.text,
+                background: active
+                  ? theme.mode === "dark"
+                    ? "#2A1A40"
+                    : "#EDE4FF"
+                  : "transparent",
+                color: active ? theme.colors.primary : text,
                 fontWeight: active ? 600 : 500,
                 cursor: "pointer",
                 fontSize: "13px",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: collapsed ? "center" : "flex-start"
+                justifyContent: collapsed ? "center" : "flex-start",
+                position: "relative"
               }}
             >
+              {active && !collapsed && (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: "3px",
+                    background: theme.colors.primary,
+                    borderRadius: "2px"
+                  }}
+                />
+              )}
+
               {collapsed ? tab.label[0] : tab.label}
             </button>
           );

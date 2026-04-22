@@ -5,6 +5,10 @@ export class UITestGenerator {
   generate(requirement: Requirement): string {
     const testName = `${requirement.id}-${this.slug(requirement.description)}`;
 
+    const pageUrl = requirement.source.pageName ?? '';
+    const selector = requirement.aiLogic?.primarySelector ?? '';
+    const action = requirement.aiLogic?.primaryAction ?? 'click';
+
     return `
 import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
@@ -12,7 +16,6 @@ import * as fs from 'fs';
 test('${requirement.id}: ${this.sanitize(requirement.description)}', async ({ page }) => {
     const steps: any[] = [];
 
-    // Event listeners
     page.on("request", req => {
       steps.push({
         type: "request",
@@ -49,18 +52,32 @@ test('${requirement.id}: ${this.sanitize(requirement.description)}', async ({ pa
     steps.push({
       type: "action",
       action: "goto",
-      url: '${requirement.page}',
+      url: '${pageUrl}',
       timestamp: Date.now()
     });
-    await page.goto('${requirement.page}');
+    await page.goto('${pageUrl}');
+
+    // Interaction (AI-driven)
+    steps.push({
+      type: "action",
+      action: '${action}',
+      selector: \`${this.sanitize(selector)}\`,
+      timestamp: Date.now()
+    });
+
+    if ('${action}' === 'click') {
+      await page.locator(\`${this.sanitize(selector)}\`).first().click();
+    } else {
+      await page.locator(\`${this.sanitize(selector)}\`).first().${action}();
+    }
 
     // Assertion
     steps.push({
       type: "assert",
-      selector: \`${this.sanitize(requirement.selector)}\`,
+      selector: \`${this.sanitize(selector)}\`,
       timestamp: Date.now()
     });
-    await expect(page.locator(\`${this.sanitize(requirement.selector)}\`).first()).toBeVisible();
+    await expect(page.locator(\`${this.sanitize(selector)}\`).first()).toBeVisible();
 
     // Save replay
     const replayDir = './replay';

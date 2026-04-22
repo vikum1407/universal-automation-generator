@@ -12,11 +12,27 @@ export class ExecutionService {
   async run(project: string, frameworkPath: string) {
     const result = await this.router.auto(project, frameworkPath);
 
+    const total = result.summary?.total ?? 0;
+    const passed = result.summary?.passed ?? 0;
+
+    const executionPercent = total === 0 ? 0 : (passed / total) * 100;
+
+    const analytics = {
+      coverage: {
+        coveragePercent: executionPercent,
+        aiEnrichedCount: 0
+      },
+      execution: {
+        executionPercent
+      },
+      highRiskAreas: []
+    };
+
     this.history.saveRun({
       project,
       rtm: null,
       execution: result,
-      analytics: null,
+      analytics,
       insights: null
     });
 

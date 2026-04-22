@@ -14,6 +14,8 @@ import { ProjectModule } from './projects/project.module';
 import { UiModule } from './projects/ui/ui.module';
 import { ApiModule } from './projects/api/api.module';
 
+import { UIScanModule } from './ui-scan/ui-scan.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,7 +31,10 @@ import { ApiModule } from './projects/api/api.module';
 
     ProjectModule,
     UiModule,
-    ApiModule
+    ApiModule,
+
+    // ⭐ THIS WAS THE MISSING MODULE ⭐
+    UIScanModule
   ],
   controllers: [],
   providers: [

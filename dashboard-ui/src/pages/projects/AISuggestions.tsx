@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { theme } from "@/theme";
 
 const API_BASE = "http://localhost:3000";
 
@@ -25,6 +26,21 @@ test("User can reset password via email link", async ({ page }) => {
 
 export default function AISuggestions({ projectId }: { projectId: string }) {
   const [suggestions, setSuggestions] = useState<any[]>([]);
+
+  const surface =
+    theme.mode === "dark" ? theme.colors.darkSurface : theme.colors.background;
+
+  const border =
+    theme.mode === "dark" ? theme.colors.darkBorder : theme.colors.border;
+
+  const text =
+    theme.mode === "dark" ? theme.colors.darkText : theme.colors.textDark;
+
+  const textLight =
+    theme.mode === "dark" ? theme.colors.darkTextLight : theme.colors.textLight;
+
+  const codeBg =
+    theme.mode === "dark" ? theme.colors.darkBackground : "#fff";
 
   const load = () => {
     fetch(`${API_BASE}/projects/${projectId}/suggestions`)
@@ -56,50 +72,93 @@ export default function AISuggestions({ projectId }: { projectId: string }) {
 
   return (
     <div style={{ marginTop: "32px" }}>
-      <h3 style={{ color: "#7B2FF7" }}>AI Suggested Tests</h3>
+      <h3 style={{ color: theme.colors.primary }}>AI Suggested Tests</h3>
 
       <div style={{ display: "grid", gap: "16px", marginTop: "16px" }}>
         {suggestions.map((s, i) => (
           <div
             key={i}
             style={{
-              padding: "16px",
+              padding: "18px",
               borderRadius: "12px",
-              border: "1px solid #eee",
-              background: "#F8F4FF"
+              border: `1px solid ${border}`,
+              background: surface,
+              boxShadow: theme.shadow.card,
+              transition: "all 0.15s ease"
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLDivElement).style.boxShadow =
+                "0 6px 14px rgba(0,0,0,0.18)";
+              (e.currentTarget as HTMLDivElement).style.transform =
+                "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLDivElement).style.boxShadow =
+                theme.shadow.card;
+              (e.currentTarget as HTMLDivElement).style.transform =
+                "translateY(0)";
             }}
           >
-            <strong style={{ color: "#7B2FF7" }}>
+            {/* Requirement Description */}
+            <strong
+              style={{
+                color: theme.colors.primary,
+                fontSize: "15px"
+              }}
+            >
               {s.requirement?.description}
             </strong>
 
-            <p style={{ marginTop: "8px", fontSize: "12px", color: "#555" }}>
+            {/* Proposed Test Name */}
+            <p
+              style={{
+                marginTop: "8px",
+                fontSize: "13px",
+                color: textLight
+              }}
+            >
               Proposed Test: {s.proposedTestName}
             </p>
 
+            {/* Code Block */}
             <pre
               style={{
-                background: "#fff",
-                padding: "12px",
+                background: codeBg,
+                padding: "14px",
                 borderRadius: "8px",
                 marginTop: "12px",
-                fontSize: "12px"
+                fontSize: "12px",
+                border: `1px solid ${border}`,
+                color: text,
+                overflowX: "auto",
+                whiteSpace: "pre-wrap"
               }}
             >
               {s.proposedTestCode}
             </pre>
 
+            {/* CTA Button */}
             <button
               onClick={() => apply(s)}
               style={{
-                marginTop: "12px",
-                padding: "8px 14px",
+                marginTop: "14px",
+                padding: "10px 16px",
                 borderRadius: "8px",
-                background: "#7B2FF7",
+                background: theme.colors.primary,
                 color: "white",
                 border: "none",
                 fontWeight: 600,
-                cursor: "pointer"
+                cursor: "pointer",
+                fontSize: "13px",
+                transition: "background 0.15s ease"
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  "#6920D8";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  theme.colors.primary;
               }}
             >
               Add to Project

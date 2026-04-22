@@ -6,7 +6,7 @@ import ProjectSidebar from "./layout/ProjectSidebar";
 import type { TabId } from "./layout/ProjectSidebar";
 import ProjectTabs from "./layout/ProjectTabs";
 
-import { socket, joinProjectRoom } from "@/ai/ws";
+import { socket } from "@/socket";
 import { toast } from "react-hot-toast";
 
 function ProgressOverlay({
@@ -60,10 +60,12 @@ export default function ProjectDetails() {
   const [progressStep, setProgressStep] = useState("Working…");
 
   const loadProject = () => {
-    fetch(`${API_BASE}/projects/${id}`)
+    fetch(`${API_BASE}/projects`)
       .then((res) => res.json())
-      .then((p) => {
-        if (!p || p.id === "temp-id") {
+      .then((list) => {
+        const p = list.find((x: any) => x.id === id);
+
+        if (!p) {
           navigate("/projects");
           return;
         }
@@ -79,13 +81,9 @@ export default function ProjectDetails() {
   };
 
   useEffect(() => {
-    loadProject();
-  }, [id]);
-
-  useEffect(() => {
     if (!id) return;
 
-    joinProjectRoom(id);
+    socket.emit("join", id);
 
     socket.on("project-status", (msg: any) => {
       setProject((prev: any) => ({
@@ -116,6 +114,8 @@ export default function ProjectDetails() {
         loadProject();
       }
     });
+
+    loadProject();
 
     return () => {
       socket.off("project-status");

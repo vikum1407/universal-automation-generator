@@ -1,82 +1,96 @@
 import { useEffect, useState } from "react";
+import { theme } from "@/theme";
+import type { RTMResponse, RTMRequirementView } from "@/api/rtm";
+
+import RTMTableHeader from "./RTMTableHeader";
+import RTMTableRow from "./RTMTableRow";
+import RTMRegenerateModal from "./RTMRegenerateModal";
 
 const API_BASE = "http://localhost:3000";
 
 export default function RTMTable({ projectId }: { projectId: string }) {
-  const [rtm, setRtm] = useState<any | null>(null);
+  const [rtm, setRtm] = useState<RTMResponse | null>(null);
+  const [regenOpen, setRegenOpen] = useState(false);
+  const [selectedReq, setSelectedReq] = useState<RTMRequirementView | null>(null);
+
+  const load = () => {
+    fetch(`${API_BASE}/projects/${projectId}/rtm`)
+      .then(res => res.json())
+      .then(data => setRtm(data)); // IMPORTANT: use full backend response
+  };
 
   useEffect(() => {
-    fetch(`${API_BASE}/projects/${projectId}/flow/rtm`)
-      .then(res => res.json())
-      .then(data => setRtm(data));
+    load();
   }, [projectId]);
 
-  if (!rtm || !rtm.requirements || !rtm.requirements.length) return null;
+  const openRegenerate = (req: RTMRequirementView) => {
+    setSelectedReq(req);
+    setRegenOpen(true);
+  };
+
+  const closeRegenerate = () => {
+    setRegenOpen(false);
+    setSelectedReq(null);
+  };
+
+  const regenerate = async (reqId: string) => {
+    await fetch(`${API_BASE}/projects/${projectId}/rtm/regenerate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ selectedIds: [reqId] })
+    });
+
+    load();
+    closeRegenerate();
+  };
+
+  if (!rtm || !rtm.rtm || !rtm.rtm.requirements) return null;
+
+  const border =
+    theme.mode === "dark" ? theme.colors.darkBorder : theme.colors.border;
 
   return (
-    <div style={{ marginTop: "32px" }}>
-      <h3 style={{ color: "#7B2FF7" }}>Requirements Traceability Matrix</h3>
+    <div style={{ marginTop: 32 }}>
+      <h3 style={{ color: theme.colors.primary }}>
+        Requirements Traceability Matrix
+      </h3>
 
-      <table
+      <div
         style={{
-          width: "100%",
-          marginTop: "16px",
-          borderCollapse: "collapse",
-          fontSize: "13px"
+          marginTop: 16,
+          border: `1px solid ${border}`,
+          borderRadius: 12,
+          overflow: "hidden",
+          background: theme.colors.background,
+          boxShadow: theme.shadow.card
         }}
       >
-        <thead>
-          <tr style={{ background: "#F8F4FF" }}>
-            <th style={{ padding: "10px", borderBottom: "1px solid #eee" }}>ID</th>
-            <th style={{ padding: "10px", borderBottom: "1px solid #eee" }}>Type</th>
-            <th style={{ padding: "10px", borderBottom: "1px solid #eee" }}>Source</th>
-            <th style={{ padding: "10px", borderBottom: "1px solid #eee" }}>Page / URL</th>
-            <th style={{ padding: "10px", borderBottom: "1px solid #eee" }}>Selector / Method</th>
-            <th style={{ padding: "10px", borderBottom: "1px solid #eee" }}>Description</th>
-            <th style={{ padding: "10px", borderBottom: "1px solid #eee" }}>Covered</th>
-            <th style={{ padding: "10px", borderBottom: "1px solid #eee" }}>Covered By</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rtm.requirements.map((req: any) => {
-            const isCovered = req.coveredBy && req.coveredBy.length > 0;
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <RTMTableHeader />
 
-            return (
-              <tr key={req.id}>
-                <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>{req.id}</td>
-                <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
-                  {req.type?.toUpperCase()}
-                </td>
-                <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
-                  {req.source}
-                </td>
-                <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
-                  {req.page || req.url}
-                </td>
-                <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
-                  {req.selector || req.method || "—"}
-                </td>
-                <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
-                  {req.description}
-                </td>
-                <td
-                  style={{
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                    color: isCovered ? "#0F9D58" : "#D93025",
-                    fontWeight: 600
-                  }}
-                >
-                  {isCovered ? "Yes" : "No"}
-                </td>
-                <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
-                  {req.coveredBy?.length ? req.coveredBy.join(", ") : "—"}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+          <tbody>
+            {rtm.rtm.requirements.map((req, idx) => (
+              <RTMTableRow
+                key={req.id}
+                req={req}
+                idx={idx}
+                onRegenerate={() => openRegenerate(req)}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <RTMRegenerateModal
+        open={regenOpen}
+        onClose={closeRegenerate}
+        onRegenerate={regenerate}
+        requirement={
+          selectedReq
+            ? { id: selectedReq.id, title: selectedReq.title }
+            : null
+        }
+      />
     </div>
   );
 }

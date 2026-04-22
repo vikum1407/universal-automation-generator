@@ -1,0 +1,331 @@
+openapi: 3.1.0
+info:
+  title: Requirements Traceability Matrix API
+  version: 1.0.0
+
+paths:
+  /projects/{projectId}/rtm:
+    get:
+      summary: Get full RTM (RTM + analytics + insights + dashboard)
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: RTM bundle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RTMResponseBundle"
+
+  /projects/{projectId}/rtm/generate:
+    post:
+      summary: Generate RTM from requirements
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: RTM bundle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RTMResponseBundle"
+
+  /projects/{projectId}/rtm/regenerate:
+    post:
+      summary: Regenerate selected requirements
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RTMRegenerationRequest"
+      responses:
+        "200":
+          description: RTM bundle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RTMResponseBundle"
+
+  /projects/{projectId}/rtm/regenerate-all:
+    post:
+      summary: Regenerate all requirements (semantic)
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Regeneration result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  rtm:
+                    $ref: "#/components/schemas/RTMDocument"
+
+  /projects/{projectId}/rtm/auto-fix:
+    post:
+      summary: Auto-fix a test file using AI
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                testFile:
+                  type: string
+      responses:
+        "200":
+          description: Auto-fix result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+
+  /projects/{projectId}/rtm/export:
+    post:
+      summary: Export RTM in various formats
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RTMExportRequest"
+      responses:
+        "200":
+          description: Export result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+components:
+  schemas:
+
+    RTMExportRequest:
+      type: object
+      properties:
+        format:
+          type: string
+          enum: [json, md, csv, docx, pdf]
+      required: [format]
+
+    RTMRegenerationRequest:
+      type: object
+      properties:
+        selectedRequirementIds:
+          type: array
+          items:
+            type: string
+      required: [selectedRequirementIds]
+
+    RTMResponseBundle:
+      type: object
+      properties:
+        rtm:
+          $ref: "#/components/schemas/RTMDocument"
+        analytics:
+          $ref: "#/components/schemas/RTMAnalyticsResult"
+        insights:
+          type: array
+          items:
+            $ref: "#/components/schemas/RTMInsight"
+        dashboard:
+          $ref: "#/components/schemas/RTMDashboardResponse"
+
+    RTMDocument:
+      type: object
+      properties:
+        generatedAt:
+          type: string
+          format: date-time
+        project:
+          type: string
+        version:
+          type: string
+        requirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/Requirement"
+      required: [generatedAt, requirements]
+
+    Requirement:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [ui, api]
+        source:
+          $ref: "#/components/schemas/RequirementSource"
+        tags:
+          type: array
+          items:
+            type: string
+        businessPriority:
+          type: string
+          enum: [low, medium, high, critical]
+        riskLevel:
+          type: string
+          enum: [low, medium, high]
+        coveredBy:
+          type: array
+          items:
+            type: string
+        aiLogic:
+          $ref: "#/components/schemas/GeneratedTestLogic"
+      required: [id, title, description, type, source, aiLogic]
+
+    RequirementSource:
+      type: object
+      properties:
+        pageName:
+          type: string
+        endpointPath:
+          type: string
+        method:
+          type: string
+
+    GeneratedTestLogic:
+      type: object
+      properties:
+        primarySelector:
+          type: string
+        primaryAction:
+          type: string
+        steps:
+          type: array
+          items:
+            type: string
+        assertions:
+          type: array
+          items:
+            type: string
+        negativeTests:
+          type: array
+          items:
+            type: object
+            properties:
+              case:
+                type: string
+              steps:
+                type: array
+                items:
+                  type: string
+              assertions:
+                type: array
+                items:
+                  type: string
+            required: [case, steps, assertions]
+      required: [steps, assertions, negativeTests]
+
+    RTMAnalyticsResult:
+      type: object
+      properties:
+        totalRequirements:
+          type: number
+        coveredRequirements:
+          type: number
+        uncoveredRequirements:
+          type: number
+        coveragePercent:
+          type: number
+        highRiskCount:
+          type: number
+        mediumRiskCount:
+          type: number
+        lowRiskCount:
+          type: number
+        criticalPriorityCount:
+          type: number
+        highPriorityCount:
+          type: number
+        mediumPriorityCount:
+          type: number
+        lowPriorityCount:
+          type: number
+
+    RTMInsight:
+      type: object
+      properties:
+        requirementId:
+          type: string
+        type:
+          type: string
+        message:
+          type: string
+
+    RTMDashboardResponse:
+      type: object
+      properties:
+        summaryBlocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/RTMDashboardBlock"
+        riskBlocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/RTMDashboardBlock"
+        priorityBlocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/RTMDashboardBlock"
+        insights:
+          type: array
+          items:
+            $ref: "#/components/schemas/RTMInsight"
+
+    RTMDashboardBlock:
+      type: object
+      properties:
+        label:
+          type: string
+        value:
+          type: string
+        type:
+          type: string
+          enum: [success, warning, danger, info]

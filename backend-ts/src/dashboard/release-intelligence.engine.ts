@@ -7,11 +7,8 @@ export class ReleaseIntelligenceEngine {
   compute(run: HistoryRun, previous?: HistoryRun) {
     const insightsEngine = new RTMInsightsEngine();
 
-    const insights = insightsEngine.generate(
-      run.analytics,
-      run.rtm,
-      run.execution
-    );
+    // Updated to match new RTMInsightsEngine API
+    const insights = insightsEngine.generateInsights(run.rtm);
 
     const riskScore = this.computeRiskScore(run);
     const changeImpact = this.computeChangeImpact(run, previous);

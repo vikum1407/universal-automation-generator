@@ -1,9 +1,22 @@
 import { useEffect, useState } from "react";
+import { theme } from "@/theme";
 
 const API_BASE = "http://localhost:3000";
 
 export default function CoverageHeatmap({ projectId }: { projectId: string }) {
   const [coverage, setCoverage] = useState<any[]>([]);
+
+  const surface =
+    theme.mode === "dark" ? theme.colors.darkSurface : theme.colors.background;
+
+  const border =
+    theme.mode === "dark" ? theme.colors.darkBorder : theme.colors.border;
+
+  const text =
+    theme.mode === "dark" ? theme.colors.darkText : theme.colors.textDark;
+
+  const textLight =
+    theme.mode === "dark" ? theme.colors.darkTextLight : theme.colors.textLight;
 
   useEffect(() => {
     fetch(`${API_BASE}/projects/${projectId}/flow/coverage`)
@@ -15,7 +28,7 @@ export default function CoverageHeatmap({ projectId }: { projectId: string }) {
 
   return (
     <div style={{ marginTop: "32px" }}>
-      <h3 style={{ color: "#7B2FF7" }}>Coverage Heatmap</h3>
+      <h3 style={{ color: theme.colors.primary }}>Coverage Heatmap</h3>
 
       <div
         style={{
@@ -26,32 +39,58 @@ export default function CoverageHeatmap({ projectId }: { projectId: string }) {
         }}
       >
         {coverage.map((item, i) => {
-          const bg = item.covered ? "#2FF7D1" : "#FF4F4F";
-          const textColor = item.covered ? "#00332A" : "#3B0000";
+          const bg = item.covered
+            ? theme.colors.success
+            : theme.colors.danger;
+
+          const fg = item.covered
+            ? "#00332A"
+            : "#3B0000";
 
           return (
             <div
               key={i}
               style={{
-                padding: "16px",
+                padding: "18px",
                 borderRadius: "12px",
                 background: bg,
-                color: textColor,
+                color: fg,
                 fontWeight: 600,
-                boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
-                fontSize: "13px"
+                boxShadow: theme.shadow.card,
+                fontSize: "13px",
+                transition: "all 0.15s ease",
+                cursor: "default"
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.boxShadow =
+                  "0 6px 14px rgba(0,0,0,0.18)";
+                (e.currentTarget as HTMLDivElement).style.transform =
+                  "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.boxShadow =
+                  theme.shadow.card;
+                (e.currentTarget as HTMLDivElement).style.transform =
+                  "translateY(0)";
               }}
             >
               <div style={{ opacity: 0.8, marginBottom: 4 }}>
                 {item.type === "ui" ? "UI Interaction" : "API Endpoint"}
               </div>
+
               <div>{item.label}</div>
 
-              <div style={{ marginTop: "8px", fontSize: "12px" }}>
+              <div
+                style={{
+                  marginTop: "8px",
+                  fontSize: "12px",
+                  opacity: 0.9
+                }}
+              >
                 {item.covered ? (
                   <>
                     Covered by:{" "}
-                    {item.coveredBy && item.coveredBy.length
+                    {item.coveredBy?.length
                       ? item.coveredBy.join(", ")
                       : "tests"}
                   </>
@@ -61,7 +100,13 @@ export default function CoverageHeatmap({ projectId }: { projectId: string }) {
               </div>
 
               {item.requirementId && (
-                <div style={{ marginTop: "6px", fontSize: "11px", opacity: 0.8 }}>
+                <div
+                  style={{
+                    marginTop: "6px",
+                    fontSize: "11px",
+                    opacity: 0.8
+                  }}
+                >
                   Requirement: {item.requirementId}
                 </div>
               )}

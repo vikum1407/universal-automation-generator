@@ -1,47 +1,34 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { UICrawler } from './ui-crawler';
-import { UIRequirementGenerator } from './ui-requirement-generator';
-import { RTMBuilder } from '../rtm/rtm.builder';
+import { Controller, Post, Body } from "@nestjs/common";
+import * as path from "path";
+import * as fs from "fs";
+import { v4 as uuid } from "uuid";
 
-@Controller('scan-ui')
+import { UIPipelineOrchestrator } from "./ui-pipeline-orchestrator";
+
+@Controller("scan-ui")
 export class UIScanController {
   @Post()
   async scan(@Body() body: { url: string }) {
-    const crawler = new UICrawler(body.url, 1, 20);
-    const result = await crawler.crawl();
+    const projectId = uuid();
 
-    const requirementGen = new UIRequirementGenerator();
-    const allRequirements = [];
+    // Write to the folder your dashboard expects
+    const outputDir = path.join("qlitz-output", projectId);
+    fs.mkdirSync(outputDir, { recursive: true });
 
-    for (const page of result.pages) {
-      const selectors = Array.isArray(page.selectors) ? page.selectors : [];
-      if (selectors.length === 0) continue;
-
-      const reqs = requirementGen.generate(selectors);
-      allRequirements.push(...reqs);
-    }
-
-    const rtm = new RTMBuilder().build(allRequirements);
-
-    const flowGraph = {
-      pages: result.pages.map((p) => ({
-        url: p.url,
-        title: p.title
-      })),
-      edges: result.pages
-        .filter((p) => p.url !== body.url)
-        .map((p) => ({
-          from: body.url,
-          to: p.url,
-          via: 'auto-detected'
-        }))
-    };
+    // Run full UI pipeline
+    const orchestrator = new UIPipelineOrchestrator();
+    const result = await orchestrator.run(body.url, outputDir);
 
     return {
-      scan: result,
-      requirements: allRequirements,
-      rtmJson: rtm,
-      flowGraph
+      projectId,
+      outputDir,
+      rtm: path.join(outputDir, "rtm.json"),
+      flowGraph: path.join(outputDir, "flow-graph.json"),
+      uiTestsDir: path.join(outputDir, "ui-tests"),
+      pagesDir: path.join(outputDir, "pages"),
+      stats: result.stats,
+      timings: result.timings,
+      requirementCount: result.requirements.length
     };
   }
 }

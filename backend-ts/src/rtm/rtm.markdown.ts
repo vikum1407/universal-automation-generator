@@ -1,35 +1,89 @@
-import { RTMDocument } from './rtm.model';
+import { Injectable } from "@nestjs/common";
+import type { RTMDocument } from "./rtm.model";
+import type { RTMAnalyticsResult } from "./rtm.analytics";
+import type { RTMInsight } from "./rtm.insights";
 
-export class RTMMarkdownBuilder {
-  build(rtm: RTMDocument): string {
-    let md = `# Qlitz Requirements Traceability Matrix\nGenerated: ${rtm.generatedAt}\n\n`;
+@Injectable()
+export class RTMMarkdownService {
+  generateMarkdown(
+    rtm: RTMDocument,
+    analytics: RTMAnalyticsResult,
+    insights: RTMInsight[]
+  ): string {
+    const lines: string[] = [];
 
-    for (const req of rtm.requirements) {
-      md += `## ${req.id} — ${req.description}\n`;
-      md += `**Type:** ${req.type}\n\n`;
-      md += `**Page:** ${req.page}\n\n`;
-      md += `**Selector:** ${req.selector ?? '-'}\n\n`;
-      md += `**Covered By:** ${req.coveredBy?.join(', ') || '-'}\n\n`;
+    // Header
+    lines.push(`# Requirements Traceability Matrix`);
+    lines.push(`Generated: **${rtm.generatedAt}**`);
+    if (rtm.project) lines.push(`Project: **${rtm.project}**`);
+    if (rtm.version) lines.push(`Version: **${rtm.version}**`);
+    lines.push("");
 
-      // AI Logic
-      md += `### AI‑Generated Steps\n`;
-      req.aiLogic?.steps.forEach(s => (md += `- ${s}\n`));
-      md += `\n`;
+    // Summary
+    lines.push(`## Summary`);
+    lines.push(`- Total Requirements: **${analytics.totalRequirements}**`);
+    lines.push(`- Covered Requirements: **${analytics.coveredRequirements}**`);
+    lines.push(`- Uncovered Requirements: **${analytics.uncoveredRequirements}**`);
+    lines.push(`- Coverage: **${analytics.coveragePercent}%**`);
+    lines.push("");
 
-      md += `### AI‑Generated Assertions\n`;
-      req.aiLogic?.assertions.forEach(a => (md += `- ${a}\n`));
-      md += `\n`;
+    // Risk Summary
+    lines.push(`## Risk Overview`);
+    lines.push(`- High Risk: **${analytics.highRiskCount}**`);
+    lines.push(`- Medium Risk: **${analytics.mediumRiskCount}**`);
+    lines.push(`- Low Risk: **${analytics.lowRiskCount}**`);
+    lines.push("");
 
-      md += `### Negative Tests\n`;
-      req.aiLogic?.negativeTests.forEach(neg => {
-        md += `- **${neg.case}**\n`;
-        neg.steps.forEach(s => (md += `  - Step: ${s}\n`));
-        neg.assertions.forEach(a => (md += `  - Assert: ${a}\n`));
-      });
+    // Priority Summary
+    lines.push(`## Priority Overview`);
+    lines.push(`- Critical: **${analytics.criticalPriorityCount}**`);
+    lines.push(`- High: **${analytics.highPriorityCount}**`);
+    lines.push(`- Medium: **${analytics.mediumPriorityCount}**`);
+    lines.push(`- Low: **${analytics.lowPriorityCount}**`);
+    lines.push("");
 
-      md += `\n---\n\n`;
+    // Requirements Table
+    lines.push(`## Requirements`);
+    lines.push(
+      `| ID | Title | Type | Source | Priority | Risk | Covered By |`
+    );
+    lines.push(
+      `|----|--------|------|--------|----------|------|------------|`
+    );
+
+    for (const r of rtm.requirements) {
+      const source =
+        r.type === "ui"
+          ? r.source.pageName || "-"
+          : `${r.source.method || ""} ${r.source.endpointPath || ""}`.trim();
+
+      const covered = r.coveredBy?.length
+        ? r.coveredBy.join(", ")
+        : "_None_";
+
+      lines.push(
+        `| ${r.id} | ${r.title} | ${r.type.toUpperCase()} | ${source} | ${
+          r.businessPriority || "-"
+        } | ${r.riskLevel || "-"} | ${covered} |`
+      );
     }
 
-    return md;
+    lines.push("");
+
+    // Insights
+    lines.push(`## Insights`);
+    if (insights.length === 0) {
+      lines.push(`No insights available.`);
+    } else {
+      for (const i of insights) {
+        lines.push(
+          `- **[${i.type}]** Requirement **${i.requirementId}** – ${i.message}`
+        );
+      }
+    }
+
+    lines.push("");
+
+    return lines.join("\n");
   }
 }

@@ -25,47 +25,43 @@ export class UIPipelineOrchestrator {
     const pipelineStart = Date.now();
     this.ensureProject(outputDir);
 
-    console.log(`[UI] Starting UI pipeline for ${startUrl} (multi-page, depth=3, hybrid auto-login)`);
+    console.log(`[UI] Starting UI pipeline for ${startUrl}`);
 
+    // ---------------------------------------------------------
+    // 1. Crawl pages
+    // ---------------------------------------------------------
     const crawlStart = Date.now();
     const crawledPages = await this.crawler.crawl(startUrl, 3, 30);
     const crawlMs = Date.now() - crawlStart;
-    console.log(`[UI] Crawled ${crawledPages.length} page(s) in ${crawlMs} ms`);
 
     const pagesDir = path.join(outputDir, 'pages');
     fs.mkdirSync(pagesDir, { recursive: true });
 
     crawledPages.forEach((p, i) => {
-      const filePath = path.join(pagesDir, `page-${i + 1}.html`);
-      fs.writeFileSync(filePath, p.html);
+      fs.writeFileSync(path.join(pagesDir, `page-${i + 1}.html`), p.html);
     });
 
-    const allNodes = [];
-    const allRequirements: Requirement[] = [];
+    // ---------------------------------------------------------
+    // 2. Extract selectors + generate UI requirements
+    // ---------------------------------------------------------
+    const allNodes: any[] = [];
+    const allSemanticRequirements: Requirement[] = [];
 
     const extractStart = Date.now();
+
     for (const page of crawledPages) {
       const nodes = this.extractor.extract(page.html, page.url);
       allNodes.push(...nodes);
 
       const uiReqs = this.requirementGen.generate(nodes);
+      const semanticReqs = this.requirementGen.toSemanticRequirements(uiReqs);
 
-      const normalized: Requirement[] = uiReqs.map((r, index) => ({
-        id: r.id ?? `UI-${index + 1}`,
-        page: r.pageUrl,
-        description: r.description,
-        selector: r.selector,
-        type: 'ui',
-        source: 'UI',
-        action: r.action
-      }));
+      allSemanticRequirements.push(...semanticReqs);
 
-      allRequirements.push(...normalized);
-
-      if (normalized.length > 0) {
-        const normalizedForWriter = normalized.map(r => ({
+      if (uiReqs.length > 0) {
+        const normalizedForWriter = uiReqs.map(r => ({
           id: r.id,
-          page: r.page,
+          page: r.pageUrl,
           description: r.description,
           selector: r.selector ?? '',
           type: 'ui',
@@ -75,38 +71,49 @@ export class UIPipelineOrchestrator {
         this.writer.writeTests(normalizedForWriter, outputDir);
       }
     }
-    const extractMs = Date.now() - extractStart;
-    console.log(`[UI] Extracted nodes + requirements in ${extractMs} ms`);
 
+    const extractMs = Date.now() - extractStart;
+
+    // ---------------------------------------------------------
+    // 3. Flow graph + hybrid flows
+    // ---------------------------------------------------------
     const flowStart = Date.now();
     const flowGraph = this.flowBuilder.build(crawledPages, allNodes);
     const flowGraphPath = path.join(outputDir, 'flow-graph.json');
     fs.writeFileSync(flowGraphPath, JSON.stringify(flowGraph, null, 2));
     const flowMs = Date.now() - flowStart;
-    console.log(`[UI] Flow graph written to ${flowGraphPath} in ${flowMs} ms`);
 
     const hybridStart = Date.now();
     const hybridFlows = this.hybridGen.generate(flowGraph, allNodes);
+
+    // Convert flows → semantic requirements
+    const hybridRequirements = this.hybridGen.toRequirements(hybridFlows);
+
+    // Add semantic hybrid requirements to RTM
+    allSemanticRequirements.push(...hybridRequirements);
+
+    // Still write hybrid tests
     if (hybridFlows.length > 0) {
       this.hybridWriter.writeTests(hybridFlows, outputDir);
-      console.log(`[UI] Hybrid-ready flows generated: ${hybridFlows.length}`);
     }
+
     const hybridMs = Date.now() - hybridStart;
 
+    // ---------------------------------------------------------
+    // 4. FINAL RTM (semantic only)
+    // ---------------------------------------------------------
     const rtm: RTMDocument = {
       generatedAt: new Date().toISOString(),
-      requirements: allRequirements
+      requirements: allSemanticRequirements
     };
 
     const rtmPath = path.join(outputDir, 'rtm.json');
     fs.writeFileSync(rtmPath, JSON.stringify(rtm, null, 2));
-    console.log(`[UI] RTM written to ${rtmPath}`);
 
+    // ---------------------------------------------------------
+    // 5. Return pipeline summary
+    // ---------------------------------------------------------
     const totalMs = Date.now() - pipelineStart;
-    console.log(`[UI] UI pipeline completed in ${totalMs} ms`);
-
-    const uniquePages = new Set(crawledPages.map(p => p.url)).size;
-    const transitionsDetected = flowGraph.edges.length;
 
     return {
       status: 'success',
@@ -121,9 +128,9 @@ export class UIPipelineOrchestrator {
       },
       stats: {
         pagesCrawled: crawledPages.length,
-        uniquePages,
+        uniquePages: new Set(crawledPages.map(p => p.url)).size,
         depthUsed: 3,
-        transitionsDetected
+        transitionsDetected: flowGraph.edges.length
       },
       artifacts: {
         outputDir,

@@ -14,18 +14,28 @@ export default function NewUIProject() {
   const [password, setPassword] = useState("");
   const [crawlDepth, setCrawlDepth] = useState(2);
   const [env, setEnv] = useState("production");
+  const [loading, setLoading] = useState(false);
 
-  function handleContinue() {
-    navigate("/projects/new/summary", {
-      state: {
-        type: "ui",
-        url,
+  async function handleContinue() {
+    setLoading(true);
+
+    const cleanUrl = url.trim();
+
+    const res = await fetch("http://localhost:3000/projects/scan-ui", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url: cleanUrl,
         username,
         password,
         crawlDepth,
         env
-      }
+      })
     });
+
+    const data = await res.json();
+
+    navigate(`/projects/${data.projectId}`);
   }
 
   return (
@@ -92,11 +102,11 @@ export default function NewUIProject() {
 
         <div className="pt-4">
           <Button
-            disabled={!url}
+            disabled={!url.trim().startsWith("http") || loading}
             onClick={handleContinue}
             className="w-full"
           >
-            Continue
+            {loading ? "Creating..." : "Continue"}
           </Button>
         </div>
 

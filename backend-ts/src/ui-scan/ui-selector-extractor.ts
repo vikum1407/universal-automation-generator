@@ -10,7 +10,6 @@ export interface UIScanNode {
   action?: string;
   attributes?: Record<string, string>;
 
-  // Phase 8 additions
   componentType?: string;
   semanticRole?: string;
 
@@ -71,7 +70,7 @@ export class UISelectorExtractor {
       const aiAssertions = this.generateAIAssertions(componentType, text, action);
       const aiNegativeTests = this.generateAINegativeTests(componentType, action);
 
-      nodes.push({
+      const scanNode: UIScanNode = {
         pageUrl,
         selector,
         text,
@@ -85,7 +84,9 @@ export class UISelectorExtractor {
         baselineGroup,
         aiAssertions,
         aiNegativeTests
-      });
+      };
+
+      nodes.push(scanNode);
     });
 
     return nodes;

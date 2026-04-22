@@ -13,29 +13,26 @@ export interface CorrelatedHybridFlow extends HybridFlow {
 
 export class ApiCorrelationEngine {
   correlate(flows: HybridFlow[], requirements: Requirement[]): CorrelatedHybridFlow[] {
-    const apiReqs = requirements.filter(r => r.type === 'api' || r.source === 'API');
+    const apiReqs = requirements.filter(r => r.type === 'api');
 
     return flows.map(flow => {
       const apiCalls: CorrelatedApiCall[] = [];
 
       for (const api of apiReqs) {
-        const apiUrl = (api as any).url as string | undefined;
-        const apiMethod = (api as any).method as string | undefined;
+        const apiUrl = api.source.endpointPath;
+        const apiMethod = api.source.method;
 
-        if (!apiUrl) {
-          continue;
-        }
+        if (!apiUrl) continue;
 
-        const matchesFlow =
-          flow.steps.some(step => {
-            try {
-              const stepUrl = new URL(step);
-              const apiUrlObj = new URL(apiUrl, stepUrl.origin);
-              return stepUrl.origin === apiUrlObj.origin;
-            } catch {
-              return false;
-            }
-          });
+        const matchesFlow = flow.steps.some(step => {
+          try {
+            const stepUrl = new URL(step);
+            const apiUrlObj = new URL(apiUrl, stepUrl.origin);
+            return stepUrl.origin === apiUrlObj.origin;
+          } catch {
+            return false;
+          }
+        });
 
         if (matchesFlow) {
           apiCalls.push({

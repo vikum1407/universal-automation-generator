@@ -13,20 +13,40 @@ export default function ProjectLayout({
         display: "flex",
         height: "100%",
         minHeight: "100vh",
-        background: theme.colors.appBackground
+        background: theme.colors.appBackground,
+        position: "relative"
       }}
     >
-      {sidebar}
+      {/* SIDEBAR */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 5
+        }}
+      >
+        {sidebar}
+      </div>
 
+      {/* CONTENT WRAPPER — overflow visible so tooltips can escape */}
       <div
         style={{
           flex: 1,
-          padding: theme.spacing.xl,
-          boxSizing: "border-box",
-          overflowY: "auto"
+          position: "relative",
+          zIndex: 10,
+          overflow: "visible"
         }}
       >
-        {content}
+        {/* INNER SCROLL AREA */}
+        <div
+          style={{
+            height: "100%",
+            overflowY: "auto",
+            padding: theme.spacing.xl,
+            boxSizing: "border-box"
+          }}
+        >
+          {content}
+        </div>
       </div>
     </div>
   );

@@ -1,226 +1,77 @@
-import { RTMDocument, Requirement } from './rtm.model';
-import { RTMExecutionDocument } from './rtm.execution.model';
+import { Injectable } from "@nestjs/common";
+import type { RTMDocument, Requirement } from "./rtm.model";
 
-export interface CoverageMetrics {
+export interface RTMAnalyticsResult {
   totalRequirements: number;
-  covered: number;
-  uncovered: number;
+  coveredRequirements: number;
+  uncoveredRequirements: number;
   coveragePercent: number;
 
-  uiTotal: number;
-  uiCovered: number;
-  uiCoveragePercent: number;
+  highRiskCount: number;
+  mediumRiskCount: number;
+  lowRiskCount: number;
 
-  apiTotal: number;
-  apiCovered: number;
-  apiCoveragePercent: number;
+  uiCount: number;
+  apiCount: number;
 
-  aiEnrichedCount: number;
+  criticalPriorityCount: number;
+  highPriorityCount: number;
+  mediumPriorityCount: number;
+  lowPriorityCount: number;
 }
 
-export interface ExecutionMetrics {
-  hasExecution: boolean;
+@Injectable()
+export class RTMAnalyticsService {
+  compute(rtm: RTMDocument): RTMAnalyticsResult {
+    const reqs = rtm.requirements || [];
 
-  totalExecuted: number;
-  passed: number;
-  failed: number;
-  notExecuted: number;
-  executionPercent: number;
+    const total = reqs.length;
+    const covered = reqs.filter(r => (r.coveredBy?.length || 0) > 0).length;
+    const uncovered = total - covered;
 
-  flakyCandidates: string[];
-}
+    const coveragePercent =
+      total === 0 ? 0 : Math.round((covered / total) * 100);
 
-export interface RiskArea {
-  id: string;
-  label: string;
-  type: 'ui' | 'api';
-  uncoveredCount: number;
-  failingCount: number;
-}
+    const highRisk = reqs.filter(r => r.riskLevel === "high").length;
+    const mediumRisk = reqs.filter(r => r.riskLevel === "medium").length;
+    const lowRisk = reqs.filter(r => r.riskLevel === "low").length;
 
-export interface RTMAnalytics {
-  coverage: CoverageMetrics;
-  execution: ExecutionMetrics;
-  highRiskAreas: RiskArea[];
-}
+    const uiCount = reqs.filter(r => r.type === "ui").length;
+    const apiCount = reqs.filter(r => r.type === "api").length;
 
-export class RTMAnalyticsEngine {
-  compute(rtm: RTMDocument, exec?: RTMExecutionDocument): RTMAnalytics {
-    // Ensure rtm.requirements always exists
-    rtm.requirements = rtm.requirements || [];
+    const criticalPriority = reqs.filter(
+      r => r.businessPriority === "critical"
+    ).length;
 
-    const coverage = this.computeCoverage(rtm);
-    const execution = this.computeExecution(rtm, exec);
-    const highRiskAreas = this.computeRiskAreas(rtm, exec);
+    const highPriority = reqs.filter(
+      r => r.businessPriority === "high"
+    ).length;
+
+    const mediumPriority = reqs.filter(
+      r => r.businessPriority === "medium"
+    ).length;
+
+    const lowPriority = reqs.filter(
+      r => r.businessPriority === "low"
+    ).length;
 
     return {
-      coverage,
-      execution,
-      highRiskAreas
+      totalRequirements: total,
+      coveredRequirements: covered,
+      uncoveredRequirements: uncovered,
+      coveragePercent,
+
+      highRiskCount: highRisk,
+      mediumRiskCount: mediumRisk,
+      lowRiskCount: lowRisk,
+
+      uiCount,
+      apiCount,
+
+      criticalPriorityCount: criticalPriority,
+      highPriorityCount: highPriority,
+      mediumPriorityCount: mediumPriority,
+      lowPriorityCount: lowPriority
     };
-  }
-
-  private computeCoverage(rtm: RTMDocument): CoverageMetrics {
-    const requirements = rtm.requirements || [];
-    const totalRequirements = requirements.length;
-
-    let covered = 0;
-    let uiTotal = 0;
-    let uiCovered = 0;
-    let apiTotal = 0;
-    let apiCovered = 0;
-    let aiEnrichedCount = 0;
-
-    for (const req of requirements) {
-      const isCovered = !!(req.coveredBy && req.coveredBy.length > 0);
-      if (isCovered) covered++;
-
-      if (req.type === 'ui') {
-        uiTotal++;
-        if (isCovered) uiCovered++;
-      } else if (req.type === 'api') {
-        apiTotal++;
-        if (isCovered) apiCovered++;
-      }
-
-      if (req.aiLogic && ((req.aiLogic.steps?.length || 0) > 0 || (req.aiLogic.assertions?.length || 0) > 0)) {
-        aiEnrichedCount++;
-      }
-    }
-
-    return {
-      totalRequirements,
-      covered,
-      uncovered: totalRequirements - covered,
-      coveragePercent: totalRequirements ? (covered / totalRequirements) * 100 : 0,
-
-      uiTotal,
-      uiCovered,
-      uiCoveragePercent: uiTotal ? (uiCovered / uiTotal) * 100 : 0,
-
-      apiTotal,
-      apiCovered,
-      apiCoveragePercent: apiTotal ? (apiCovered / apiTotal) * 100 : 0,
-
-      aiEnrichedCount
-    };
-  }
-
-  private computeExecution(
-    rtm: RTMDocument,
-    exec?: RTMExecutionDocument
-  ): ExecutionMetrics {
-    const requirements = rtm.requirements || [];
-
-    if (!exec || !exec.results) {
-      return {
-        hasExecution: false,
-        totalExecuted: 0,
-        passed: 0,
-        failed: 0,
-        notExecuted: requirements.length,
-        executionPercent: 0,
-        flakyCandidates: []
-      };
-    }
-
-    const statusByReq = new Map<string, Set<'passed' | 'failed'>>();
-
-    for (const result of exec.results) {
-      if (!statusByReq.has(result.requirementId)) {
-        statusByReq.set(result.requirementId, new Set());
-      }
-      statusByReq.get(result.requirementId)!.add(result.status);
-    }
-
-    let passed = 0;
-    let failed = 0;
-    let notExecuted = 0;
-    const flakyCandidates: string[] = [];
-
-    for (const req of requirements) {
-      const statuses = statusByReq.get(req.id);
-
-      if (!statuses || statuses.size === 0) {
-        notExecuted++;
-        continue;
-      }
-
-      if (statuses.has('passed') && statuses.has('failed')) {
-        flakyCandidates.push(req.id);
-      }
-
-      if (statuses.has('failed')) {
-        failed++;
-      } else if (statuses.has('passed')) {
-        passed++;
-      }
-    }
-
-    const totalExecuted = passed + failed;
-
-    return {
-      hasExecution: true,
-      totalExecuted,
-      passed,
-      failed,
-      notExecuted,
-      executionPercent: requirements.length
-        ? (totalExecuted / requirements.length) * 100
-        : 0,
-      flakyCandidates
-    };
-  }
-
-  private computeRiskAreas(
-    rtm: RTMDocument,
-    exec?: RTMExecutionDocument
-  ): RiskArea[] {
-    const requirements = rtm.requirements || [];
-    const failingByReq = new Set<string>();
-
-    if (exec && exec.results) {
-      for (const r of exec.results) {
-        if (r.status === 'failed') {
-          failingByReq.add(r.requirementId);
-        }
-      }
-    }
-
-    const areaMap = new Map<string, RiskArea>();
-
-    const keyFor = (req: Requirement) =>
-      req.type === 'ui' ? `ui:${req.page}` : `api:${req.url || req.page}`;
-
-    const labelFor = (req: Requirement) =>
-      req.type === 'ui' ? req.page : req.url || req.page;
-
-    for (const req of requirements) {
-      const key = keyFor(req);
-      if (!areaMap.has(key)) {
-        areaMap.set(key, {
-          id: key,
-          label: labelFor(req),
-          type: req.type,
-          uncoveredCount: 0,
-          failingCount: 0
-        });
-      }
-
-      const area = areaMap.get(key)!;
-
-      const isCovered = !!(req.coveredBy && req.coveredBy.length > 0);
-      if (!isCovered) {
-        area.uncoveredCount++;
-      }
-
-      if (failingByReq.has(req.id)) {
-        area.failingCount++;
-      }
-    }
-
-    return Array.from(areaMap.values())
-      .filter(a => a.uncoveredCount > 0 || a.failingCount > 0)
-      .sort((a, b) => (b.uncoveredCount + b.failingCount) - (a.uncoveredCount + a.failingCount));
   }
 }

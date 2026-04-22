@@ -19,10 +19,13 @@ export class FlowRequirementGenerator {
 
       requirements.push({
         id: `FLOW-NAV-${index + 1}`,
-        page: edge.from,
+        title: `Navigation from ${edge.from} to ${edge.to}`,
         description,
         type: 'ui',
-        source: 'UI'
+        source: {
+          pageName: edge.from
+        },
+        coveredBy: []
       });
     });
 
@@ -46,20 +49,26 @@ export class FlowRequirementGenerator {
     entryPoints.forEach((p, index) => {
       requirements.push({
         id: `FLOW-ENTRY-${index + 1}`,
-        page: p.url,
+        title: `Entry point: ${p.url}`,
         description: `Page "${p.url}" is an entry point in the application flow (no incoming navigation).`,
         type: 'ui',
-        source: 'UI'
+        source: {
+          pageName: p.url
+        },
+        coveredBy: []
       });
     });
 
     deadEnds.forEach((p, index) => {
       requirements.push({
         id: `FLOW-DEAD-${index + 1}`,
-        page: p.url,
+        title: `Terminal page: ${p.url}`,
         description: `Page "${p.url}" is a terminal page in the application flow (no outgoing navigation).`,
         type: 'ui',
-        source: 'UI'
+        source: {
+          pageName: p.url
+        },
+        coveredBy: []
       });
     });
 
