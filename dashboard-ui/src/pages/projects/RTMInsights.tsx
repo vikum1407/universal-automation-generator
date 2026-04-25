@@ -1,89 +1,218 @@
-import type { CSSProperties } from "react";
 import { theme } from "@/theme";
+import type { RTMInsights as RTMInsightsType, RTMRequirement } from "@/api/rtm";
 
-interface RTMInsightsProps {
-  insights: {
-    uncoveredCount: number;
-    flakyCount: number;
-    failedCount: number;
-    stableCount: number;
-    highRiskEndpoints: string[];
-    uiGaps: string[];
-  } | null;
+const RISK_COLOR: Record<string, string> = {
+  critical: "#EF5350", high: "#FF7043", medium: "#FFA726", low: "#66BB6A",
+};
+const TYPE_COLOR: Record<string, string> = {
+  api: "#448AFF", ui: "#9C27B0", hybrid: "#FF7043",
+  performance: "#00BCD4", security: "#EF5350", business: "#66BB6A",
+};
+
+function InsightCard({
+  icon, title, count, color, children,
+}: {
+  icon: string; title: string; count: number; color: string;
+  children: React.ReactNode;
+}) {
+  const isDark = theme.mode === "dark";
+  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
+  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+
+  return (
+    <div style={{
+      padding: "16px 18px", borderRadius: 14,
+      background: surface, border: `1px solid ${border}`,
+      boxShadow: theme.shadow.card
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+        <span style={{ fontSize: 20 }}>{icon}</span>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: isDark ? theme.colors.darkText : theme.colors.textDark }}>
+            {title}
+          </div>
+        </div>
+        <span style={{
+          padding: "2px 10px", borderRadius: 10, fontSize: 12, fontWeight: 700,
+          background: count > 0 ? `${color}22` : "#00C85322",
+          color: count > 0 ? color : "#00C853"
+        }}>{count}</span>
+      </div>
+      {count === 0
+        ? <div style={{ fontSize: 12, color: textLight }}>None found — all clear!</div>
+        : children
+      }
+    </div>
+  );
 }
 
-export default function RTMInsights({ insights }: RTMInsightsProps) {
-  if (!insights) return null;
-
-  const card: CSSProperties = {
-    padding: theme.spacing.md,
-    borderRadius: theme.radii.md,
-    border: `1px solid ${theme.colors.border}`,
-    background: theme.colors.background,
-    boxShadow: theme.shadow.card,
-    display: "flex",
-    flexDirection: "column",
-    gap: 6
-  };
-
-  const label: CSSProperties = {
-    fontSize: 13,
-    color: theme.colors.textDark
-  };
-
-  const value: CSSProperties = {
-    fontSize: 22,
-    fontWeight: 600,
-    color: theme.colors.primary
-  };
+function ReqChip({ req, onSelect }: { req: RTMRequirement; onSelect: () => void }) {
+  const isDark = theme.mode === "dark";
+  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
+  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
 
   return (
     <div
+      onClick={onSelect}
       style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-        gap: theme.spacing.md,
-        marginBottom: theme.spacing.lg
+        padding: "8px 12px", borderRadius: 8, cursor: "pointer",
+        border: `1px solid ${border}`, marginBottom: 6,
+        display: "flex", alignItems: "center", gap: 8,
+        transition: "background 0.12s ease"
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLDivElement).style.background = isDark ? "#2A1A40" : "#EDE4FF";
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.background = "transparent";
       }}
     >
-      <div style={card}>
-        <div style={label}>Uncovered Requirements</div>
-        <div style={value}>{insights.uncoveredCount}</div>
+      <span style={{
+        padding: "1px 7px", borderRadius: 5, fontSize: 10, fontWeight: 700,
+        background: `${TYPE_COLOR[req.type] ?? "#888"}22`,
+        color: TYPE_COLOR[req.type] ?? "#888"
+      }}>{req.type.toUpperCase()}</span>
+      <span style={{ flex: 1, fontSize: 12, color: text, fontWeight: 500 }}>{req.title}</span>
+      {req.riskLevel !== "low" && (
+        <span style={{
+          fontSize: 10, fontWeight: 700,
+          color: RISK_COLOR[req.riskLevel] ?? "#FFA726"
+        }}>⚠ {req.riskLevel}</span>
+      )}
+      <span style={{ fontSize: 10, color: textLight }}>→</span>
+    </div>
+  );
+}
+
+export default function RTMInsights({
+  insights,
+  onSelectReq,
+}: {
+  insights: RTMInsightsType;
+  onSelectReq: (req: RTMRequirement) => void;
+}) {
+  const isDark = theme.mode === "dark";
+  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+
+  const totalIssues = insights.highRiskUncovered.length +
+    insights.duplicateSuspects.length +
+    insights.needsRewrite.length;
+
+  if (!totalIssues) {
+    return (
+      <div style={{
+        marginTop: 24, textAlign: "center", padding: "32px 0",
+        color: textLight
+      }}>
+        <div style={{ fontSize: 36, marginBottom: 8 }}>🎉</div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "#00C853" }}>All clear!</div>
+        <div style={{ fontSize: 13, marginTop: 4 }}>No AI insights found — RTM is healthy.</div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginTop: 24 }}>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 16, fontWeight: 700, color: isDark ? theme.colors.darkText : theme.colors.textDark }}>
+          AI Insights
+        </div>
+        <div style={{ fontSize: 12, color: textLight, marginTop: 3 }}>
+          {totalIssues} issue{totalIssues !== 1 ? "s" : ""} detected — click any item to view details
+        </div>
       </div>
 
-      <div style={card}>
-        <div style={label}>Flaky Tests</div>
-        <div style={value}>{insights.flakyCount}</div>
-      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 14 }}>
 
-      <div style={card}>
-        <div style={label}>Failed Tests</div>
-        <div style={value}>{insights.failedCount}</div>
-      </div>
-
-      <div style={card}>
-        <div style={label}>Stable Tests</div>
-        <div style={value}>{insights.stableCount}</div>
-      </div>
-
-      <div style={card}>
-        <div style={label}>High‑Risk Endpoints</div>
-        <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13 }}>
-          {insights.highRiskEndpoints.length === 0 && <li>None</li>}
-          {insights.highRiskEndpoints.map((e) => (
-            <li key={e}>{e}</li>
+        {/* High-risk uncovered */}
+        <InsightCard
+          icon="🔴"
+          title="High-Risk Uncovered Requirements"
+          count={insights.highRiskUncovered.length}
+          color="#EF5350"
+        >
+          {insights.highRiskUncovered.slice(0, 5).map(r => (
+            <ReqChip key={r.id} req={r} onSelect={() => onSelectReq(r)} />
           ))}
-        </ul>
-      </div>
+          {insights.highRiskUncovered.length > 5 && (
+            <div style={{ fontSize: 11, color: textLight, marginTop: 4 }}>
+              +{insights.highRiskUncovered.length - 5} more
+            </div>
+          )}
+        </InsightCard>
 
-      <div style={card}>
-        <div style={label}>UI Coverage Gaps</div>
-        <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13 }}>
-          {insights.uiGaps.length === 0 && <li>None</li>}
-          {insights.uiGaps.map((g) => (
-            <li key={g}>{g}</li>
+        {/* Duplicate suspects */}
+        <InsightCard
+          icon="🔁"
+          title="Possible Duplicate Requirements"
+          count={insights.duplicateSuspects.length}
+          color="#FFA726"
+        >
+          {insights.duplicateSuspects.slice(0, 4).map((d, i) => {
+            const isDark2 = theme.mode === "dark";
+            const border = isDark2 ? theme.colors.darkBorder : theme.colors.border;
+            const text = isDark2 ? theme.colors.darkText : theme.colors.textDark;
+            const tl = isDark2 ? theme.colors.darkTextLight : theme.colors.textLight;
+            return (
+              <div key={i} style={{
+                padding: "8px 12px", borderRadius: 8,
+                border: `1px solid ${border}`, marginBottom: 6
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                  <span style={{ fontSize: 10, color: "#FFA726", fontWeight: 700 }}>
+                    {d.similarity}% similar
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, color: text, marginBottom: 2 }}>{d.titles[0]}</div>
+                <div style={{ fontSize: 11, color: tl }}>{d.titles[1]}</div>
+              </div>
+            );
+          })}
+        </InsightCard>
+
+        {/* Needs rewrite */}
+        <InsightCard
+          icon="✍️"
+          title="Requirements Needing Better Description"
+          count={insights.needsRewrite.length}
+          color="#9C27B0"
+        >
+          {insights.needsRewrite.slice(0, 5).map(r => (
+            <ReqChip key={r.id} req={r} onSelect={() => onSelectReq(r)} />
           ))}
-        </ul>
+          {insights.needsRewrite.length > 5 && (
+            <div style={{ fontSize: 11, color: textLight, marginTop: 4 }}>
+              +{insights.needsRewrite.length - 5} more
+            </div>
+          )}
+        </InsightCard>
+
+        {/* Failing tests */}
+        <InsightCard
+          icon="❌"
+          title="Requirements with Failing Tests"
+          count={insights.withFailingTests.length}
+          color="#EF5350"
+        >
+          {insights.withFailingTests.slice(0, 5).map(r => (
+            <ReqChip key={r.id} req={r} onSelect={() => onSelectReq(r)} />
+          ))}
+        </InsightCard>
+
+        {/* Flaky tests */}
+        <InsightCard
+          icon="⚡"
+          title="Requirements with Flaky Tests"
+          count={insights.withFlakyTests.length}
+          color="#FFA726"
+        >
+          {insights.withFlakyTests.slice(0, 5).map(r => (
+            <ReqChip key={r.id} req={r} onSelect={() => onSelectReq(r)} />
+          ))}
+        </InsightCard>
+
       </div>
     </div>
   );

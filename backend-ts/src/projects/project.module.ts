@@ -33,6 +33,7 @@ import { ApiTestGenerationService } from './api/api-test-generation.service';
 import { APITestGenerator } from './api/api-test-generator';
 import { APITestWriter } from './api/api-test-writer';
 import { APIAnalyticsController } from './api/api-analytics.controller';
+import { CoverageController } from './coverage/coverage.controller';
 
 @Module({
   imports: [
@@ -53,7 +54,8 @@ import { APIAnalyticsController } from './api/api-analytics.controller';
     CloudSyncController,
 
     APIScanController,
-    APIAnalyticsController
+    APIAnalyticsController,
+    CoverageController,
   ],
   providers: [
     ProjectService,

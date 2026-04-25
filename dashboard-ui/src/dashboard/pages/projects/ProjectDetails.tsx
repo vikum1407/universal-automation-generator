@@ -141,7 +141,7 @@ export default function ProjectDetails() {
             setCollapsed={setCollapsed}
           />
         }
-        content={<ProjectTabs project={project} activeTab={activeTab} />}
+        content={<ProjectTabs project={project} activeTab={activeTab} setActiveTab={setActiveTab} />}
       />
 
       {(isInitializing || isRecrawling) && (

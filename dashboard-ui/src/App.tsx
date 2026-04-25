@@ -46,7 +46,7 @@ export default function App() {
       <ErrorBoundary>
         <Routes>
           <Route element={<DashboardLayout />}>
-            <Route path="/" element={<Navigate to="/journeys" replace />} />
+            <Route path="/" element={<Navigate to="/projects" replace />} />
 
             {/* PROJECT CREATION WIZARD */}
             <Route path="/projects/new" element={<NewProjectType />} />

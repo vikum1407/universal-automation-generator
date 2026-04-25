@@ -13,6 +13,7 @@ interface OverviewProps {
 
 export default function Overview({ project }: OverviewProps) {
   const isUI = project.type === "ui";
+  const displayName = project.name || (isUI ? project.url : project.swaggerUrl) || "Untitled Project";
 
   const [progress, setProgress] = useState({
     open: false,
@@ -96,7 +97,7 @@ export default function Overview({ project }: OverviewProps) {
       >
         <div style={{ flex: "1 1 260px", minWidth: 260 }}>
           <input
-            defaultValue={project.name}
+            defaultValue={displayName}
             style={{
               fontSize: "24px",
               fontWeight: 700,

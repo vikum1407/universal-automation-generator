@@ -1,27 +1,30 @@
 import { Controller, Get, Post, Param, Body } from "@nestjs/common";
 import * as fs from "fs";
+import * as path from "path";
+
+const OUTPUT_BASE = "./qlitz-output";
 
 @Controller("projects/:id/suggestions")
 export class SuggestionsController {
-  // Generate missing test suggestions
+  private base(id: string) { return path.join(OUTPUT_BASE, id); }
+
   @Get()
   async getSuggestions(@Param("id") id: string) {
-    const uiFlow = `./generated-ui-project/${id}/flow-graph.json`;
-    const apiEndpoints = `./generated-api-project/${id}/endpoints.json`;
+    const base = this.base(id);
+    const rtmFile = path.join(base, "rtm.json");
+    const flowGraphFile = path.join(base, "flow-graph.json");
+    const endpointsFile = path.join(base, "endpoints.json");
 
-    const rtmFile = fs.existsSync(`./generated-ui-project/${id}/rtm.json`)
-      ? `./generated-ui-project/${id}/rtm.json`
-      : `./generated-api-project/${id}/rtm.json`;
+    if (!fs.existsSync(rtmFile)) return [];
 
     const rtm = JSON.parse(fs.readFileSync(rtmFile, "utf8"));
     const covered = new Set(rtm.requirements.map((r: any) => r.description));
-
     let items: any[] = [];
 
-    // UI edges
-    if (fs.existsSync(uiFlow)) {
-      const flow = JSON.parse(fs.readFileSync(uiFlow, "utf8"));
-      items = flow.edges.map((e: any) => ({
+    // UI: interactions from flow graph edges
+    if (fs.existsSync(flowGraphFile)) {
+      const flow = JSON.parse(fs.readFileSync(flowGraphFile, "utf8"));
+      items = (flow.edges || []).map((e: any) => ({
         id: `${e.from}->${e.to}`,
         description: e.action || `Navigate from ${e.from} to ${e.to}`,
         type: "ui",
@@ -29,16 +32,17 @@ export class SuggestionsController {
       }));
     }
 
-    // API endpoints
-    if (fs.existsSync(apiEndpoints)) {
-      const endpoints = JSON.parse(fs.readFileSync(apiEndpoints, "utf8"));
+    // API: missing endpoint tests
+    if (fs.existsSync(endpointsFile)) {
+      const endpoints = JSON.parse(fs.readFileSync(endpointsFile, "utf8"));
       items = endpoints.map((ep: any) => ({
         id: `${ep.method} ${ep.path}`,
         description: ep.summary || `${ep.method} ${ep.path}`,
         type: "api",
         method: ep.method,
         url: ep.path,
-        requestBody: ep.requestBody
+        requestBody: ep.requestBody,
+        parameters: ep.parameters
       }));
     }
 
@@ -53,46 +57,44 @@ export class SuggestionsController {
           : `api-missing-${index + 1}.spec.ts`,
       proposedTestCode:
         m.type === "ui"
-          ? `import { test } from "@playwright/test";
+          ? `import { test, expect } from "@playwright/test";
 
 test("${m.description}", async ({ page }) => {
-  await page.goto("YOUR_URL_HERE");
-  await page.click("${m.selector || ""}");
+  await page.goto(process.env.BASE_URL ?? "YOUR_URL_HERE");
+  await page.click("${m.selector || "YOUR_SELECTOR"}");
+  // TODO: add assertions
 });`
-          : `import request from "supertest";
+          : `import { test, expect } from "@playwright/test";
 
-test("${m.description}", async () => {
-  const res = await request("YOUR_API_BASE")
-    .${m.method.toLowerCase()}("${m.url}")
-    .send(${JSON.stringify(m.requestBody || {}, null, 2)});
-  expect(res.status).toBe(200);
+test("${m.description}", async ({ request }) => {
+  const response = await request.${m.method.toLowerCase()}(\`\${process.env.API_BASE_URL ?? ""}${m.url}\`, {
+    headers: { "Content-Type": "application/json" }${m.requestBody ? `,\n    data: ${JSON.stringify(m.requestBody, null, 4)}` : ""}
+  });
+  expect(response.status()).toBe(200);
+  const json = await response.json();
+  expect(json).toBeDefined();
 });`
     }));
   }
 
-  // Apply suggestion
   @Post("apply")
   async applySuggestion(@Param("id") id: string, @Body() body: any) {
+    const base = this.base(id);
     const { proposedTestName, proposedTestCode, requirement } = body;
 
-    const isUI = fs.existsSync(`./generated-ui-project/${id}`);
-    const base = isUI
-      ? `./generated-ui-project/${id}`
-      : `./generated-api-project/${id}`;
+    // API tests → tests/ subdirectory; UI tests → root
+    const isAPI = requirement?.type === "api";
+    const testDir = isAPI ? path.join(base, "tests") : base;
+    if (!fs.existsSync(testDir)) fs.mkdirSync(testDir, { recursive: true });
 
-    // write test file
-    fs.writeFileSync(`${base}/${proposedTestName}`, proposedTestCode);
+    fs.writeFileSync(path.join(testDir, proposedTestName), proposedTestCode);
 
-    // update RTM
-    const rtmFile = `${base}/rtm.json`;
-    const rtm = JSON.parse(fs.readFileSync(rtmFile, "utf8"));
-
-    rtm.requirements.push({
-      ...requirement,
-      coveredBy: [proposedTestName]
-    });
-
-    fs.writeFileSync(rtmFile, JSON.stringify(rtm, null, 2));
+    const rtmFile = path.join(base, "rtm.json");
+    if (fs.existsSync(rtmFile)) {
+      const rtm = JSON.parse(fs.readFileSync(rtmFile, "utf8"));
+      rtm.requirements.push({ ...requirement, coveredBy: [proposedTestName] });
+      fs.writeFileSync(rtmFile, JSON.stringify(rtm, null, 2));
+    }
 
     return { ok: true };
   }

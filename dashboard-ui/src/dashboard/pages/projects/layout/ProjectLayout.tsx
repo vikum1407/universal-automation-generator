@@ -27,13 +27,14 @@ export default function ProjectLayout({
         {sidebar}
       </div>
 
-      {/* CONTENT WRAPPER — overflow visible so tooltips can escape */}
+      {/* CONTENT WRAPPER */}
       <div
         style={{
           flex: 1,
+          minWidth: 0,          /* prevent flex child from overflowing its allocated width */
           position: "relative",
           zIndex: 10,
-          overflow: "visible"
+          overflow: "hidden"
         }}
       >
         {/* INNER SCROLL AREA */}
@@ -41,6 +42,7 @@ export default function ProjectLayout({
           style={{
             height: "100%",
             overflowY: "auto",
+            overflowX: "hidden", /* clip horizontal overflow — each section scrolls internally */
             padding: theme.spacing.xl,
             boxSizing: "border-box"
           }}

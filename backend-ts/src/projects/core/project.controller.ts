@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, Delete } from "@nestjs/common";
+import { Controller, Post, Get, Patch, Body, Param, Delete } from "@nestjs/common";
 import { ProjectService } from "../project.service";
 import * as path from "path";
 import * as fs from "fs";
@@ -62,6 +62,11 @@ export class ProjectController {
   @Get(":id")
   async getProject(@Param("id") id: string) {
     return this.projectService.getFullProject(id);
+  }
+
+  @Patch(":id")
+  async updateProject(@Param("id") id: string, @Body() body: { name?: string; pinned?: boolean }) {
+    return this.projectService.updateProject(id, body);
   }
 
   @Delete(":id")

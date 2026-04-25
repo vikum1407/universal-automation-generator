@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { CloudService } from "../cloud/cloud.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import * as fs from "fs";
+import * as path from "path";
 import { ReCrawlService } from "../services/ReCrawlService";
 
 @Injectable()
@@ -47,16 +48,37 @@ export class ProjectService {
   }
 
   async getFullProject(id: string) {
-    return this.prisma.project.findUnique({
-      where: { id }
-    });
+    const p = await this.prisma.project.findUnique({ where: { id } });
+    return p ? this.withName(p) : null;
   }
 
   async listProjects() {
-    return this.prisma.project.findMany({
-      orderBy: { createdAt: "desc" },
+    const projects = await this.prisma.project.findMany({
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
       take: 50
     });
+    return projects.map(p => this.withName(p));
+  }
+
+  private withName(p: any) {
+    if (p.name) return p;
+    const url = p.type === "api" ? p.swaggerUrl : p.url;
+    let name = "Untitled Project";
+    try {
+      if (url) name = new URL(url).hostname;
+    } catch {}
+    return { ...p, name };
+  }
+
+  async updateProject(id: string, data: { name?: string; pinned?: boolean }) {
+    const updated = await this.prisma.project.update({
+      where: { id },
+      data: {
+        ...(data.name !== undefined ? { name: data.name } : {}),
+        ...(data.pinned !== undefined ? { pinned: data.pinned } : {}),
+      },
+    });
+    return this.withName(updated);
   }
 
   async delete(id: string) {
@@ -100,6 +122,7 @@ export class ProjectService {
     const base = `./qlitz-output/${projectId}`;
 
     const analytics: any = {
+      endpoints: undefined,
       tests: 0,
       passed: 0,
       failed: 0,
@@ -113,8 +136,20 @@ export class ProjectService {
 
     if (!fs.existsSync(base)) return analytics;
 
-    const testFiles = fs.readdirSync(base).filter(f => f.endsWith(".spec.ts"));
-    analytics.tests = testFiles.length;
+    // Count spec files at root level (UI tests) and tests/ subdirectory (API tests)
+    const rootTests = fs.readdirSync(base).filter(f => f.endsWith(".spec.ts"));
+    const testsDir = path.join(base, "tests");
+    const subTests = fs.existsSync(testsDir)
+      ? fs.readdirSync(testsDir).filter(f => f.endsWith(".spec.ts"))
+      : [];
+    analytics.tests = rootTests.length + subTests.length;
+
+    // Endpoint count (API projects only)
+    const endpointsFile = path.join(base, "endpoints.json");
+    if (fs.existsSync(endpointsFile)) {
+      const eps = JSON.parse(fs.readFileSync(endpointsFile, "utf8"));
+      analytics.endpoints = Array.isArray(eps) ? eps.length : 0;
+    }
 
     const resultsFile = `${base}/test-results.json`;
     if (fs.existsSync(resultsFile)) {

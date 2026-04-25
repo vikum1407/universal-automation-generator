@@ -101,6 +101,8 @@ export default function ProjectAnalytics({ projectId }: { projectId: string }) {
       ? theme.colors.success
       : textLight;
 
+  const isAPI = data.endpoints !== undefined;
+
   // ---------------------------------------------------------
   // RENDER ANALYTICS GRID
   // ---------------------------------------------------------
@@ -117,13 +119,14 @@ export default function ProjectAnalytics({ projectId }: { projectId: string }) {
           gap: theme.spacing.md
         }}
       >
+        {isAPI && card("Endpoints", data.endpoints, theme.colors.primary)}
         {card("Total Tests", data.tests)}
         {card("Passed", data.passed, theme.colors.success)}
         {card("Failed", data.failed, theme.colors.danger)}
         {card("Coverage %", `${data.coverage}%`)}
         {card("Requirements", data.requirements)}
-        {card("AI Suggestions", data.aiSuggestions)}
-        {card("Auto‑Healed", data.autoHealed)}
+        {!isAPI && card("AI Suggestions", data.aiSuggestions)}
+        {!isAPI && card("Auto‑Healed", data.autoHealed)}
         {card(
           "Last Run",
           data.lastRun ? new Date(data.lastRun).toLocaleString() : "—"

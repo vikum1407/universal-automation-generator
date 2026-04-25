@@ -109,15 +109,13 @@ export class UIController {
     };
   }
 
-  // Replay
+  // Replay — reads from qlitz-output/{id}/replay/{test}.json
   @Get("replay/:test")
   async getReplay(
     @Param("id") id: string,
     @Param("test") test: string
   ) {
-    const base = `./generated-ui-project/${id}`;
-    const file = `${base}/replay/${test}.json`;
-
+    const file = `./qlitz-output/${id}/replay/${test}.json`;
     if (!fs.existsSync(file)) return [];
     return JSON.parse(fs.readFileSync(file, "utf8"));
   }

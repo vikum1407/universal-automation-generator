@@ -12,15 +12,17 @@ import AISuggestions from "@/pages/projects/AISuggestions";
 import TestRunner from "@/pages/projects/TestRunner";
 import AutoHeal from "@/pages/projects/AutoHeal";
 import ReplayViewer from "@/pages/projects/ReplayViewer";
+import APIReplayViewer from "@/pages/projects/APIReplayViewer";
 
 import type { TabId } from "@/dashboard/pages/projects/layout/ProjectSidebar";
 
 interface ProjectTabsProps {
   project: any;
   activeTab: TabId;
+  setActiveTab: (tab: TabId) => void;
 }
 
-export default function ProjectTabs({ project, activeTab }: ProjectTabsProps) {
+export default function ProjectTabs({ project, activeTab, setActiveTab }: ProjectTabsProps) {
   const isUI = project.type === "ui";
   const isAPI = project.type === "api";
   const navigate = useNavigate();
@@ -52,7 +54,7 @@ export default function ProjectTabs({ project, activeTab }: ProjectTabsProps) {
     case "coverage":
       return (
         <div style={{ marginTop: theme.spacing.lg }}>
-          <CoverageHeatmap projectId={project.id} />
+          <CoverageHeatmap projectId={project.id} onNavigate={setActiveTab} />
         </div>
       );
 
@@ -80,13 +82,10 @@ export default function ProjectTabs({ project, activeTab }: ProjectTabsProps) {
     case "replay":
       return (
         <div style={{ marginTop: theme.spacing.lg }}>
-          {isUI ? (
-            <ReplayViewer projectId={project.id} testName="example" />
-          ) : (
-            <p style={{ color: theme.colors.textLight }}>
-              Replay is only available for UI projects.
-            </p>
-          )}
+          {isUI
+            ? <ReplayViewer projectId={project.id} testName="example" />
+            : <APIReplayViewer projectId={project.id} />
+          }
         </div>
       );
 

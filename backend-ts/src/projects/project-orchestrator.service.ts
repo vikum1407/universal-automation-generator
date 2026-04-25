@@ -200,6 +200,9 @@ export class ProjectOrchestratorService {
         )
       );
 
+      this.emitProgress(project.id, 75, "Scaffolding project…");
+      this.ensureAPIProjectScaffold(base);
+
       this.emitProgress(project.id, 80, "Generating tests…");
       await this.apiTestGen.generateTests(base);
 
@@ -221,6 +224,37 @@ export class ProjectOrchestratorService {
         data: { status: "failed" }
       });
       this.gateway.emitProjectStatus(project.id);
+    }
+  }
+
+  private ensureAPIProjectScaffold(outputDir: string) {
+    const pkg = {
+      name: "qlitz-api-project",
+      version: "1.0.0",
+      private: true,
+      scripts: { test: "playwright test", "show-report": "playwright show-report" },
+      devDependencies: { "@playwright/test": "^1.42.0" }
+    };
+
+    const config = `import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests',
+  reporter: [['html', { open: 'never' }]],
+  use: {
+    extraHTTPHeaders: { 'Content-Type': 'application/json' }
+  }
+});
+`;
+
+    const pkgFile = path.join(outputDir, "package.json");
+    const cfgFile = path.join(outputDir, "playwright.config.ts");
+
+    if (!fs.existsSync(pkgFile)) {
+      fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2));
+    }
+    if (!fs.existsSync(cfgFile)) {
+      fs.writeFileSync(cfgFile, config);
     }
   }
 }

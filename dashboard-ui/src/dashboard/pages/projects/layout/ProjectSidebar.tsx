@@ -11,7 +11,7 @@ export type TabId =
   | "replay"
   | "settings";
 
-const TABS: { id: TabId; label: string }[] = [
+const ALL_TABS: { id: TabId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "flows", label: "Flows / Endpoints" },
   { id: "rtm", label: "RTM" },
@@ -40,6 +40,8 @@ export default function ProjectSidebar({
   const border = theme.mode === "dark" ? theme.colors.darkBorder : theme.colors.border;
   const text = theme.mode === "dark" ? theme.colors.darkText : theme.colors.textDark;
   const textLight = theme.mode === "dark" ? theme.colors.darkTextLight : theme.colors.textLight;
+
+  const TABS = ALL_TABS;
 
   return (
     <div

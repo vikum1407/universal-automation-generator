@@ -45,6 +45,8 @@ enum SuggestionStatus {
 model Project {
   id              String      @id @default(uuid())
   type            ProjectType
+  name            String?
+  pinned          Boolean     @default(false)
   url             String?
   username        String?
   password        String?
