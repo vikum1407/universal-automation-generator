@@ -11,7 +11,6 @@ export class UiIngestionService {
   async ingestFromUrl(url: string): Promise<IngestedData> {
     const data = await this.urlIngestor.ingest(url);
 
-    // refine actions
     const refinedActions = this.actionDetector.refine(data.actions || []);
 
     return {

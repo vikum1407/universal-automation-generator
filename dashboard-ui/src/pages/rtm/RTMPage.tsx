@@ -14,14 +14,19 @@ export default function RTMPage({ projectId }: { projectId: string }) {
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState("requirements");
 
+  // ---------------------------------------------------------
+  // LOAD RTM FROM NEW BACKEND FORMAT
+  // ---------------------------------------------------------
   const load = async () => {
     setLoading(true);
+
     const res = await fetch(`/projects/${projectId}/rtm`);
     const data = await res.json();
 
-    // IMPORTANT: store full backend response
+    // NEW: backend returns { requirements, insights }
     setRTM(data);
     setInsights(data.insights || null);
+
     setLoading(false);
   };
 
@@ -29,40 +34,58 @@ export default function RTMPage({ projectId }: { projectId: string }) {
     load();
   }, [projectId]);
 
+  // ---------------------------------------------------------
+  // EXPORT
+  // ---------------------------------------------------------
   const exportRTM = async (format: string) => {
     await fetch(`/projects/${projectId}/rtm/export`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         project: projectId,
-        rtm: rtm.rtm,
+        rtm: rtm.requirements, // NEW: no nested rtm.rtm
         format
       })
     });
   };
 
+  // ---------------------------------------------------------
+  // BULK REGENERATE
+  // ---------------------------------------------------------
   const bulkRegenerate = async () => {
     await fetch(`/projects/${projectId}/rtm/regenerate-all`, {
       method: "POST",
       headers: { "Content-Type": "application/json" }
     });
+
     load();
   };
 
+  // ---------------------------------------------------------
+  // LOADING + EMPTY STATES
+  // ---------------------------------------------------------
   if (loading) {
     return <div className="p-6 text-gray-400">Loading RTM…</div>;
   }
 
-  // NEW: correct requirement path
-  if (!rtm || !rtm.rtm || !rtm.rtm.requirements) {
+  if (!rtm || !rtm.requirements) {
     return <div className="p-6 text-gray-400">No RTM data found.</div>;
   }
 
-  // NEW: summary computed from new schema
+  // ---------------------------------------------------------
+  // SUMMARY (NEW FORMAT)
+  // ---------------------------------------------------------
   const summary = {
-    totalRequirements: rtm.rtm.requirements.length,
-    coveredRequirements: 0,
-    coveragePercent: 0
+    totalRequirements: rtm.requirements.length,
+    coveredRequirements: rtm.requirements.filter((r: any) => r.covered).length || 0,
+    coveragePercent:
+      rtm.requirements.length > 0
+        ? Math.round(
+            (rtm.requirements.filter((r: any) => r.covered).length /
+              rtm.requirements.length) *
+              100
+          )
+        : 0
   };
 
   return (
@@ -76,6 +99,7 @@ export default function RTMPage({ projectId }: { projectId: string }) {
       <div className="p-6 flex flex-col gap-6 flex-1">
         <RTMDashboard summary={summary} />
 
+        {/* EXPORT BUTTONS */}
         <div className="flex gap-3">
           <button
             onClick={() => exportRTM("md")}
@@ -103,13 +127,14 @@ export default function RTMPage({ projectId }: { projectId: string }) {
           </button>
         </div>
 
+        {/* PANELS */}
         {active === "insights" && insights && <RTMInsights insights={insights} />}
         {active === "coverage" && <RTMCoverageHeatmap projectId={projectId} />}
         {active === "tests" && <RTMTestsExplorer projectId={projectId} />}
         {active === "timeline" && <RTMCoverageTimeline projectId={projectId} />}
         {active === "ai" && <RTMAISuggestions projectId={projectId} />}
 
-        {/* NEW: pass projectId only */}
+        {/* REQUIREMENTS TABLE */}
         {active === "requirements" && <RTMTable projectId={projectId} />}
       </div>
     </div>

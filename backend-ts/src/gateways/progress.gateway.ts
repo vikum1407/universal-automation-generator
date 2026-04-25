@@ -23,11 +23,10 @@ export class ProgressGateway {
     client.join(projectId);
 
     const p = progressService.get(projectId);
-
     if (!p) return;
 
     client.emit("project-status", {
-      status: p.status,
+      status: p.status ?? "processing",
       progressPercent: p.percent,
       progressStep: p.step
     });
@@ -38,7 +37,7 @@ export class ProgressGateway {
     if (!p) return;
 
     this.server.to(projectId).emit("project-status", {
-      status: p.status,
+      status: p.status ?? "processing",
       progressPercent: p.percent,
       progressStep: p.step
     });

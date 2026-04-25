@@ -44,3 +44,6 @@ backend-ts/generated-api-project/
 backend-ts/generated/
 backend-ts/generated/prisma/
 backend-ts/playwright.config.ts
+
+backend-ts/history-data/
+backend-ts/history-data/run_*.json

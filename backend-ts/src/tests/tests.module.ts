@@ -5,13 +5,11 @@ import { FrameworkGenerationOrchestrator } from '../generator/framework-generati
 import { UnifiedTestCaseGenerator } from '../generator/unified-test-case-generator';
 
 import { UIScanModule } from '../ui-scan/ui-scan.module';
-import { APIScanModule } from '../api-scan/api-scan.module';
 import { OrchestratorModule } from '../orchestrator/orchestrator.module';
 
 @Module({
   imports: [
     UIScanModule,
-    APIScanModule,
     OrchestratorModule
   ],
   controllers: [TestsController],

@@ -1,19 +1,29 @@
-import { Module } from '@nestjs/common';
-import { APIController } from './api.controller';
-import { ApiService } from './api.service';
-import { ApiTestGenerationService } from './api-test-generation.service';
+import { Controller, Get, Post, Param, Body, UploadedFile, UseInterceptors } from "@nestjs/common";
+import * as fs from "fs";
+import { FileInterceptor } from "@nestjs/platform-express";
 
-import { APITestGenerator } from '../../api-scan/api-test-generator';
-import { APITestWriter } from '../../api-scan/api-test-writer';
+@Controller("projects/:id/api")
+export class APIController {
+  // Upload Swagger file
+  @Post("upload")
+  @UseInterceptors(FileInterceptor("file"))
+  async uploadSwagger(@UploadedFile() file: any) {
+    return { filePath: file.path };
+  }
 
-@Module({
-  controllers: [APIController],
-  providers: [
-    ApiService,
-    ApiTestGenerationService,
-    APITestGenerator,
-    APITestWriter,
-  ],
-  exports: [ApiService, ApiTestGenerationService],
-})
-export class ApiModule {}
+  // Get API endpoints
+  @Get("endpoints")
+  async getEndpoints(@Param("id") id: string) {
+    const file = `./qlitz-output/${id}/endpoints.json`;
+    if (!fs.existsSync(file)) return [];
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  }
+
+  // Get RTM (API version)
+  @Get("rtm")
+  async getRTM(@Param("id") id: string) {
+    const apiFile = `./qlitz-output/${id}/rtm.json`;
+    if (!fs.existsSync(apiFile)) return { generatedAt: "", requirements: [] };
+    return JSON.parse(fs.readFileSync(apiFile, "utf8"));
+  }
+}

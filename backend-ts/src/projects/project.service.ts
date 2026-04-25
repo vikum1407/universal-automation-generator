@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { randomUUID } from "crypto";
-import { ProjectOrchestratorService } from "./project-orchestrator.service";
 import { CloudService } from "../cloud/cloud.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import * as fs from "fs";
@@ -9,19 +8,15 @@ import { ReCrawlService } from "../services/ReCrawlService";
 @Injectable()
 export class ProjectService {
   constructor(
-    private readonly orchestrator: ProjectOrchestratorService,
     private readonly cloud: CloudService,
     private readonly prisma: PrismaService,
     private readonly recrawlService: ReCrawlService
-  ) {
-    fs.mkdirSync('./generated-ui-project', { recursive: true });
-    fs.mkdirSync('./generated-api-project', { recursive: true });
-  }
+  ) {}
 
   async createUIProject(data: any) {
     const id = randomUUID();
 
-    const project = await this.prisma.project.create({
+    return this.prisma.project.create({
       data: {
         id,
         type: "ui",
@@ -30,18 +25,15 @@ export class ProjectService {
         password: data.password,
         crawlDepth: data.crawlDepth,
         env: data.env,
-        status: "initializing"
+        status: "processing"
       }
     });
-
-    this.orchestrator.runUIInitialization(project).catch(() => {});
-    return project;
   }
 
   async createAPIProject(data: any) {
     const id = randomUUID();
 
-    const project = await this.prisma.project.create({
+    return this.prisma.project.create({
       data: {
         id,
         type: "api",
@@ -49,12 +41,9 @@ export class ProjectService {
         swaggerFilePath: data.swaggerFilePath,
         authToken: data.authToken,
         env: data.env,
-        status: "initializing"
+        status: "processing"
       }
     });
-
-    this.orchestrator.runAPIInitialization(project).catch(() => {});
-    return project;
   }
 
   async getFullProject(id: string) {
@@ -88,11 +77,9 @@ export class ProjectService {
   }
 
   async getCIStatus(projectId: string) {
-    const uiBase = `./generated-ui-project/${projectId}`;
-    const apiBase = `./generated-api-project/${projectId}`;
-    const base = fs.existsSync(uiBase) ? uiBase : apiBase;
-
+    const base = `./qlitz-output/${projectId}`;
     const ciFile = `${base}/qlitz-report.json`;
+
     if (!fs.existsSync(ciFile)) {
       return {
         status: "not-run",
@@ -110,9 +97,7 @@ export class ProjectService {
   }
 
   async getAnalytics(projectId: string) {
-    const uiBase = `./generated-ui-project/${projectId}`;
-    const apiBase = `./generated-api-project/${projectId}`;
-    const base = fs.existsSync(uiBase) ? uiBase : apiBase;
+    const base = `./qlitz-output/${projectId}`;
 
     const analytics: any = {
       tests: 0,
@@ -196,31 +181,36 @@ export class ProjectService {
   }
 
   async getEndpoints(projectId: string) {
-    return this.prisma.endpoint.findMany({
-      where: { projectId },
-      orderBy: { path: "asc" }
+    const base = `./qlitz-output/${projectId}`;
+    const file = `${base}/endpoints.json`;
+
+    if (!fs.existsSync(file)) return [];
+
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  }
+
+  async markProjectReady(id: string) {
+    return this.prisma.project.update({
+      where: { id },
+      data: { status: "ready" }
+    });
+  }
+
+  async markProjectFailed(id: string) {
+    return this.prisma.project.update({
+      where: { id },
+      data: { status: "failed" }
     });
   }
 
   async getFlowGraph(projectId: string) {
-    const pages = await this.prisma.page.findMany({
-      where: { projectId }
-    });
+    const file = `./qlitz-output/${projectId}/flow-graph.json`;
 
-    const transitions = await this.prisma.transition.findMany({
-      where: { projectId }
-    });
+    if (!fs.existsSync(file)) {
+      return { pages: [], edges: [] };
+    }
 
-    return {
-      pages: pages.map(p => ({
-        url: p.url
-      })),
-      edges: transitions.map(t => ({
-        from: pages.find(p => p.id === t.fromId)?.url || "",
-        to: pages.find(p => p.id === t.toId)?.url || "",
-        action: t.action
-      }))
-    };
+    return JSON.parse(fs.readFileSync(file, "utf8"));
   }
 
   async recordFlowStep(

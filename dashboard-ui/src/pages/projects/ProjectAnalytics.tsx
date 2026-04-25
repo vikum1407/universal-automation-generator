@@ -21,15 +21,22 @@ export default function ProjectAnalytics({ projectId }: { projectId: string }) {
   const textLight =
     theme.mode === "dark" ? theme.colors.darkTextLight : theme.colors.textLight;
 
+  // ---------------------------------------------------------
+  // LOAD ANALYTICS FROM NEW BACKEND ENDPOINT
+  // ---------------------------------------------------------
   useEffect(() => {
-    fetch(`${API_BASE}/projects/${projectId}/flow/analytics`)
+    fetch(`${API_BASE}/projects/${projectId}/analytics`)
       .then(res => res.json())
       .then(d => {
         setData(d);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, [projectId]);
 
+  // ---------------------------------------------------------
+  // LOADING STATE
+  // ---------------------------------------------------------
   if (loading) {
     return (
       <div
@@ -47,8 +54,14 @@ export default function ProjectAnalytics({ projectId }: { projectId: string }) {
     );
   }
 
+  // ---------------------------------------------------------
+  // EMPTY STATE
+  // ---------------------------------------------------------
   if (!data) return <EmptyState message="No analytics available yet." />;
 
+  // ---------------------------------------------------------
+  // CARD COMPONENT
+  // ---------------------------------------------------------
   const card = (label: string, value: any, color = theme.colors.primary) => (
     <div
       style={{
@@ -78,6 +91,9 @@ export default function ProjectAnalytics({ projectId }: { projectId: string }) {
     </div>
   );
 
+  // ---------------------------------------------------------
+  // CI STATUS COLOR
+  // ---------------------------------------------------------
   const ciColor =
     data.ciStatus === "failed"
       ? theme.colors.danger
@@ -85,6 +101,9 @@ export default function ProjectAnalytics({ projectId }: { projectId: string }) {
       ? theme.colors.success
       : textLight;
 
+  // ---------------------------------------------------------
+  // RENDER ANALYTICS GRID
+  // ---------------------------------------------------------
   return (
     <div style={{ marginTop: theme.spacing.xl }}>
       <h3 style={{ color: theme.colors.primary, marginBottom: theme.spacing.md }}>

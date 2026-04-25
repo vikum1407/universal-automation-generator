@@ -3,12 +3,27 @@ import { ProgressContext } from "../context/ProgressContext";
 
 export function useProjectProgress() {
   const ctx = useContext(ProgressContext);
+
   return {
-    openProgress: ctx.openProgress,
-    closeProgress: ctx.closeProgress,
-    projectId: ctx.projectId,
+    // state
+    isOpen: ctx.isOpen,
     percent: ctx.percent,
     step: ctx.step,
-    isOpen: ctx.isOpen
+    projectId: ctx.projectId,
+
+    // actions
+    openProgress: ctx.openProgress,
+    closeProgress: ctx.closeProgress,
+
+    // unified update function
+    updateProgress: (data: {
+      isOpen?: boolean;
+      percent?: number;
+      step?: string;
+    }) => {
+      if (data.isOpen !== undefined) ctx.isOpen = data.isOpen;
+      if (data.percent !== undefined) ctx.updateProgress(data.percent, data.step || ctx.step);
+      if (data.step !== undefined) ctx.updateProgress(data.percent ?? ctx.percent, data.step);
+    }
   };
 }

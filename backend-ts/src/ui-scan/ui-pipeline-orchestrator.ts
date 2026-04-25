@@ -11,6 +11,8 @@ import { FlowHybridTestGenerator } from '../hybrid/flow-hybrid-test-generator';
 import { HybridFlowTestWriter } from '../hybrid/hybrid-flow-test-writer';
 
 import { RTMDocument, Requirement } from '../rtm/rtm.model';
+import { progressService } from '../services/ProgressService';
+import { ProgressGateway } from '../gateways/progress.gateway';
 
 export class UIPipelineOrchestrator {
   private crawler = new UIMultiPageCrawler();
@@ -21,18 +23,30 @@ export class UIPipelineOrchestrator {
   private hybridGen = new FlowHybridTestGenerator();
   private hybridWriter = new HybridFlowTestWriter();
 
+  constructor(
+    private readonly projectId: string,
+    private readonly gateway: ProgressGateway
+  ) {}
+
+  private emitProgress(percent: number, step: string) {
+    progressService.update(this.projectId, percent, step);
+    this.gateway.emitRecrawlProgress(this.projectId, percent, step);
+    this.gateway.emitProjectStatus(this.projectId);
+  }
+
   async run(startUrl: string, outputDir: string): Promise<any> {
     const pipelineStart = Date.now();
     this.ensureProject(outputDir);
 
-    console.log(`[UI] Starting UI pipeline for ${startUrl}`);
+    this.emitProgress(3, "Initialising pipeline…");
 
-    // ---------------------------------------------------------
-    // 1. Crawl pages
-    // ---------------------------------------------------------
+    // ── CRAWL: 3% → 65% (longest step) ──────────────────────────────────────
+    this.emitProgress(5, "Crawling pages…");
     const crawlStart = Date.now();
     const crawledPages = await this.crawler.crawl(startUrl, 3, 30);
     const crawlMs = Date.now() - crawlStart;
+
+    this.emitProgress(65, `Crawled ${crawledPages.length} pages`);
 
     const pagesDir = path.join(outputDir, 'pages');
     fs.mkdirSync(pagesDir, { recursive: true });
@@ -41,21 +55,21 @@ export class UIPipelineOrchestrator {
       fs.writeFileSync(path.join(pagesDir, `page-${i + 1}.html`), p.html);
     });
 
-    // ---------------------------------------------------------
-    // 2. Extract selectors + generate UI requirements
-    // ---------------------------------------------------------
+    // ── EXTRACT: 65% → 78% ───────────────────────────────────────────────────
+    this.emitProgress(66, "Extracting selectors…");
+
     const allNodes: any[] = [];
     const allSemanticRequirements: Requirement[] = [];
-
     const extractStart = Date.now();
+    const total = crawledPages.length;
 
-    for (const page of crawledPages) {
+    for (let i = 0; i < crawledPages.length; i++) {
+      const page = crawledPages[i];
       const nodes = this.extractor.extract(page.html, page.url);
       allNodes.push(...nodes);
 
       const uiReqs = this.requirementGen.generate(nodes);
       const semanticReqs = this.requirementGen.toSemanticRequirements(uiReqs);
-
       allSemanticRequirements.push(...semanticReqs);
 
       if (uiReqs.length > 0) {
@@ -67,41 +81,38 @@ export class UIPipelineOrchestrator {
           type: 'ui',
           action: r.action
         }));
-
         this.writer.writeTests(normalizedForWriter, outputDir);
       }
+
+      // Emit incremental progress per page during extraction
+      const extractPercent = 66 + Math.round(((i + 1) / total) * 12);
+      this.emitProgress(extractPercent, `Extracting page ${i + 1} of ${total}…`);
     }
 
     const extractMs = Date.now() - extractStart;
 
-    // ---------------------------------------------------------
-    // 3. Flow graph + hybrid flows
-    // ---------------------------------------------------------
+    // ── FLOW GRAPH: 78% → 85% ────────────────────────────────────────────────
+    this.emitProgress(79, "Building flow graph…");
     const flowStart = Date.now();
     const flowGraph = this.flowBuilder.build(crawledPages, allNodes);
     const flowGraphPath = path.join(outputDir, 'flow-graph.json');
     fs.writeFileSync(flowGraphPath, JSON.stringify(flowGraph, null, 2));
     const flowMs = Date.now() - flowStart;
 
+    // ── HYBRID FLOWS: 85% → 92% ──────────────────────────────────────────────
+    this.emitProgress(85, "Generating hybrid flows…");
     const hybridStart = Date.now();
     const hybridFlows = this.hybridGen.generate(flowGraph, allNodes);
-
-    // Convert flows → semantic requirements
     const hybridRequirements = this.hybridGen.toRequirements(hybridFlows);
-
-    // Add semantic hybrid requirements to RTM
     allSemanticRequirements.push(...hybridRequirements);
 
-    // Still write hybrid tests
     if (hybridFlows.length > 0) {
       this.hybridWriter.writeTests(hybridFlows, outputDir);
     }
-
     const hybridMs = Date.now() - hybridStart;
 
-    // ---------------------------------------------------------
-    // 4. FINAL RTM (semantic only)
-    // ---------------------------------------------------------
+    // ── RTM: 92% → 100% ──────────────────────────────────────────────────────
+    this.emitProgress(92, "Writing RTM…");
     const rtm: RTMDocument = {
       generatedAt: new Date().toISOString(),
       requirements: allSemanticRequirements
@@ -110,22 +121,19 @@ export class UIPipelineOrchestrator {
     const rtmPath = path.join(outputDir, 'rtm.json');
     fs.writeFileSync(rtmPath, JSON.stringify(rtm, null, 2));
 
-    // ---------------------------------------------------------
-    // 5. Return pipeline summary
-    // ---------------------------------------------------------
+    this.emitProgress(100, "Completed ✓");
+
+    progressService.complete(this.projectId);
+    this.gateway.emitProjectStatus(this.projectId);
+    this.gateway.emitRecrawlEvent(this.projectId);
+
     const totalMs = Date.now() - pipelineStart;
 
     return {
       status: 'success',
       pipeline: 'ui',
       generatedAt: rtm.generatedAt,
-      timings: {
-        totalMs,
-        crawlMs,
-        extractMs,
-        flowMs,
-        hybridMs
-      },
+      timings: { totalMs, crawlMs, extractMs, flowMs, hybridMs },
       stats: {
         pagesCrawled: crawledPages.length,
         uniquePages: new Set(crawledPages.map(p => p.url)).size,

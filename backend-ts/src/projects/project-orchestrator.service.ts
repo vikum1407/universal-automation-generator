@@ -1,5 +1,6 @@
 import { Injectable, Logger, Inject, forwardRef } from "@nestjs/common";
 import * as fs from "fs";
+import * as path from "path";
 import { PrismaService } from "../../prisma/prisma.service";
 
 import { UiUrlIngestor } from "../ui-scan/ui-url-ingestor";
@@ -15,6 +16,8 @@ import { ProjectService } from "./project.service";
 import { ProgressGateway } from "../gateways/progress.gateway";
 import { progressService } from "../services/ProgressService";
 
+const OUTPUT_BASE = "./qlitz-output";
+
 @Injectable()
 export class ProjectOrchestratorService {
   private readonly logger = new Logger(ProjectOrchestratorService.name);
@@ -28,30 +31,27 @@ export class ProjectOrchestratorService {
     private readonly projectService: ProjectService
   ) {}
 
-  private emit(projectId: string, percent: number, step: string) {
+  private emitProgress(projectId: string, percent: number, step: string) {
     progressService.update(projectId, percent, step);
+    this.gateway.emitRecrawlProgress(projectId, percent, step);
     this.gateway.emitProjectStatus(projectId);
   }
 
   async runUIInitialization(project: any) {
-    progressService.init(project.id, "initializing");
-    this.gateway.emitProjectStatus(project.id);
-
+    // Do NOT call progressService.init() here — controller already did it
     try {
-      this.logger.log(`UI initialization started for project ${project.id}`);
-
-      const base = `./generated-ui-project/${project.id}`;
+      const base = path.join(OUTPUT_BASE, project.id);
       fs.mkdirSync(base, { recursive: true });
 
-      this.emit(project.id, 10, "Scanning website…");
+      this.emitProgress(project.id, 10, "Scanning website…");
       const ingestor = new UiUrlIngestor();
       await ingestor.ingest(project.url);
 
-      this.emit(project.id, 25, "Crawling pages…");
+      this.emitProgress(project.id, 25, "Crawling pages…");
       const crawler = new UIMultiPageCrawler();
       const crawled = await crawler.crawl(project.url, project.crawlDepth);
 
-      this.emit(project.id, 40, "Detecting flows…");
+      this.emitProgress(project.id, 40, "Detecting flows…");
       const pages: UIPage[] = crawled.map(p => ({
         url: p.url,
         nodes: this.toUIScanNodes(p.components || [], p.url)
@@ -87,11 +87,11 @@ export class ProjectOrchestratorService {
       });
 
       fs.writeFileSync(
-        `${base}/flow-graph.json`,
+        path.join(base, "flow-graph.json"),
         JSON.stringify({ nodes: elementNodes, edges: elementEdges }, null, 2)
       );
 
-      this.emit(project.id, 55, "Recording flow steps…");
+      this.emitProgress(project.id, 55, "Recording flow steps…");
       for (const edge of flowGraph.edges) {
         await this.projectService.recordFlowStep(
           project.id,
@@ -102,7 +102,7 @@ export class ProjectOrchestratorService {
         );
       }
 
-      this.emit(project.id, 70, "Building requirements…");
+      this.emitProgress(project.id, 70, "Building requirements…");
       const requirements: Requirement[] = elementEdges.map((edge, index) => ({
         id: `ui-flow-${project.id}-${index}`,
         title: edge.action
@@ -110,14 +110,12 @@ export class ProjectOrchestratorService {
           : `Interaction from ${edge.from} to ${edge.to}`,
         description: edge.action || `Interaction from ${edge.from} to ${edge.to}`,
         type: "ui",
-        source: {
-          pageName: edge.from
-        },
+        source: { pageName: edge.from },
         coveredBy: []
       }));
 
       fs.writeFileSync(
-        `${base}/rtm.json`,
+        path.join(base, "rtm.json"),
         JSON.stringify(
           { generatedAt: new Date().toISOString(), requirements },
           null,
@@ -125,10 +123,10 @@ export class ProjectOrchestratorService {
         )
       );
 
-      this.emit(project.id, 85, "Generating tests…");
+      this.emitProgress(project.id, 85, "Generating tests…");
       await this.uiTestGen.generateTests(base);
 
-      this.emit(project.id, 95, "Finalizing…");
+      this.emitProgress(project.id, 95, "Finalizing…");
       await this.prisma.project.update({
         where: { id: project.id },
         data: { status: "ready" }
@@ -136,12 +134,16 @@ export class ProjectOrchestratorService {
 
       progressService.complete(project.id);
       this.gateway.emitProjectStatus(project.id);
+      this.gateway.emitRecrawlEvent(project.id);
+
     } catch (err) {
-      this.logger.error(err);
+      this.logger.error(`UI initialization failed for ${project.id}`, err);
+      progressService.fail(project.id, "Initialization failed");
       await this.prisma.project.update({
         where: { id: project.id },
         data: { status: "failed" }
       });
+      this.gateway.emitProjectStatus(project.id);
     }
   }
 
@@ -157,28 +159,24 @@ export class ProjectOrchestratorService {
   }
 
   async runAPIInitialization(project: any) {
-    progressService.init(project.id, "initializing");
-    this.gateway.emitProjectStatus(project.id);
-
+    // Do NOT call progressService.init() here — controller already did it
     try {
-      this.logger.log(`API initialization started for project ${project.id}`);
-
-      const base = `./generated-api-project/${project.id}`;
+      const base = path.join(OUTPUT_BASE, project.id);
       fs.mkdirSync(base, { recursive: true });
 
-      this.emit(project.id, 15, "Parsing Swagger…");
+      this.emitProgress(project.id, 15, "Parsing Swagger…");
       const parser = new APIParser();
       const schema = await parser.loadSchema(project.swaggerUrl);
 
-      this.emit(project.id, 35, "Extracting endpoints…");
+      this.emitProgress(project.id, 35, "Extracting endpoints…");
       const endpoints = parser.extractEndpoints(schema);
 
       fs.writeFileSync(
-        `${base}/endpoints.json`,
+        path.join(base, "endpoints.json"),
         JSON.stringify(endpoints, null, 2)
       );
 
-      this.emit(project.id, 60, "Building requirements…");
+      this.emitProgress(project.id, 60, "Building requirements…");
       const requirements: Requirement[] = endpoints.map(
         (ep: any, index: number) => ({
           id: `api-${project.id}-${index}`,
@@ -194,7 +192,7 @@ export class ProjectOrchestratorService {
       );
 
       fs.writeFileSync(
-        `${base}/rtm.json`,
+        path.join(base, "rtm.json"),
         JSON.stringify(
           { generatedAt: new Date().toISOString(), requirements },
           null,
@@ -202,10 +200,10 @@ export class ProjectOrchestratorService {
         )
       );
 
-      this.emit(project.id, 80, "Generating tests…");
+      this.emitProgress(project.id, 80, "Generating tests…");
       await this.apiTestGen.generateTests(base);
 
-      this.emit(project.id, 95, "Finalizing…");
+      this.emitProgress(project.id, 95, "Finalizing…");
       await this.prisma.project.update({
         where: { id: project.id },
         data: { status: "ready" }
@@ -213,12 +211,16 @@ export class ProjectOrchestratorService {
 
       progressService.complete(project.id);
       this.gateway.emitProjectStatus(project.id);
+      this.gateway.emitRecrawlEvent(project.id);
+
     } catch (err) {
-      this.logger.error(err);
+      this.logger.error(`API initialization failed for ${project.id}`, err);
+      progressService.fail(project.id, "Initialization failed");
       await this.prisma.project.update({
         where: { id: project.id },
         data: { status: "failed" }
       });
+      this.gateway.emitProjectStatus(project.id);
     }
   }
 }

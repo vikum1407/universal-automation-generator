@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 
 import { ProjectService } from './project.service';
-import { ProjectOrchestratorService } from './project-orchestrator.service';
 import { CloudService } from '../cloud/cloud.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RefactorService } from '../refactor/refactor.service';
@@ -16,7 +15,6 @@ import { SyncController } from './sync/sync.controller';
 import { RefactorController } from './refactor/refactor.controller';
 
 import { UiModule } from '../projects/ui/ui.module';
-import { ApiModule } from '../projects/api/api.module';
 
 import { UiRecrawlController } from "./ui-actions/ui-recrawl.controller";
 import { UiRecrawlService } from "./ui-actions/ui-recrawl.service";
@@ -29,10 +27,16 @@ import { ProjectGateway } from './project.gateway';
 import { ProgressGateway } from '../gateways/progress.gateway';
 import { ReCrawlService } from '../services/ReCrawlService';
 
+import { APIScanController } from './api-scan.controller';
+import { ProjectOrchestratorService } from './project-orchestrator.service';
+import { ApiTestGenerationService } from './api/api-test-generation.service';
+import { APITestGenerator } from './api/api-test-generator';
+import { APITestWriter } from './api/api-test-writer';
+import { APIAnalyticsController } from './api/api-analytics.controller';
+
 @Module({
   imports: [
     UiModule,
-    ApiModule
   ],
   controllers: [
     ProjectController,
@@ -46,11 +50,13 @@ import { ReCrawlService } from '../services/ReCrawlService';
 
     UiRecrawlController,
     UiRefactorController,
-    CloudSyncController
+    CloudSyncController,
+
+    APIScanController,
+    APIAnalyticsController
   ],
   providers: [
     ProjectService,
-    ProjectOrchestratorService,
     CloudService,
     PrismaService,
     RefactorService,
@@ -61,11 +67,15 @@ import { ReCrawlService } from '../services/ReCrawlService';
 
     ProjectGateway,
     ProgressGateway,
-    ReCrawlService
+    ReCrawlService,
+    APITestGenerator,     
+    APITestWriter,         
+
+    ProjectOrchestratorService,
+    ApiTestGenerationService
   ],
   exports: [
     ProjectService,
-    ProjectOrchestratorService,
     ReCrawlService
   ]
 })

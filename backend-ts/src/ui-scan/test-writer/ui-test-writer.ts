@@ -9,7 +9,13 @@ import { StateWriter } from './writers/state-writer';
 import { FlowWriter } from './writers/flow-writer';
 import { CommentsWriter } from './writers/comments-writer';
 
-import { RequirementLike, FlowGraph, UIJourney, UIScenario, UIStateGraph } from './writers/helpers';
+import {
+  RequirementLike,
+  FlowGraph,
+  UIJourney,
+  UIScenario,
+  UIStateGraph
+} from './writers/helpers';
 
 export class UITestWriter {
   private actionWriter = new ActionWriter();

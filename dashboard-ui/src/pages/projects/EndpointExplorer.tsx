@@ -18,10 +18,14 @@ export default function EndpointExplorer({ projectId }: { projectId: string }) {
   const textLight =
     theme.mode === "dark" ? theme.colors.darkTextLight : theme.colors.textLight;
 
+  // ---------------------------------------------------------
+  // LOAD NEW ENDPOINT FORMAT
+  // ---------------------------------------------------------
   useEffect(() => {
-    fetch(`${API_BASE}/projects/${projectId}/api/endpoints`)
+    fetch(`${API_BASE}/projects/${projectId}/endpoints`)
       .then(res => res.json())
-      .then(setEndpoints);
+      .then(setEndpoints)
+      .catch(() => setEndpoints([]));
   }, [projectId]);
 
   if (!endpoints.length)

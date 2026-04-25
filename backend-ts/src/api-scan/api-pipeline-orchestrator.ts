@@ -1,17 +1,32 @@
 import { chromium } from 'playwright';
 import { APIRequirementGenerator } from './api-requirement-generator';
-import { APITestWriter } from './api-test-writer';
+import { APITestWriter } from '../projects/api/api-test-writer';
 import { RTMDocument, Requirement } from '../rtm/rtm.model';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import { progressService } from '../services/ProgressService';
+import { ProgressGateway } from '../gateways/progress.gateway';
 
 export class APIPipelineOrchestrator {
   private requirementGen = new APIRequirementGenerator();
   private writer = new APITestWriter();
 
+  constructor(
+    private readonly projectId: string,
+    private readonly gateway: ProgressGateway
+  ) {}
+
+  private emitProgress(percent: number, step: string) {
+    progressService.update(this.projectId, percent, step);
+    this.gateway.emitRecrawlProgress(this.projectId, percent, step);
+    this.gateway.emitProjectStatus(this.projectId);
+  }
+
   async run(url: string, outputDir: string): Promise<any> {
     const pipelineStart = Date.now();
-    console.log(`[API] Starting API pipeline for ${url}`);
+
+    this.emitProgress(5, "Starting API pipeline…");
 
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext();
@@ -36,12 +51,15 @@ export class APIPipelineOrchestrator {
       }
     });
 
+    this.emitProgress(20, "Capturing API calls…");
+
     const captureStart = Date.now();
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForTimeout(2000);
     await browser.close();
     const captureMs = Date.now() - captureStart;
-    console.log(`[API] Captured ${calls.length} API call(s) in ${captureMs} ms`);
+
+    this.emitProgress(40, "Generating API requirements…");
 
     const apiRequirements: Requirement[] = calls.map((call, index) => ({
       id: `API-${index + 1}`,
@@ -57,19 +75,31 @@ export class APIPipelineOrchestrator {
 
     this.ensureProject(outputDir);
 
-    if (apiRequirements.length > 0) {
-      const forWriter = apiRequirements.map(r => ({
-        id: r.id,
-        description: r.description,
-        method: r.source.method ?? 'GET',
-        url: r.source.endpointPath ?? '',
-        requestBody: null,
-        expectedStatus: 200
-      }));
+    this.emitProgress(60, "Writing API tests…");
 
-      this.writer.writeTests(forWriter, outputDir);
-      console.log('[API] API tests written');
+    if (apiRequirements.length > 0) {
+      const tests = apiRequirements.map(r => {
+        const name = `${r.source.method}_${r.source.endpointPath}`
+          .replace(/[{}\/]/g, '_')
+          .replace(/_+/g, '_');
+
+        return {
+          name,
+          content: `
+import { test, expect } from '@playwright/test';
+
+test('${r.id}: ${r.description.replace(/'/g, "\\'")}', async ({ request }) => {
+  const response = await request.${r.source.method.toLowerCase()}(\`${r.source.endpointPath}\`);
+  expect(response.status()).toBe(200);
+});
+`
+        };
+      });
+
+      this.writer.writeTests(outputDir, tests);
     }
+
+    this.emitProgress(80, "Updating RTM…");
 
     const rtmPath = path.join(outputDir, 'rtm.json');
     let existingRtm: RTMDocument | null = null;
@@ -87,10 +117,14 @@ export class APIPipelineOrchestrator {
     };
 
     fs.writeFileSync(rtmPath, JSON.stringify(mergedRtm, null, 2));
-    console.log(`[API] RTM updated at ${rtmPath}`);
+
+    this.emitProgress(100, "Completed");
+
+    progressService.complete(this.projectId);
+    this.gateway.emitProjectStatus(this.projectId);
+    this.gateway.emitRecrawlEvent(this.projectId);
 
     const totalMs = Date.now() - pipelineStart;
-    console.log(`[API] API pipeline completed in ${totalMs} ms`);
 
     return {
       status: 'success',

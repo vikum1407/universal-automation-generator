@@ -1,10 +1,11 @@
-import { createContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useState, useCallback } from "react";
 
 interface ProgressState {
   isOpen: boolean;
   projectId: string | null;
   percent: number;
   step: string;
+
   openProgress: (projectId: string) => void;
   closeProgress: () => void;
   updateProgress: (percent: number, step: string) => void;
@@ -20,7 +21,7 @@ export const ProgressContext = createContext<ProgressState>({
   updateProgress: () => {}
 });
 
-export function ProgressProvider({ children }: { children: ReactNode }) {
+export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [percent, setPercent] = useState(0);
@@ -43,6 +44,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const updateProgress = useCallback((p: number, s: string) => {
     setPercent(p);
     setStep(s);
+    setIsOpen(true);
   }, []);
 
   return (

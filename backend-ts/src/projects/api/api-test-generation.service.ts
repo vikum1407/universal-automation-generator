@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { APITestGenerator } from '../../api-scan/api-test-generator';
-import { APITestWriter } from '../../api-scan/api-test-writer';
+import { APITestGenerator } from './api-test-generator';
+import { APITestWriter } from './api-test-writer';
 import { Requirement } from '../../rtm/rtm.model';
 import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ApiTestGenerationService {
@@ -12,26 +13,30 @@ export class ApiTestGenerationService {
   ) {}
 
   async generateTests(projectPath: string) {
-    const requirements: Requirement[] = await this.loadRequirements(projectPath);
-
-    const generated = requirements.map(req => this.generator.generate(req));
-
-    const finalContent = generated.join('\n\n');
-
-    this.writer.writeTests(projectPath, finalContent);
-
-    return { count: requirements.length };
-  }
-
-  private async loadRequirements(projectPath: string): Promise<Requirement[]> {
-    const rtmPath = `${projectPath}/rtm.json`;
+    const rtmPath = path.join(projectPath, 'rtm.json');
 
     if (!fs.existsSync(rtmPath)) {
-      return [];
+      return { count: 0 };
     }
 
-    const rtm = JSON.parse(fs.readFileSync(rtmPath, 'utf-8'));
+    const rtm = JSON.parse(fs.readFileSync(rtmPath, 'utf8'));
+    const requirements: Requirement[] = rtm.requirements.filter(
+      (r: Requirement) => r.type === 'api'
+    );
 
-    return (rtm.requirements as Requirement[]).filter(r => r.type === 'api');
+    const tests = requirements.map(req => {
+      const name = `${req.source.method}_${req.source.endpointPath}`
+        .replace(/[{}\/]/g, '_')
+        .replace(/_+/g, '_');
+
+      return {
+        name,
+        content: this.generator.generate(req)
+      };
+    });
+
+    this.writer.writeTests(projectPath, tests);
+
+    return { count: tests.length };
   }
 }

@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Card } from "../../components/ui/Card";
 import { Input } from "../../components/ui/form/Input";
 import { Button } from "../../components/ui/form/Button";
 import { FormField } from "../../components/ui/form/FormField";
+
+import { socket } from "../../socket";
+import ProgressModal from "../../components/ProgressModal";
 
 export default function NewUIProject() {
   const navigate = useNavigate();
@@ -15,31 +18,118 @@ export default function NewUIProject() {
   const [crawlDepth, setCrawlDepth] = useState(2);
   const [env, setEnv] = useState("production");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const [progress, setProgress] = useState({
+    open: false,
+    percent: 0,
+    step: "Starting…"
+  });
+
+  const projectIdRef = useRef<string | null>(null);
+  const navigatedRef = useRef(false);
+
+  function doNavigate() {
+    if (navigatedRef.current) return;
+    navigatedRef.current = true;
+    setTimeout(() => {
+      navigate(`/projects/${projectIdRef.current}`);
+    }, 800);
+  }
+
+  useEffect(() => {
+    // recrawl-progress is the main progress stream during pipeline
+    const recrawlHandler = (data: any) => {
+      setProgress({
+        open: true,
+        percent: data.percent ?? 0,
+        step: data.step ?? "Working…"
+      });
+    };
+
+    // project-status fires on status changes (processing, ready, failed)
+    const statusHandler = (data: any) => {
+      if (data.progressPercent !== undefined) {
+        setProgress(prev => ({
+          ...prev,
+          open: true,
+          percent: data.progressPercent,
+          step: data.progressStep ?? prev.step
+        }));
+      }
+
+      if (data.status === "ready" || data.status === "failed") {
+        setProgress(prev => ({ ...prev, open: false }));
+        doNavigate();
+      }
+    };
+
+    // recrawl-event fires when pipeline fully completes
+    const eventHandler = (data: any) => {
+      if (data.event === "recrawl-completed") {
+        setProgress({ open: false, percent: 100, step: "Completed" });
+        doNavigate();
+      }
+    };
+
+    socket.on("recrawl-progress", recrawlHandler);
+    socket.on("project-status", statusHandler);
+    socket.on("recrawl-event", eventHandler);
+
+    return () => {
+      socket.off("recrawl-progress", recrawlHandler);
+      socket.off("project-status", statusHandler);
+      socket.off("recrawl-event", eventHandler);
+    };
+  }, [navigate]);
 
   async function handleContinue() {
     setLoading(true);
+    setError("");
+    navigatedRef.current = false;
 
-    const cleanUrl = url.trim();
+    try {
+      const res = await fetch("http://localhost:3000/projects/scan-ui", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: url.trim(),
+          username,
+          password,
+          crawlDepth,
+          env
+        })
+      });
 
-    const res = await fetch("http://localhost:3000/projects/scan-ui", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        url: cleanUrl,
-        username,
-        password,
-        crawlDepth,
-        env
-      })
-    });
+      const data = await res.json();
 
-    const data = await res.json();
+      if (!data.projectId) {
+        setError("Server did not return a project ID. Please try again.");
+        setLoading(false);
+        return;
+      }
 
-    navigate(`/projects/${data.projectId}`);
+      projectIdRef.current = data.projectId;
+
+      // Join socket room BEFORE showing modal so no events are missed
+      socket.emit("join", data.projectId);
+
+      setProgress({ open: true, percent: 0, step: "Starting…" });
+
+    } catch (e) {
+      setError("Failed to create project. Please try again.");
+      setLoading(false);
+    }
   }
 
   return (
     <div className="max-w-3xl mx-auto py-12 space-y-10">
+      <ProgressModal
+        open={progress.open}
+        percent={progress.percent}
+        step={progress.step}
+      />
+
       <h1 className="text-h1 font-semibold text-neutral-dark dark:text-neutral-light">
         UI Automation — Website Setup
       </h1>
@@ -51,6 +141,7 @@ export default function NewUIProject() {
             placeholder="https://example.com"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
+            disabled={loading}
           />
         </FormField>
 
@@ -60,6 +151,7 @@ export default function NewUIProject() {
               placeholder="admin"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              disabled={loading}
             />
           </FormField>
 
@@ -69,6 +161,7 @@ export default function NewUIProject() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
           </FormField>
         </div>
@@ -81,6 +174,7 @@ export default function NewUIProject() {
             value={crawlDepth}
             onChange={(e) => setCrawlDepth(Number(e.target.value))}
             className="w-full"
+            disabled={loading}
           />
         </FormField>
 
@@ -88,10 +182,12 @@ export default function NewUIProject() {
           <select
             value={env}
             onChange={(e) => setEnv(e.target.value)}
+            disabled={loading}
             className="
               w-full px-3 py-2 rounded border border-[var(--card-border)]
               bg-[var(--card-bg)] text-[var(--fg)]
               focus:outline-none focus:ring-2 focus:ring-brand-primary
+              disabled:opacity-50 disabled:cursor-not-allowed
             "
           >
             <option value="production">Production</option>
@@ -100,13 +196,17 @@ export default function NewUIProject() {
           </select>
         </FormField>
 
+        {error && (
+          <p className="text-sm text-red-500 text-center">{error}</p>
+        )}
+
         <div className="pt-4">
           <Button
             disabled={!url.trim().startsWith("http") || loading}
             onClick={handleContinue}
             className="w-full"
           >
-            {loading ? "Creating..." : "Continue"}
+            {loading ? "Creating…" : "Continue"}
           </Button>
         </div>
 

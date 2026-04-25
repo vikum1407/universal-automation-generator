@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { APIProjectWriter } from './api-project-writer';
-import { APITestGenerator } from './api-test-generator';
+import { APITestGenerator } from '../projects/api/api-test-generator';
 import { APIZipGenerator } from './api-zip-generator';
 import { Requirement } from '../rtm/rtm.model';
 

@@ -30,11 +30,11 @@ const CustomNode = ({ data }: any) => {
   const text =
     theme.mode === "dark" ? theme.colors.darkText : theme.colors.textDark;
 
-  const accent = stringToColor(data.pageUrl);
+  const accent = stringToColor(data.pageUrl || "");
 
   return (
     <div
-      onClick={() => window.open(data.fullUrl, "_blank")}
+      onClick={() => data.fullUrl && window.open(data.fullUrl, "_blank")}
       style={{
         padding: "12px 14px",
         borderRadius: "12px",
@@ -60,7 +60,7 @@ const CustomNode = ({ data }: any) => {
         (e.currentTarget as HTMLDivElement).style.boxShadow = theme.shadow.card;
         (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
       }}
-      title={`${data.fullUrl}\n${data.selector || ""}`}
+      title={`${data.fullUrl || ""}\n${data.selector || ""}`}
     >
       <div
         style={{
@@ -70,7 +70,7 @@ const CustomNode = ({ data }: any) => {
           color: theme.mode === "dark" ? theme.colors.darkTextLight : "#666"
         }}
       >
-        {new URL(data.pageUrl).hostname}
+        {data.pageUrl ? new URL(data.pageUrl).hostname : ""}
       </div>
 
       <div>{data.label}</div>
@@ -87,14 +87,21 @@ export default function FlowGraph({ projectId }: { projectId: string }) {
   const border =
     theme.mode === "dark" ? theme.colors.darkBorder : theme.colors.border;
 
+  // ---------------------------------------------------------
+  // LOAD NEW FLOW GRAPH FORMAT
+  // ---------------------------------------------------------
   useEffect(() => {
-    fetch(`${API_BASE}/projects/${projectId}/flow`)
+    fetch(`${API_BASE}/projects/${projectId}/flows`)
       .then(res => res.json())
-      .then(setGraph);
+      .then(setGraph)
+      .catch(() => setGraph(null));
   }, [projectId]);
 
   if (!graph || !graph.nodes?.length) return null;
 
+  // ---------------------------------------------------------
+  // MAP NODES
+  // ---------------------------------------------------------
   const nodes = graph.nodes.map((n: any, index: number) => ({
     id: n.id,
     position: {
@@ -110,6 +117,9 @@ export default function FlowGraph({ projectId }: { projectId: string }) {
     type: "customNode"
   }));
 
+  // ---------------------------------------------------------
+  // MAP EDGES
+  // ---------------------------------------------------------
   const edges = graph.edges.map((e: any, index: number) => ({
     id: e.id || `edge-${index}`,
     source: e.from,

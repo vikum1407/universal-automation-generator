@@ -18,7 +18,7 @@ export class UiTestGenerationService {
 
     const requirementLike = uiRequirements.map(req => ({
       id: req.id,
-      page: req.source.pageName ?? 'unknown',
+      page: req.source?.pageName ?? 'unknown',
       description: req.description,
       selector: req.aiLogic?.primarySelector ?? '',
       action: req.aiLogic?.primaryAction ?? 'click',
@@ -52,6 +52,7 @@ export class UiTestGenerationService {
       status: 'passed',
       failures: [],
     };
+
     fs.writeFileSync(
       `${projectPath}/test-results.json`,
       JSON.stringify(results, null, 2)

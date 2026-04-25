@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { theme } from "@/theme";
-import type { RTMResponse, RTMRequirementView } from "@/api/rtm";
+import type { RTMRequirementView } from "@/api/rtm";
 
 import RTMTableHeader from "./RTMTableHeader";
 import RTMTableRow from "./RTMTableRow";
@@ -9,20 +9,26 @@ import RTMRegenerateModal from "./RTMRegenerateModal";
 const API_BASE = "http://localhost:3000";
 
 export default function RTMTable({ projectId }: { projectId: string }) {
-  const [rtm, setRtm] = useState<RTMResponse | null>(null);
+  const [rtm, setRtm] = useState<any>(null);
   const [regenOpen, setRegenOpen] = useState(false);
   const [selectedReq, setSelectedReq] = useState<RTMRequirementView | null>(null);
 
+  // ---------------------------------------------------------
+  // LOAD NEW RTM FORMAT
+  // ---------------------------------------------------------
   const load = () => {
     fetch(`${API_BASE}/projects/${projectId}/rtm`)
       .then(res => res.json())
-      .then(data => setRtm(data)); // IMPORTANT: use full backend response
+      .then(data => setRtm(data)); // NEW: backend returns { requirements, insights }
   };
 
   useEffect(() => {
     load();
   }, [projectId]);
 
+  // ---------------------------------------------------------
+  // MODAL HANDLERS
+  // ---------------------------------------------------------
   const openRegenerate = (req: RTMRequirementView) => {
     setSelectedReq(req);
     setRegenOpen(true);
@@ -33,18 +39,24 @@ export default function RTMTable({ projectId }: { projectId: string }) {
     setSelectedReq(null);
   };
 
+  // ---------------------------------------------------------
+  // SINGLE REQUIREMENT REGENERATE
+  // ---------------------------------------------------------
   const regenerate = async (reqId: string) => {
     await fetch(`${API_BASE}/projects/${projectId}/rtm/regenerate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ selectedIds: [reqId] })
+      body: JSON.stringify({ selectedRequirementIds: [reqId] }) // NEW: correct backend field
     });
 
     load();
     closeRegenerate();
   };
 
-  if (!rtm || !rtm.rtm || !rtm.rtm.requirements) return null;
+  // ---------------------------------------------------------
+  // EMPTY STATE
+  // ---------------------------------------------------------
+  if (!rtm || !rtm.requirements) return null;
 
   const border =
     theme.mode === "dark" ? theme.colors.darkBorder : theme.colors.border;
@@ -69,7 +81,7 @@ export default function RTMTable({ projectId }: { projectId: string }) {
           <RTMTableHeader />
 
           <tbody>
-            {rtm.rtm.requirements.map((req, idx) => (
+            {rtm.requirements.map((req: RTMRequirementView, idx: number) => (
               <RTMTableRow
                 key={req.id}
                 req={req}

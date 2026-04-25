@@ -12,7 +12,6 @@ import { TestsModule } from './tests/tests.module';
 
 import { ProjectModule } from './projects/project.module';
 import { UiModule } from './projects/ui/ui.module';
-import { ApiModule } from './projects/api/api.module';
 
 import { UIScanModule } from './ui-scan/ui-scan.module';
 
@@ -31,9 +30,6 @@ import { UIScanModule } from './ui-scan/ui-scan.module';
 
     ProjectModule,
     UiModule,
-    ApiModule,
-
-    // ⭐ THIS WAS THE MISSING MODULE ⭐
     UIScanModule
   ],
   controllers: [],

@@ -2,7 +2,7 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { RTMGenerator } from '../rtm/rtm.generator';
 import { Requirement } from '../rtm/rtm.model';
 import { UITestGenerator } from '../ui-scan/ui-test-generator';
-import { APITestGenerator } from '../api-scan/api-test-generator';
+import { APITestGenerator } from '../projects/api/api-test-generator';
 
 @Controller('enhance')
 export class EnhanceController {

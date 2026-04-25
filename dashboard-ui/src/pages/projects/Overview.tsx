@@ -80,7 +80,11 @@ export default function Overview({ project }: OverviewProps) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: theme.spacing.xl }}>
-      <ProgressModal open={progress.open} percent={progress.percent} step={progress.step} />
+      <ProgressModal
+        open={progress.open}
+        percent={progress.percent}
+        step={progress.step}
+      />
 
       <div
         style={{
