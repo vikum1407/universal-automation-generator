@@ -9,9 +9,18 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: 'http://localhost:5173',
-    methods: 'GET,POST,PUT,DELETE,OPTIONS',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (curl, Postman, mobile apps)
+      // and any localhost / 127.0.0.1 port (dev frontend on any Vite port)
+      if (!origin || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS: origin ${origin} not allowed`), false);
+      }
+    },
+    methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
+    credentials: false,
   });
 
   app.use(bodyParser.json({ limit: '50mb' }));

@@ -24,6 +24,7 @@ import { RequirementPatternsEngine } from './requirement-patterns.engine';
 import { RequirementFixesEngine } from './requirement-fixes.engine';
 import { SelfHealingController } from './self-healing.controller';
 import { SelfHealingEngine } from './self-healing.engine';
+import { TimelineController } from './timeline.controller';
 import { StabilityModule } from '../stability/stability.module';
 
 @Module({
@@ -35,7 +36,8 @@ import { StabilityModule } from '../stability/stability.module';
     DashboardController,
     ReleaseController,
     RequirementController,
-    SelfHealingController
+    SelfHealingController,
+    TimelineController,
   ],
   providers: [
     DashboardService,

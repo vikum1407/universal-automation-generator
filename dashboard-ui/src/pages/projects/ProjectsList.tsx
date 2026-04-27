@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import Loader from "../../components/Loader";
 import EmptyState from "../../components/EmptyState";
 import { theme } from "../../theme";
@@ -410,28 +411,58 @@ export default function ProjectsList() {
   useEffect(() => { load(); }, []);
 
   const pin = async (project: any) => {
-    await fetch(`${API_BASE}/projects/${project.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pinned: !project.pinned }),
-    });
-    load();
+    const newPinned = !project.pinned;
+    // Optimistic update
+    setProjects(prev => prev.map(p => p.id === project.id ? { ...p, pinned: newPinned } : p));
+    try {
+      const res = await fetch(`${API_BASE}/projects/${project.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pinned: newPinned }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      toast.success(newPinned ? "Project pinned" : "Project unpinned");
+      load();
+    } catch {
+      // Revert optimistic update
+      setProjects(prev => prev.map(p => p.id === project.id ? { ...p, pinned: !newPinned } : p));
+      toast.error("Failed to update pin status");
+    }
   };
 
   const rename = async (project: any, name: string) => {
-    await fetch(`${API_BASE}/projects/${project.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
+    const oldName = project.name;
+    // Optimistic update
+    setProjects(prev => prev.map(p => p.id === project.id ? { ...p, name } : p));
     setRenameTarget(null);
-    load();
+    try {
+      const res = await fetch(`${API_BASE}/projects/${project.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      toast.success("Project renamed");
+      load();
+    } catch {
+      // Revert optimistic update
+      setProjects(prev => prev.map(p => p.id === project.id ? { ...p, name: oldName } : p));
+      toast.error("Failed to rename project");
+    }
   };
 
   const deleteProject = async (project: any) => {
-    await fetch(`${API_BASE}/projects/${project.id}`, { method: "DELETE" });
     setDeleteTarget(null);
-    load();
+    // Optimistic remove
+    setProjects(prev => prev.filter(p => p.id !== project.id));
+    try {
+      const res = await fetch(`${API_BASE}/projects/${project.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
+      toast.success("Project deleted");
+    } catch {
+      toast.error("Failed to delete project");
+      load(); // restore list on failure
+    }
   };
 
   if (loading) return <Loader />;

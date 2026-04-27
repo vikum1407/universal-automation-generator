@@ -34,6 +34,17 @@ import { APITestGenerator } from './api/api-test-generator';
 import { APITestWriter } from './api/api-test-writer';
 import { APIAnalyticsController } from './api/api-analytics.controller';
 import { CoverageController } from './coverage/coverage.controller';
+import { AutoHealController } from './auto-heal/auto-heal.controller';
+import { ReplayController } from './replay/replay.controller';
+import { SystemMapController } from './system-map/system-map.controller';
+import { HistoryController } from './history/history.controller';
+import { SettingsController } from './settings/settings.controller';
+import { TrendsController } from './trends/trends.controller';
+import { InsightsController, OrgInsightsController } from './insights/insights.controller';
+import { OverviewController } from './overview/overview.controller';
+import { ReadinessController } from './readiness/readiness.controller';
+import { HeatMapController } from './heatmap/heatmap.controller';
+import { StoryController } from './story/story.controller';
 
 @Module({
   imports: [
@@ -56,6 +67,18 @@ import { CoverageController } from './coverage/coverage.controller';
     APIScanController,
     APIAnalyticsController,
     CoverageController,
+    AutoHealController,
+    ReplayController,
+    SystemMapController,
+    HistoryController,
+    SettingsController,
+    TrendsController,
+    InsightsController,
+    OrgInsightsController,
+    OverviewController,
+    ReadinessController,
+    HeatMapController,
+    StoryController,
   ],
   providers: [
     ProjectService,

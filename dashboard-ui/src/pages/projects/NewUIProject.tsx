@@ -101,10 +101,17 @@ export default function NewUIProject() {
         })
       });
 
-      const data = await res.json();
+      let data: any;
+      try {
+        data = await res.json();
+      } catch {
+        setError(`Server error (${res.status}). Check the backend is running.`);
+        setLoading(false);
+        return;
+      }
 
-      if (!data.projectId) {
-        setError("Server did not return a project ID. Please try again.");
+      if (!res.ok || !data.projectId) {
+        setError(data?.message ?? "Server did not return a project ID. Please try again.");
         setLoading(false);
         return;
       }
@@ -116,8 +123,11 @@ export default function NewUIProject() {
 
       setProgress({ open: true, percent: 0, step: "Starting…" });
 
-    } catch (e) {
-      setError("Failed to create project. Please try again.");
+    } catch (e: any) {
+      const msg = e?.message?.includes("fetch") || e?.message?.includes("network")
+        ? "Cannot reach the backend — make sure the server is running on port 3000."
+        : "Failed to create project. Please try again.";
+      setError(msg);
       setLoading(false);
     }
   }

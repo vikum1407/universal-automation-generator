@@ -47,38 +47,68 @@ export class ProjectService {
     });
   }
 
+  // ── File-based meta store (name + pinned) ─────────────────────────────────
+  // Stored at qlitz-output/projects-meta.json so we don't need DB migrations.
+
+  private readonly META_FILE = "./qlitz-output/projects-meta.json";
+
+  private readMeta(): Record<string, { name?: string; pinned?: boolean }> {
+    try {
+      if (fs.existsSync(this.META_FILE)) {
+        return JSON.parse(fs.readFileSync(this.META_FILE, "utf8"));
+      }
+    } catch {}
+    return {};
+  }
+
+  private writeMeta(meta: Record<string, { name?: string; pinned?: boolean }>) {
+    try {
+      fs.mkdirSync("./qlitz-output", { recursive: true });
+      fs.writeFileSync(this.META_FILE, JSON.stringify(meta, null, 2), "utf8");
+    } catch {}
+  }
+
+  private applyMeta(p: any): any {
+    const meta = this.readMeta();
+    const m = meta[p.id] ?? {};
+    const url = p.type === "api" ? p.swaggerUrl : p.url;
+    let derivedName = "Untitled Project";
+    try { if (url) derivedName = new URL(url).hostname; } catch {}
+    return {
+      ...p,
+      name: m.name ?? derivedName,
+      pinned: m.pinned ?? false,
+    };
+  }
+
   async getFullProject(id: string) {
     const p = await this.prisma.project.findUnique({ where: { id } });
-    return p ? this.withName(p) : null;
+    return p ? this.applyMeta(p) : null;
   }
 
   async listProjects() {
     const projects = await this.prisma.project.findMany({
-      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
-      take: 50
+      orderBy: [{ createdAt: "desc" }],
+      take: 50,
     });
-    return projects.map(p => this.withName(p));
-  }
-
-  private withName(p: any) {
-    if (p.name) return p;
-    const url = p.type === "api" ? p.swaggerUrl : p.url;
-    let name = "Untitled Project";
-    try {
-      if (url) name = new URL(url).hostname;
-    } catch {}
-    return { ...p, name };
+    const enriched = projects.map(p => this.applyMeta(p));
+    // Sort pinned first, then by createdAt desc
+    return enriched.sort((a, b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return 0;
+    });
   }
 
   async updateProject(id: string, data: { name?: string; pinned?: boolean }) {
-    const updated = await this.prisma.project.update({
-      where: { id },
-      data: {
-        ...(data.name !== undefined ? { name: data.name } : {}),
-        ...(data.pinned !== undefined ? { pinned: data.pinned } : {}),
-      },
-    });
-    return this.withName(updated);
+    const meta = this.readMeta();
+    if (!meta[id]) meta[id] = {};
+    if (data.name !== undefined) meta[id].name = data.name;
+    if (data.pinned !== undefined) meta[id].pinned = data.pinned;
+    this.writeMeta(meta);
+
+    const p = await this.prisma.project.findUnique({ where: { id } });
+    return p ? this.applyMeta(p) : { id, ...data };
   }
 
   async delete(id: string) {

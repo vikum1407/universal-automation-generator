@@ -3,16 +3,19 @@ import { useNavigate } from "react-router-dom";
 
 import Overview from "@/pages/projects/Overview";
 import Settings from "@/pages/projects/Settings";
+import ProjectInsightsPage from "@/pages/projects/ProjectInsightsPage";
 
-import FlowGraph from "@/pages/projects/FlowGraph";
-import EndpointExplorer from "@/pages/projects/EndpointExplorer";
+import SystemMap from "@/pages/projects/SystemMap";
 import RTMTable from "@/pages/projects/RTMTable";
+import History from "@/pages/projects/History";
 import CoverageHeatmap from "@/pages/projects/CoverageHeatmap";
 import AISuggestions from "@/pages/projects/AISuggestions";
 import TestRunner from "@/pages/projects/TestRunner";
 import AutoHeal from "@/pages/projects/AutoHeal";
 import ReplayViewer from "@/pages/projects/ReplayViewer";
-import APIReplayViewer from "@/pages/projects/APIReplayViewer";
+import ProjectReadinessPage from "@/pages/projects/ProjectReadinessPage";
+import HeatMapPage from "@/pages/projects/HeatMapPage";
+import StoryPage from "@/pages/projects/StoryPage";
 
 import type { TabId } from "@/dashboard/pages/projects/layout/ProjectSidebar";
 
@@ -23,8 +26,6 @@ interface ProjectTabsProps {
 }
 
 export default function ProjectTabs({ project, activeTab, setActiveTab }: ProjectTabsProps) {
-  const isUI = project.type === "ui";
-  const isAPI = project.type === "api";
   const navigate = useNavigate();
 
   switch (activeTab) {
@@ -33,14 +34,14 @@ export default function ProjectTabs({ project, activeTab, setActiveTab }: Projec
         <Overview
           project={project}
           onUpdateProject={() => {}}
+          onNavigate={setActiveTab}
         />
       );
 
     case "flows":
       return (
         <div style={{ marginTop: theme.spacing.lg }}>
-          {isUI && <FlowGraph projectId={project.id} />}
-          {isAPI && <EndpointExplorer projectId={project.id} />}
+          <SystemMap projectId={project.id} projectType={project.type} />
         </div>
       );
 
@@ -48,6 +49,27 @@ export default function ProjectTabs({ project, activeTab, setActiveTab }: Projec
       return (
         <div style={{ marginTop: theme.spacing.lg }}>
           <RTMTable projectId={project.id} />
+        </div>
+      );
+
+    case "insights":
+      return (
+        <div style={{ marginTop: theme.spacing.lg }}>
+          <ProjectInsightsPage projectId={project.id} />
+        </div>
+      );
+
+    case "readiness":
+      return (
+        <div style={{ marginTop: theme.spacing.lg }}>
+          <ProjectReadinessPage projectId={project.id} onNavigate={setActiveTab} />
+        </div>
+      );
+
+    case "heatmap":
+      return (
+        <div style={{ marginTop: theme.spacing.lg }}>
+          <HeatMapPage projectId={project.id} onNavigate={setActiveTab} />
         </div>
       );
 
@@ -82,10 +104,21 @@ export default function ProjectTabs({ project, activeTab, setActiveTab }: Projec
     case "replay":
       return (
         <div style={{ marginTop: theme.spacing.lg }}>
-          {isUI
-            ? <ReplayViewer projectId={project.id} testName="example" />
-            : <APIReplayViewer projectId={project.id} />
-          }
+          <ReplayViewer projectId={project.id} />
+        </div>
+      );
+
+    case "history":
+      return (
+        <div style={{ marginTop: theme.spacing.lg }}>
+          <History projectId={project.id} onNavigate={(tab) => setActiveTab(tab as TabId)} />
+        </div>
+      );
+
+    case "story":
+      return (
+        <div style={{ marginTop: theme.spacing.lg }}>
+          <StoryPage projectId={project.id} />
         </div>
       );
 
