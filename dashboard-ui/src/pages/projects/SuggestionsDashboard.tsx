@@ -1,4 +1,4 @@
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { SuggestionsAnalytics, SuggestionType } from "@/api/suggestions";
 import { TYPE_COLOR, TYPE_LABEL } from "@/api/suggestions";
 
@@ -7,20 +7,16 @@ function MetricTile({
 }: {
   icon: string; label: string; value: number | string; sub?: string; color?: string;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P } = useColors();
 
   return (
     <div style={{
       flex: "1 1 140px", minWidth: 0, padding: "16px 18px", borderRadius: 14,
       background: surface, border: `1px solid ${border}`,
-      boxShadow: theme.shadow.card,
+      boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
     }}>
       <div style={{ fontSize: 22, marginBottom: 6 }}>{icon}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color: color ?? theme.colors.primary, lineHeight: 1 }}>
+      <div style={{ fontSize: 26, fontWeight: 800, color: color ?? P, lineHeight: 1 }}>
         {value}
       </div>
       <div style={{ fontSize: 12, fontWeight: 600, color: text, marginTop: 5 }}>{label}</div>
@@ -34,10 +30,7 @@ function CategoryBar({
 }: {
   byCategory: Partial<Record<SuggestionType, number>>;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT2: textLight } = useColors();
 
   const entries = Object.entries(byCategory).filter(([, v]) => v && v > 0) as [SuggestionType, number][];
   const total = entries.reduce((s, [, v]) => s + v, 0);
@@ -47,7 +40,7 @@ function CategoryBar({
     <div style={{
       padding: "14px 18px", borderRadius: 12,
       background: surface, border: `1px solid ${border}`,
-      boxShadow: theme.shadow.card,
+      boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
     }}>
       <div style={{
         fontSize: 10, fontWeight: 700, color: textLight,

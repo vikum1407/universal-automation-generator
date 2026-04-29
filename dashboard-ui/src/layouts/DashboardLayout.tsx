@@ -28,7 +28,7 @@ export default function DashboardLayout() {
       <div
         className={`
           h-full flex flex-col transition-all duration-300
-          ${sidebarOpen ? "pl-64" : "pl-20"}
+          ${sidebarOpen ? "pl-[224px]" : "pl-[60px]"}
         `}
       >
         <Header />

@@ -1,4 +1,4 @@
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { RTMRequirement } from "@/api/rtm";
 
 const RISK_COLOR: Record<string, string> = {
@@ -25,9 +25,7 @@ function Badge({ label, color, bg }: { label: string; color: string; bg: string 
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { BDR: border, TXT2: textLight } = useColors();
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{
@@ -49,12 +47,8 @@ export default function RTMDeepView({
   onClose: () => void;
   onRegenerate: (id: string) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? "#161622" : "#FAFAFA";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const codeBg = isDark ? "#0D0D1A" : "#F0F0F0";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, dark } = useColors();
+  const codeBg = dark ? "#0D0D1A" : "#F0F0F0";
 
   const riskColor = RISK_COLOR[req.riskLevel] ?? "#FFA726";
   const prioColor = PRIORITY_COLOR[req.businessPriority] ?? "#FFA726";
@@ -137,8 +131,8 @@ export default function RTMDeepView({
               <div style={{ fontSize: 10, color: textLight, textTransform: "uppercase", letterSpacing: "0.06em" }}>AI Confidence</div>
               <Badge
                 label={`${Math.round((req.aiLogic?.confidenceScore ?? 0.72) * 100)}%`}
-                color={theme.colors.primary}
-                bg={`${theme.colors.primary}22`}
+                color={P}
+                bg={`${P}22`}
               />
             </div>
           </div>
@@ -246,7 +240,7 @@ export default function RTMDeepView({
               {req.tags.map((t, i) => (
                 <span key={i} style={{
                   padding: "2px 9px", borderRadius: 10, fontSize: 11,
-                  background: isDark ? "#2A1A40" : "#EDE4FF", color: theme.colors.primary
+                  background: dark ? "#2A1A40" : "#EDE4FF", color: P
                 }}>{t}</span>
               ))}
             </div>
@@ -266,7 +260,7 @@ export default function RTMDeepView({
                   <div style={{
                     position: "absolute", left: -12, top: 4,
                     width: 8, height: 8, borderRadius: "50%",
-                    background: theme.colors.primary
+                    background: P
                   }} />
                   <div style={{ fontSize: 11, color: textLight }}>
                     {new Date(h.timestamp).toLocaleString()}
@@ -291,7 +285,7 @@ export default function RTMDeepView({
           onClick={() => onRegenerate(req.id)}
           style={{
             width: "100%", padding: "9px 0", borderRadius: 10,
-            background: theme.colors.primary, color: "#fff", border: "none",
+            background: P, color: "#fff", border: "none",
             fontWeight: 700, fontSize: 13, cursor: "pointer",
             transition: "opacity 0.15s"
           }}

@@ -11,7 +11,7 @@ import ExecutionTrendsPanel from "./pages/ExecutionTimeline/ExecutionTrendsPanel
 import ExecutionInsightsPanel from "./pages/ExecutionTimeline/ExecutionInsightsPanel";
 import ExecutionComparePanel from "./pages/ExecutionTimeline/ExecutionComparePanel";
 
-import ReleaseReadinessDashboard from "./pages/Release/ReleaseReadinessDashboard";
+import OrgReadinessCenter from "./pages/Release/OrgReadinessCenter";
 import ReleaseHeatmap from "./pages/Release/ReleaseHeatmap";
 import ReleaseStory from "./pages/Release/ReleaseStory";
 
@@ -71,7 +71,7 @@ export default function App() {
             <Route path="/execution/compare" element={<ExecutionComparePanel />} />
 
             {/* RELEASE */}
-            <Route path="/release" element={<ReleaseReadinessDashboard />} />
+            <Route path="/release" element={<OrgReadinessCenter />} />
             <Route path="/release/heatmap" element={<ReleaseHeatmap />} />
             <Route path="/release/story" element={<ReleaseStory />} />
 

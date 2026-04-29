@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import toast from "react-hot-toast";
 import type { Suggestion, SuggestionsAnalytics } from "@/api/suggestions";
 import {
@@ -47,12 +48,7 @@ const ACTION_SUCCESS: Record<string, string> = {
 // ── Analysis progress panel ───────────────────────────────────────────────────
 
 function AnalysisProgress({ step }: { step: number }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? theme.colors.darkBackground : "#f5f5f8";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const current = ANALYSIS_STEPS[Math.min(step, ANALYSIS_STEPS.length - 1)];
   const progress = Math.round(((step + 1) / ANALYSIS_STEPS.length) * 100);
@@ -67,7 +63,7 @@ function AnalysisProgress({ step }: { step: number }) {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
         <div style={{
           width: 42, height: 42, borderRadius: 12,
-          background: `${theme.colors.primary}22`,
+          background: `${P}22`,
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 20,
         }}>
@@ -86,13 +82,13 @@ function AnalysisProgress({ step }: { step: number }) {
       {/* Progress bar */}
       <div style={{
         height: 6, borderRadius: 4,
-        background: isDark ? "#2a2a3a" : "#eee",
+        background: border,
         overflow: "hidden", marginBottom: 14,
       }}>
         <div style={{
           height: "100%",
           width: `${progress}%`,
-          background: `linear-gradient(90deg, ${theme.colors.primary}, #a855f7)`,
+          background: `linear-gradient(90deg, ${P}, #a855f7)`,
           borderRadius: 4,
           transition: "width 0.6s ease",
         }} />
@@ -114,8 +110,8 @@ function AnalysisProgress({ step }: { step: number }) {
             >
               <div style={{
                 width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
-                background: done ? "#66BB6A" : active ? theme.colors.primary : bg,
-                border: `2px solid ${done ? "#66BB6A" : active ? theme.colors.primary : (isDark ? "#444" : "#ddd")}`,
+                background: done ? "#66BB6A" : active ? P : bg,
+                border: `2px solid ${done ? "#66BB6A" : active ? P : (border)}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 9, color: "#fff", fontWeight: 800,
                 transition: "all 0.3s",
@@ -124,7 +120,7 @@ function AnalysisProgress({ step }: { step: number }) {
               </div>
               <span style={{
                 fontSize: 12,
-                color: active ? theme.colors.primary : done ? "#66BB6A" : textLight,
+                color: active ? P : done ? "#66BB6A" : textLight,
                 fontWeight: active ? 600 : 400,
               }}>
                 {s.message}
@@ -140,10 +136,7 @@ function AnalysisProgress({ step }: { step: number }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function AISuggestions({ projectId }: { projectId: string }) {
-  const isDark = theme.mode === "dark";
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [analytics, setAnalytics] = useState<SuggestionsAnalytics | null>(null);
@@ -294,7 +287,7 @@ export default function AISuggestions({ projectId }: { projectId: string }) {
         flexWrap: "wrap", gap: 12, marginBottom: 24,
       }}>
         <div>
-          <h2 style={{ margin: 0, color: theme.colors.primary, fontSize: 20, fontWeight: 800 }}>
+          <h2 style={{ margin: 0, color: P, fontSize: 20, fontWeight: 800 }}>
             AI Suggestions
           </h2>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: textLight, maxWidth: 480 }}>
@@ -330,7 +323,7 @@ export default function AISuggestions({ projectId }: { projectId: string }) {
             disabled={generating}
             style={{
               padding: "9px 18px", borderRadius: 10, border: "none",
-              background: generating ? "#9e7de0" : theme.colors.primary,
+              background: generating ? "#9e7de0" : P,
               color: "#fff", fontSize: 13, fontWeight: 700,
               cursor: generating ? "not-allowed" : "pointer",
               transition: "opacity 0.12s, background 0.2s",
@@ -359,7 +352,7 @@ export default function AISuggestions({ projectId }: { projectId: string }) {
           justifyContent: "center", padding: "60px 20px", textAlign: "center",
         }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🧠</div>
-          <h3 style={{ margin: "0 0 8px", color: theme.colors.primary }}>No Suggestions Yet</h3>
+          <h3 style={{ margin: "0 0 8px", color: P }}>No Suggestions Yet</h3>
           <p style={{ color: textLight, fontSize: 13, maxWidth: 380, margin: "0 0 24px", lineHeight: 1.6 }}>
             Run the AI analysis engine to detect coverage gaps, predict failures, and get actionable recommendations.
           </p>
@@ -367,7 +360,7 @@ export default function AISuggestions({ projectId }: { projectId: string }) {
             onClick={startAnalysis}
             style={{
               padding: "11px 28px", borderRadius: 10, border: "none",
-              background: theme.colors.primary, color: "#fff",
+              background: P, color: "#fff",
               fontSize: 14, fontWeight: 700, cursor: "pointer",
               display: "flex", alignItems: "center", gap: 8,
             }}

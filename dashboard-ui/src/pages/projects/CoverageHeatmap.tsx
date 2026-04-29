@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { TabId } from "@/dashboard/pages/projects/layout/ProjectSidebar";
 
 const API_BASE = "http://localhost:3000";
@@ -26,11 +27,7 @@ function SummaryTile({
   label: string; covered: number; total: number; pct: number;
   active: boolean; onClick: () => void; disabled: boolean;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const scoreColor = pct >= 80 ? "#00C853" : pct >= 50 ? "#FFA726" : "#EF5350";
   const r = 30, cx = 38, cy = 38, sw = 6;
@@ -48,7 +45,7 @@ function SummaryTile({
           ? `2px solid ${scoreColor}`
           : `1px solid ${border}`,
         background: active
-          ? (isDark ? `${scoreColor}18` : `${scoreColor}10`)
+          ? (dark ? `${scoreColor}18` : `${scoreColor}10`)
           : surface,
         boxShadow: active ? `0 0 0 3px ${scoreColor}30` : theme.shadow.card,
         transition: "all 0.18s ease",
@@ -57,7 +54,7 @@ function SummaryTile({
     >
       <svg width={76} height={76}>
         <circle cx={cx} cy={cy} r={r} fill="none"
-          stroke={isDark ? "#333" : "#eee"} strokeWidth={sw} />
+          stroke={border} strokeWidth={sw} />
         <circle cx={cx} cy={cy} r={r} fill="none"
           stroke={scoreColor} strokeWidth={sw}
           strokeDasharray={`${dash} ${circ}`}
@@ -80,11 +77,7 @@ function SummaryTile({
 
 // ─── Stacked bar chart ────────────────────────────────────────────────────────
 function StackedTypeChart({ rows }: { rows: { type: string; total: number; covered: number; uncovered: number; pct: number }[] }) {
-  const isDark = theme.mode === "dark";
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   if (!rows.length) return null;
 
@@ -107,8 +100,8 @@ function StackedTypeChart({ rows }: { rows: { type: string; total: number; cover
               </span>
               <span style={{ color: textLight }}>{row.covered}/{row.total} ({row.pct}%)</span>
             </div>
-            <div style={{ height: 10, borderRadius: 6, overflow: "hidden", background: isDark ? "#333" : "#eee", display: "flex" }}>
-              <div style={{ width: `${row.pct}%`, background: TYPE_COLOR[row.type] ?? theme.colors.primary, transition: "width 0.5s ease" }} />
+            <div style={{ height: 10, borderRadius: 6, overflow: "hidden", background: border, display: "flex" }}>
+              <div style={{ width: `${row.pct}%`, background: TYPE_COLOR[row.type] ?? P, transition: "width 0.5s ease" }} />
             </div>
           </div>
         ))}
@@ -155,22 +148,23 @@ function StackedTypeChart({ rows }: { rows: { type: string; total: number; cover
 
 // ─── Action button ────────────────────────────────────────────────────────────
 function ActionBtn({ label, onClick }: { label: string; onClick: () => void }) {
+  const { P } = useColors();
   return (
     <button
       onClick={e => { e.stopPropagation(); onClick(); }}
       style={{
-        padding: "5px 12px", borderRadius: 8, border: `1px solid ${theme.colors.primary}`,
-        background: "transparent", color: theme.colors.primary,
+        padding: "5px 12px", borderRadius: 8, border: `1px solid ${P}`,
+        background: "transparent", color: P,
         fontSize: 11, fontWeight: 600, cursor: "pointer",
         transition: "all 0.12s ease", flexShrink: 0
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLButtonElement).style.background = theme.colors.primary;
+        (e.currentTarget as HTMLButtonElement).style.background = P;
         (e.currentTarget as HTMLButtonElement).style.color = "#fff";
       }}
       onMouseLeave={e => {
         (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-        (e.currentTarget as HTMLButtonElement).style.color = theme.colors.primary;
+        (e.currentTarget as HTMLButtonElement).style.color = P;
       }}
     >
       {label}
@@ -180,11 +174,7 @@ function ActionBtn({ label, onClick }: { label: string; onClick: () => void }) {
 
 // ─── Gap row — uncovered requirement ─────────────────────────────────────────
 function RequirementGapRow({ req, onGenerate }: { req: any; onGenerate: () => void }) {
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   return (
     <div style={{
@@ -218,7 +208,7 @@ function RequirementGapRow({ req, onGenerate }: { req: any; onGenerate: () => vo
           <div style={{ fontSize: 12, color: textLight, marginBottom: 6 }}>{req.description}</div>
         )}
         {req.suggestedTestFile && (
-          <code style={{ fontSize: 11, color: textLight, background: isDark ? "#111" : "#F5F5F5", padding: "2px 7px", borderRadius: 5 }}>
+          <code style={{ fontSize: 11, color: textLight, background: dark ? "#111" : "#F5F5F5", padding: "2px 7px", borderRadius: 5 }}>
             {req.suggestedTestFile}
           </code>
         )}
@@ -227,7 +217,7 @@ function RequirementGapRow({ req, onGenerate }: { req: any; onGenerate: () => vo
             {req.tags.map((t: string, i: number) => (
               <span key={i} style={{
                 padding: "1px 7px", borderRadius: 10, fontSize: 11,
-                background: isDark ? "#2A1A40" : "#EDE4FF", color: theme.colors.primary
+                background: dark ? "#2A1A40" : "#EDE4FF", color: P
               }}>{t}</span>
             ))}
           </div>
@@ -240,11 +230,7 @@ function RequirementGapRow({ req, onGenerate }: { req: any; onGenerate: () => vo
 
 // ─── Gap row — untested endpoint ──────────────────────────────────────────────
 function EndpointGapRow({ ep, onGenerate }: { ep: any; onGenerate: () => void }) {
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
   const mc = METHOD_COLOR[ep.method] ?? textLight;
 
   return (
@@ -263,7 +249,7 @@ function EndpointGapRow({ ep, onGenerate }: { ep: any; onGenerate: () => void })
           <div style={{ fontSize: 11, color: textLight, marginTop: 2 }}>{ep.summary}</div>
         )}
         {ep.suggestedTestFile && (
-          <code style={{ fontSize: 11, color: textLight, background: isDark ? "#111" : "#F5F5F5", padding: "2px 7px", borderRadius: 5, marginTop: 4, display: "inline-block" }}>
+          <code style={{ fontSize: 11, color: textLight, background: dark ? "#111" : "#F5F5F5", padding: "2px 7px", borderRadius: 5, marginTop: 4, display: "inline-block" }}>
             {ep.suggestedTestFile}
           </code>
         )}
@@ -272,7 +258,7 @@ function EndpointGapRow({ ep, onGenerate }: { ep: any; onGenerate: () => void })
             {ep.tags.map((t: string, i: number) => (
               <span key={i} style={{
                 padding: "1px 7px", borderRadius: 10, fontSize: 11,
-                background: isDark ? "#2A1A40" : "#EDE4FF", color: theme.colors.primary
+                background: dark ? "#2A1A40" : "#EDE4FF", color: P
               }}>{t}</span>
             ))}
           </div>
@@ -285,11 +271,7 @@ function EndpointGapRow({ ep, onGenerate }: { ep: any; onGenerate: () => void })
 
 // ─── Gap row — untested flow ──────────────────────────────────────────────────
 function FlowGapRow({ flow, onGenerate }: { flow: any; onGenerate: () => void }) {
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   return (
     <div style={{
@@ -304,7 +286,7 @@ function FlowGapRow({ flow, onGenerate }: { flow: any; onGenerate: () => void })
           {flow.action && <span> · <em>{flow.action}</em></span>}
         </div>
         {flow.suggestedTestFile && (
-          <code style={{ fontSize: 11, color: textLight, background: isDark ? "#111" : "#F5F5F5", padding: "2px 7px", borderRadius: 5, marginTop: 4, display: "inline-block" }}>
+          <code style={{ fontSize: 11, color: textLight, background: dark ? "#111" : "#F5F5F5", padding: "2px 7px", borderRadius: 5, marginTop: 4, display: "inline-block" }}>
             {flow.suggestedTestFile}
           </code>
         )}
@@ -316,10 +298,7 @@ function FlowGapRow({ flow, onGenerate }: { flow: any; onGenerate: () => void })
 
 // ─── Navigation brain banner ──────────────────────────────────────────────────
 function NavigationBrain({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const links: { label: string; tab: TabId; icon: string; desc: string }[] = [
     { label: "Tests", tab: "tests", icon: "▶", desc: "Run all generated tests" },
@@ -347,8 +326,8 @@ function NavigationBrain({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
               transition: "all 0.12s ease", minWidth: 120,
             }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = isDark ? "#2A1A40" : "#EDE4FF";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = theme.colors.primary;
+              (e.currentTarget as HTMLButtonElement).style.background = dark ? "#2A1A40" : "#EDE4FF";
+              (e.currentTarget as HTMLButtonElement).style.borderColor = P;
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLButtonElement).style.background = "transparent";
@@ -356,7 +335,7 @@ function NavigationBrain({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
             }}
           >
             <div style={{ fontSize: 16, marginBottom: 3 }}>{l.icon}</div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: theme.colors.primary }}>{l.label}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: P }}>{l.label}</div>
             <div style={{ fontSize: 11, color: textLight, marginTop: 1 }}>{l.desc}</div>
           </button>
         ))}
@@ -378,11 +357,7 @@ export default function CoverageHeatmap({
   const [activeTile, setActiveTile] = useState<"requirements" | "api" | "ui" | "hybrid" | null>(null);
   const [gapView, setGapView] = useState<GapView>("all");
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   useEffect(() => {
     fetch(`${API_BASE}/projects/${projectId}/coverage`)
@@ -397,7 +372,7 @@ export default function CoverageHeatmap({
         {[0, 1, 2, 3].map(i => (
           <div key={i} style={{
             height: 160, borderRadius: 16,
-            background: isDark ? "#1a1a2e" : "#f3f4f6",
+            background: dark ? "#1a1a2e" : "#f3f4f6",
             animation: "pulse 1.5s infinite"
           }} />
         ))}
@@ -465,7 +440,7 @@ export default function CoverageHeatmap({
 
       {/* ── Header ── */}
       <div style={{ marginBottom: 20 }}>
-        <h3 style={{ color: theme.colors.primary, margin: 0 }}>Coverage Dashboard</h3>
+        <h3 style={{ color: P, margin: 0 }}>Coverage Dashboard</h3>
         <div style={{ fontSize: 12, color: textLight, marginTop: 4 }}>
           <span>Project type: <strong style={{ color: text }}>{projectType?.toUpperCase() ?? "—"}</strong></span>
           <span style={{ margin: "0 8px" }}>·</span>
@@ -477,7 +452,7 @@ export default function CoverageHeatmap({
               <span style={{ margin: "0 8px" }}>·</span>
               <button
                 onClick={() => setActiveTile(null)}
-                style={{ fontSize: 12, color: theme.colors.primary, background: "none", border: "none", cursor: "pointer", padding: 0, fontWeight: 600 }}
+                style={{ fontSize: 12, color: P, background: "none", border: "none", cursor: "pointer", padding: 0, fontWeight: 600 }}
               >
                 Clear filter ✕
               </button>
@@ -578,10 +553,10 @@ export default function CoverageHeatmap({
                     padding: "5px 12px", borderRadius: 8, fontSize: 12, fontWeight: isActive ? 700 : 400,
                     border: `1px solid ${border}`, cursor: "pointer",
                     background: isActive
-                      ? (v === "high-risk" ? "#EF535022" : `${theme.colors.primary}22`)
+                      ? (v === "high-risk" ? "#EF535022" : `${P}22`)
                       : "transparent",
                     color: isActive
-                      ? (v === "high-risk" ? "#EF5350" : theme.colors.primary)
+                      ? (v === "high-risk" ? "#EF5350" : P)
                       : textLight,
                     transition: "all 0.12s ease"
                   }}

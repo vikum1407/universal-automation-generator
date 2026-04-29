@@ -6,21 +6,9 @@ import {
   SEVERITY_COLOR, SEVERITY_BG, TYPE_LABEL, TYPE_ICON, STATUS_LABEL, STATUS_COLOR,
   type Insight, type InsightSeverity, type InsightStatus, type InsightType,
 } from "../../api/insights";
-import { theme } from "../../theme";
+import { useColors } from "@/hooks/useColors";
 
 // ─── Palette (respects theme) ──────────────────────────────────────────────────
-
-function useColors() {
-  const isDark = theme.mode === "dark";
-  return {
-    P:    theme.colors.primary,
-    BG:   isDark ? theme.colors.appBackground  : "#f8f8fc",
-    CARD: isDark ? theme.colors.darkSurface     : theme.colors.background,
-    BDR:  isDark ? theme.colors.darkBorder      : theme.colors.border,
-    TXT:  isDark ? theme.colors.darkText        : theme.colors.textDark,
-    TXT2: isDark ? theme.colors.darkTextLight   : theme.colors.textLight,
-  };
-}
 
 // ─── Summary tile ──────────────────────────────────────────────────────────────
 
@@ -431,7 +419,7 @@ export default function ProjectInsightsPage({ projectId }: { projectId: string }
   const resolved = insights.filter(i => i.status === "resolved").length;
 
   return (
-    <div style={{ padding: `${theme.spacing.lg} 0` }}>
+    <div style={{ padding: "24px 0" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>

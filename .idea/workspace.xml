@@ -5,24 +5,43 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f4e1a107-ee6d-4165-a968-80ae02610902" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/src/api/aiClient.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/InputPanel.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/ProviderSelector.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/ResultPanel.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/ScrollToTopButton.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/SkeletonCard.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/TestCaseGenerator.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/TestCaseGenerator/index.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/common/Button.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/common/Card.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/common/TextArea.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/TestCaseGeneratorPage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/testgen/ai/model/AiTestCaseRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/testgen/ai/model/AiTestCaseRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/hooks/useGenerateForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/hooks/useGenerateForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend-ts/src/projects/project.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend-ts/src/projects/project.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend-ts/src/projects/readiness/readiness.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend-ts/src/projects/readiness/readiness.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/dashboard/pages/projects/layout/ProjectLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/dashboard/pages/projects/layout/ProjectLayout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/dashboard/pages/projects/layout/ProjectSidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/dashboard/pages/projects/layout/ProjectSidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/layouts/DashboardLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/layouts/DashboardLayout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/layouts/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/layouts/Sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/ExecutionTimeline/ExecutionInsightsPanel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/ExecutionTimeline/ExecutionInsightsPanel.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/ExecutionTimeline/ExecutionTimeline.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/ExecutionTimeline/ExecutionTimeline.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/ExecutionTimeline/ExecutionTrendsPanel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/ExecutionTimeline/ExecutionTrendsPanel.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/AISuggestions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/AISuggestions.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/AutoHeal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/AutoHeal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/CoverageHeatmap.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/CoverageHeatmap.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/HeatMapPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/HeatMapPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/History.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/History.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/Overview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/Overview.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/ProjectInsightsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/ProjectInsightsPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/ProjectReadinessPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/ProjectReadinessPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/ProjectsList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/ProjectsList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMDashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMDashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMDeepView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMDeepView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMInsights.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMInsights.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMTable.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMTable.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMTableHeader.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMTableHeader.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMTableRow.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/RTMTableRow.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/ReplayViewer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/ReplayViewer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/Settings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/Settings.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/StoryPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/StoryPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/SuggestionDeepView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/SuggestionDeepView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/SuggestionsDashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/SuggestionsDashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/SuggestionsTable.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/SuggestionsTable.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/SystemMap.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/SystemMap.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/TestDeepView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/TestDeepView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/TestRunner.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/TestRunner.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/TestSummaryBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/TestSummaryBar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/Trends.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard-ui/src/pages/projects/Trends.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

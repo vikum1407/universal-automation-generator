@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { AutoHealItem, AutoHealSummary, HealType, HealStatus } from "@/api/auto-heal";
 import {
   fetchAutoHeal, fetchAutoHealSummary, scanAutoHeal,
@@ -20,10 +21,10 @@ function Badge({ label, color }: { label: string; color: string }) {
 }
 
 function ConfidenceBar({ value, color }: { value: number; color: string }) {
-  const isDark = theme.mode === "dark";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-      <div style={{ flex: 1, height: 5, borderRadius: 3, background: isDark ? "#333" : "#eee" }}>
+      <div style={{ flex: 1, height: 5, borderRadius: 3, background: border }}>
         <div style={{ height: "100%", width: `${Math.round(value * 100)}%`, background: color, borderRadius: 3, transition: "width 0.4s" }} />
       </div>
       <span style={{ fontSize: 10, fontWeight: 700, color, minWidth: 28 }}>
@@ -44,18 +45,14 @@ function formatTestName(name: string): string {
 function SummaryTile({
   icon, label, value, sub, color,
 }: { icon: string; label: string; value: number | string; sub?: string; color?: string }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
   return (
     <div style={{
       flex: "1 1 130px", minWidth: 0, padding: "14px 16px", borderRadius: 14,
       background: surface, border: `1px solid ${border}`, boxShadow: theme.shadow.card,
     }}>
       <div style={{ fontSize: 20, marginBottom: 5 }}>{icon}</div>
-      <div style={{ fontSize: 24, fontWeight: 800, color: color ?? theme.colors.primary, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 24, fontWeight: 800, color: color ?? P, lineHeight: 1 }}>{value}</div>
       <div style={{ fontSize: 11, fontWeight: 600, color: text, marginTop: 4 }}>{label}</div>
       {sub && <div style={{ fontSize: 10, color: textLight, marginTop: 2 }}>{sub}</div>}
     </div>
@@ -70,10 +67,7 @@ function SummaryBar({
   scannedAt: string;
   onScan: () => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   return (
     <div style={{ marginBottom: 20 }}>
@@ -88,7 +82,7 @@ function SummaryBar({
           disabled={scanning}
           style={{
             padding: "8px 20px", borderRadius: 9, border: "none",
-            background: scanning ? "#9e7de0" : theme.colors.primary,
+            background: scanning ? "#9e7de0" : P,
             color: "#fff", fontWeight: 700, fontSize: 13,
             cursor: scanning ? "not-allowed" : "pointer",
             display: "flex", alignItems: "center", gap: 6,
@@ -103,7 +97,7 @@ function SummaryBar({
           </span>
         )}
         {scanning && (
-          <span style={{ fontSize: 12, color: theme.colors.primary, fontWeight: 500 }}>
+          <span style={{ fontSize: 12, color: P, fontWeight: 500 }}>
             Analyzing tests for healable patterns…
           </span>
         )}
@@ -145,11 +139,7 @@ function HealQueue({
   onValidate: (h: AutoHealItem) => void;
   onIgnore: (h: AutoHealItem) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const filtered = heals.filter(h => {
     if (typeFilter !== "all" && h.type !== typeFilter) return false;
@@ -199,13 +189,13 @@ function HealQueue({
                 onClick={() => onSelect(h)}
                 style={{
                   cursor: "pointer",
-                  background: selected ? (isDark ? "#1e1230" : "#f0eaff") : "transparent",
-                  borderLeft: `3px solid ${selected ? theme.colors.primary : "transparent"}`,
+                  background: selected ? (`${P}15`) : "transparent",
+                  borderLeft: `3px solid ${selected ? P : "transparent"}`,
                   transition: "background 0.1s",
                 }}
                 onMouseEnter={e => {
                   if (!selected) (e.currentTarget as HTMLTableRowElement).style.background =
-                    isDark ? "#1a1a2e" : "#fafafa";
+                    bg;
                 }}
                 onMouseLeave={e => {
                   if (!selected) (e.currentTarget as HTMLTableRowElement).style.background = "transparent";
@@ -250,7 +240,7 @@ function HealQueue({
                 <td style={{ padding: "11px 14px", whiteSpace: "nowrap" }}>
                   {h.lastFailed
                     ? <span style={{ fontSize: 11, color: "#EF5350" }}>{new Date(h.lastFailed).toLocaleDateString()}</span>
-                    : <span style={{ color: isDark ? "#444" : "#ccc", fontSize: 11 }}>—</span>
+                    : <span style={{ color: border, fontSize: 11 }}>—</span>
                   }
                 </td>
                 {/* Actions */}
@@ -262,7 +252,7 @@ function HealQueue({
                         disabled={isLoading}
                         style={{
                           padding: "4px 9px", borderRadius: 6, border: "none",
-                          background: isLoading ? "#9e7de0" : theme.colors.primary,
+                          background: isLoading ? "#9e7de0" : P,
                           color: "#fff", fontSize: 10, fontWeight: 700,
                           cursor: isLoading ? "not-allowed" : "pointer",
                         }}
@@ -320,27 +310,26 @@ function HealQueue({
 // ── Code diff viewer ──────────────────────────────────────────────────────────
 
 function DiffViewer({ before, after }: { before: string; after: string }) {
-  const isDark = theme.mode === "dark";
-  const codeBg = isDark ? "#0d0d1a" : "#f8f8ff";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
+  const codeBg = dark ? "#0d0d1a" : "#f8f8ff";
 
   return (
     <div style={{ borderRadius: 10, border: `1px solid ${border}`, overflow: "hidden", fontSize: 11, fontFamily: "monospace" }}>
       {/* Before */}
-      <div style={{ background: isDark ? "#1a0000" : "#fff5f5", borderBottom: `1px solid ${border}` }}>
-        <div style={{ padding: "4px 10px", background: isDark ? "#2a0000" : "#ffebee", fontSize: 10, fontWeight: 700, color: "#EF5350" }}>
+      <div style={{ background: dark ? "#1a0000" : "#fff5f5", borderBottom: `1px solid ${border}` }}>
+        <div style={{ padding: "4px 10px", background: dark ? "#2a0000" : "#ffebee", fontSize: 10, fontWeight: 700, color: "#EF5350" }}>
           − Before
         </div>
-        <pre style={{ margin: 0, padding: "10px 14px", color: "#EF5350", whiteSpace: "pre-wrap", lineHeight: 1.6, background: isDark ? "#1a0000" : "#fff5f5" }}>
+        <pre style={{ margin: 0, padding: "10px 14px", color: "#EF5350", whiteSpace: "pre-wrap", lineHeight: 1.6, background: dark ? "#1a0000" : "#fff5f5" }}>
           {before || "—"}
         </pre>
       </div>
       {/* After */}
-      <div style={{ background: isDark ? "#001a00" : "#f5fff5" }}>
-        <div style={{ padding: "4px 10px", background: isDark ? "#002a00" : "#e8f5e9", fontSize: 10, fontWeight: 700, color: "#66BB6A" }}>
+      <div style={{ background: dark ? "#001a00" : "#f5fff5" }}>
+        <div style={{ padding: "4px 10px", background: dark ? "#002a00" : "#e8f5e9", fontSize: 10, fontWeight: 700, color: "#66BB6A" }}>
           + After
         </div>
-        <pre style={{ margin: 0, padding: "10px 14px", color: "#66BB6A", whiteSpace: "pre-wrap", lineHeight: 1.6, background: isDark ? "#001a00" : "#f5fff5" }}>
+        <pre style={{ margin: 0, padding: "10px 14px", color: "#66BB6A", whiteSpace: "pre-wrap", lineHeight: 1.6, background: dark ? "#001a00" : "#f5fff5" }}>
           {after || "—"}
         </pre>
       </div>
@@ -362,12 +351,7 @@ function HealDetailPanel({
 }) {
   if (!heal) return null;
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? theme.colors.darkBackground : "#f5f5f8";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const typeColor = TYPE_COLOR[heal.type];
   const statusColor = STATUS_COLOR[heal.status];
@@ -402,7 +386,7 @@ function HealDetailPanel({
               cursor: "pointer", fontSize: 17, color: textLight, padding: "2px 6px",
             }}>✕</button>
           </div>
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: theme.colors.primary, lineHeight: 1.4 }}>
+          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: P, lineHeight: 1.4 }}>
             {formatTestName(heal.testId)}
           </h3>
           <div style={{ fontSize: 11, color: textLight, marginTop: 4, fontFamily: "monospace" }}>
@@ -423,7 +407,7 @@ function HealDetailPanel({
                 <span style={{ fontSize: 11, color: textLight }}>Confidence</span>
                 <span style={{ fontSize: 11, fontWeight: 700, color: confColor }}>{Math.round(heal.confidence * 100)}%</span>
               </div>
-              <div style={{ height: 5, borderRadius: 3, background: isDark ? "#333" : "#eee" }}>
+              <div style={{ height: 5, borderRadius: 3, background: border }}>
                 <div style={{ height: "100%", width: `${heal.confidence * 100}%`, background: confColor, borderRadius: 3 }} />
               </div>
             </div>
@@ -432,7 +416,7 @@ function HealDetailPanel({
                 <span style={{ fontSize: 11, color: textLight }}>Impact</span>
                 <span style={{ fontSize: 11, fontWeight: 700, color: impactColor }}>{Math.round(heal.impact * 100)}%</span>
               </div>
-              <div style={{ height: 5, borderRadius: 3, background: isDark ? "#333" : "#eee" }}>
+              <div style={{ height: 5, borderRadius: 3, background: border }}>
                 <div style={{ height: "100%", width: `${heal.impact * 100}%`, background: impactColor, borderRadius: 3 }} />
               </div>
             </div>
@@ -458,8 +442,8 @@ function HealDetailPanel({
           {/* Root cause */}
           <div style={{
             padding: "10px 14px", borderRadius: 8,
-            background: isDark ? "#1a0a00" : "#fff8f0",
-            border: `1px solid ${isDark ? "#3a1500" : "#FFE0B2"}`,
+            background: dark ? "#1a0a00" : "#fff8f0",
+            border: `1px solid ${dark ? "#3a1500" : "#FFE0B2"}`,
           }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: "#FF9800", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 5 }}>
               🔍 Root Cause
@@ -470,10 +454,10 @@ function HealDetailPanel({
           {/* AI reasoning */}
           <div style={{
             padding: "10px 14px", borderRadius: 8,
-            background: isDark ? "#0a0a1a" : "#f5f0ff",
-            border: `1px solid ${isDark ? "#1e1040" : "#D1C4E9"}`,
+            background: dark ? "#0a0a1a" : "#f5f0ff",
+            border: `1px solid ${dark ? "#1e1040" : "#D1C4E9"}`,
           }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: theme.colors.primary, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 5 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: P, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 5 }}>
               🧠 AI Reasoning
             </div>
             <div style={{ fontSize: 12, color: text, lineHeight: 1.7 }}>{heal.aiReasoning}</div>
@@ -517,7 +501,7 @@ function HealDetailPanel({
                   disabled={isLoading}
                   style={{
                     padding: "10px 16px", borderRadius: 10, border: "none",
-                    background: isLoading ? "#9e7de0" : theme.colors.primary,
+                    background: isLoading ? "#9e7de0" : P,
                     color: "#fff", fontWeight: 600, fontSize: 13,
                     cursor: isLoading ? "not-allowed" : "pointer",
                     display: "flex", alignItems: "center", gap: 8,
@@ -586,9 +570,9 @@ function HealDetailPanel({
             {isLoading && (
               <div style={{
                 marginTop: 10, padding: "9px 12px", borderRadius: 8,
-                background: `${theme.colors.primary}15`,
-                border: `1px solid ${theme.colors.primary}33`,
-                fontSize: 12, color: theme.colors.primary, fontWeight: 500,
+                background: `${P}15`,
+                border: `1px solid ${P}33`,
+                fontSize: 12, color: P, fontWeight: 500,
               }}>
                 ⏳ Processing… please wait.
               </div>
@@ -603,11 +587,7 @@ function HealDetailPanel({
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function AutoHeal({ projectId }: { projectId: string }) {
-  const isDark = theme.mode === "dark";
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const [heals, setHeals] = useState<AutoHealItem[]>([]);
   const [summary, setSummary] = useState<AutoHealSummary | null>(null);
@@ -736,7 +716,7 @@ export default function AutoHeal({ projectId }: { projectId: string }) {
     <div style={{ width: "100%", minWidth: 0 }}>
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
-        <h2 style={{ margin: 0, color: theme.colors.primary, fontSize: 20, fontWeight: 800 }}>
+        <h2 style={{ margin: 0, color: P, fontSize: 20, fontWeight: 800 }}>
           Auto-Heal
         </h2>
         <p style={{ margin: "4px 0 0", fontSize: 13, color: textLight }}>
@@ -761,7 +741,7 @@ export default function AutoHeal({ projectId }: { projectId: string }) {
           color: textLight, fontSize: 13,
         }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🩹</div>
-          <h3 style={{ margin: "0 0 8px", color: theme.colors.primary }}>No Heal Candidates</h3>
+          <h3 style={{ margin: "0 0 8px", color: P }}>No Heal Candidates</h3>
           <p style={{ maxWidth: 360, margin: "0 auto 20px", lineHeight: 1.6 }}>
             No tests with spec files found in this project yet. Generate tests first, or run a scan after test failures.
           </p>
@@ -770,7 +750,7 @@ export default function AutoHeal({ projectId }: { projectId: string }) {
             disabled={scanning}
             style={{
               padding: "10px 24px", borderRadius: 10, border: "none",
-              background: theme.colors.primary, color: "#fff",
+              background: P, color: "#fff",
               fontWeight: 700, fontSize: 14, cursor: scanning ? "not-allowed" : "pointer",
             }}
           >
@@ -793,7 +773,7 @@ export default function AutoHeal({ projectId }: { projectId: string }) {
               onChange={e => setSearch(e.target.value)}
               style={{
                 flex: "1 1 180px", padding: "7px 12px", borderRadius: 8,
-                border: `1px solid ${border}`, background: isDark ? surface : "#fff",
+                border: `1px solid ${border}`, background: dark ? surface : "#fff",
                 color: text, fontSize: 12, outline: "none",
               }}
             />
@@ -803,7 +783,7 @@ export default function AutoHeal({ projectId }: { projectId: string }) {
               onChange={e => setTypeFilter(e.target.value as HealType | "all")}
               style={{
                 padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`,
-                background: isDark ? surface : "#fff", color: text, fontSize: 12,
+                background: dark ? surface : "#fff", color: text, fontSize: 12,
               }}
             >
               <option value="all">All Types</option>
@@ -821,7 +801,7 @@ export default function AutoHeal({ projectId }: { projectId: string }) {
               onChange={e => setStatusFilter(e.target.value as HealStatus | "all")}
               style={{
                 padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`,
-                background: isDark ? surface : "#fff", color: text, fontSize: 12,
+                background: dark ? surface : "#fff", color: text, fontSize: 12,
               }}
             >
               <option value="all">All Status</option>

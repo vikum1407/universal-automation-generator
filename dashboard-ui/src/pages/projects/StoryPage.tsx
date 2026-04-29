@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -68,7 +69,7 @@ function themeColor(t: string) {
 // ─── Subcomponents ────────────────────────────────────────────────────────────
 
 function MetricPill({ label, value, accent }: { label: string; value: string | number | null; accent?: string }) {
-  const P = theme.colors.primary;
+  const { P, TXT2 } = useColors();
   const col = accent ?? P;
   return (
     <div style={{
@@ -80,7 +81,7 @@ function MetricPill({ label, value, accent }: { label: string; value: string | n
       <span style={{ fontSize: 20, fontWeight: 800, color: col, lineHeight: 1 }}>
         {value === null || value === undefined ? "—" : value}
       </span>
-      <span style={{ fontSize: 11, color: theme.colors.textLight, marginTop: 4, whiteSpace: "nowrap" }}>
+      <span style={{ fontSize: 11, color: TXT2, marginTop: 4, whiteSpace: "nowrap" }}>
         {label}
       </span>
     </div>
@@ -90,7 +91,7 @@ function MetricPill({ label, value, accent }: { label: string; value: string | n
 function MetricCompare({ label, start, now, suffix = "", accent }: {
   label: string; start: number | null; now: number | null; suffix?: string; accent?: string;
 }) {
-  const P = theme.colors.primary;
+  const { P, CARD, BDR, TXT, TXT2 } = useColors();
   const col = accent ?? P;
   const diff = (now ?? 0) - (start ?? 0);
   const up = diff > 0;
@@ -98,33 +99,33 @@ function MetricCompare({ label, start, now, suffix = "", accent }: {
     <div style={{
       display: "flex", flexDirection: "column", gap: 6,
       padding: "14px 16px", borderRadius: 10,
-      background: theme.colors.background,
-      border: `1px solid ${theme.colors.border}`,
+      background: CARD,
+      border: `1px solid ${BDR}`,
     }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: theme.colors.textLight, textTransform: "uppercase", letterSpacing: "0.07em" }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.07em" }}>
         {label}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 11, color: theme.colors.textLight, marginBottom: 2 }}>Start</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: theme.colors.textDark }}>
+          <div style={{ fontSize: 11, color: TXT2, marginBottom: 2 }}>Start</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: TXT }}>
             {start === null ? "—" : `${start}${suffix}`}
           </div>
         </div>
-        <div style={{ flex: 1, height: 1, background: theme.colors.border, position: "relative" }}>
+        <div style={{ flex: 1, height: 1, background: BDR, position: "relative" }}>
           <div style={{
             position: "absolute", top: "50%", left: "50%",
             transform: "translate(-50%,-50%)",
             fontSize: 10, fontWeight: 700,
-            color: diff === 0 ? theme.colors.textLight : up ? "#00C172" : "#FF5A5A",
-            background: theme.colors.background, padding: "1px 4px", borderRadius: 3,
+            color: diff === 0 ? TXT2 : up ? "#00C172" : "#FF5A5A",
+            background: CARD, padding: "1px 4px", borderRadius: 3,
             whiteSpace: "nowrap",
           }}>
             {diff === 0 ? "=" : up ? `+${diff}${suffix}` : `${diff}${suffix}`}
           </div>
         </div>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 11, color: theme.colors.textLight, marginBottom: 2 }}>Now</div>
+          <div style={{ fontSize: 11, color: TXT2, marginBottom: 2 }}>Now</div>
           <div style={{ fontSize: 18, fontWeight: 700, color: col }}>
             {now === null ? "—" : `${now}${suffix}`}
           </div>
@@ -135,6 +136,7 @@ function MetricCompare({ label, start, now, suffix = "", accent }: {
 }
 
 function MomentDot({ moment }: { moment: StoryMoment }) {
+  const { TXT, TXT2 } = useColors();
   const TYPE_COLOR: Record<string, string> = {
     "project-created":        "#7B2FF7",
     "requirements-generated": "#448AFF",
@@ -147,7 +149,7 @@ function MomentDot({ moment }: { moment: StoryMoment }) {
     "coverage-milestone":     "#00C172",
     "re-crawl":               "#448AFF",
   };
-  const col = TYPE_COLOR[moment.type] ?? theme.colors.primary;
+  const col = TYPE_COLOR[moment.type] ?? "#7B2FF7";
   const date = new Date(moment.timestamp);
   const dateStr = `${date.toLocaleDateString(undefined, { month: "short", day: "numeric" })} ${date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}`;
 
@@ -162,11 +164,11 @@ function MomentDot({ moment }: { moment: StoryMoment }) {
         }} />
       </div>
       <div style={{ paddingBottom: 14 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: theme.colors.textDark }}>{moment.title}</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: TXT }}>{moment.title}</div>
         {moment.description && (
-          <div style={{ fontSize: 12, color: theme.colors.textLight, marginTop: 2 }}>{moment.description}</div>
+          <div style={{ fontSize: 12, color: TXT2, marginTop: 2 }}>{moment.description}</div>
         )}
-        <div style={{ fontSize: 11, color: theme.colors.textLight, marginTop: 3, opacity: 0.7 }}>{dateStr}</div>
+        <div style={{ fontSize: 11, color: TXT2, marginTop: 3, opacity: 0.7 }}>{dateStr}</div>
       </div>
     </div>
   );
@@ -187,6 +189,7 @@ function HighlightChip({ text, accent }: { text: string; accent: string }) {
 }
 
 function ChapterCard({ chapter, index }: { chapter: StoryChapter; index: number }) {
+  const { CARD, TXT, TXT2 } = useColors();
   const [open, setOpen] = useState(index === 0);
   const tc = themeColor(chapter.theme);
   const from = new Date(chapter.period.from);
@@ -197,7 +200,7 @@ function ChapterCard({ chapter, index }: { chapter: StoryChapter; index: number 
     <div style={{
       borderRadius: 12,
       border: `1px solid ${tc.border}`,
-      background: theme.colors.background,
+      background: CARD,
       overflow: "hidden",
     }}>
       {/* Header */}
@@ -224,7 +227,7 @@ function ChapterCard({ chapter, index }: { chapter: StoryChapter; index: number 
 
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 14, fontWeight: 700, color: theme.colors.textDark }}>{chapter.title}</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: TXT }}>{chapter.title}</span>
             <span style={{
               fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10,
               background: `${tc.accent}18`, color: tc.accent, letterSpacing: "0.06em",
@@ -232,7 +235,7 @@ function ChapterCard({ chapter, index }: { chapter: StoryChapter; index: number 
               {tc.label.toUpperCase()}
             </span>
           </div>
-          <div style={{ fontSize: 12, color: theme.colors.textLight, marginTop: 2 }}>{dateRange}</div>
+          <div style={{ fontSize: 12, color: TXT2, marginTop: 2 }}>{dateRange}</div>
         </div>
 
         {/* Highlights preview (collapsed) */}
@@ -251,7 +254,7 @@ function ChapterCard({ chapter, index }: { chapter: StoryChapter; index: number 
         <svg width={14} height={14} viewBox="0 0 14 14" fill="none" style={{
           flexShrink: 0, transition: "transform 0.2s",
           transform: open ? "rotate(180deg)" : "rotate(0deg)",
-          color: theme.colors.textLight,
+          color: TXT2,
         }}>
           <path d="M2 5l5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
@@ -262,7 +265,7 @@ function ChapterCard({ chapter, index }: { chapter: StoryChapter; index: number 
         <div style={{ padding: "20px 24px", borderTop: `1px solid ${tc.border}` }}>
           {/* Narrative */}
           <p style={{
-            fontSize: 14, lineHeight: 1.75, color: theme.colors.textDark,
+            fontSize: 14, lineHeight: 1.75, color: TXT,
             margin: "0 0 20px",
           }}>
             {chapter.narrative}
@@ -303,7 +306,7 @@ function ChapterCard({ chapter, index }: { chapter: StoryChapter; index: number 
           {/* Key moments */}
           {chapter.keyMoments.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: theme.colors.textLight, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
                 Key Moments
               </div>
               <div style={{ borderLeft: `2px solid ${tc.border}`, paddingLeft: 16 }}>
@@ -331,12 +334,7 @@ export default function StoryPage({ projectId }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError]       = useState<string | null>(null);
 
-  const P    = theme.colors.primary;
-  const BG   = theme.colors.background;
-  const BDR  = theme.colors.border;
-  const TXT  = theme.colors.textDark;
-  const TXT2 = theme.colors.textLight;
-  const CARD = theme.colors.card ?? theme.colors.background;
+  const { P, CARD, BDR, TXT, TXT2, BG } = useColors();
 
   const load = useCallback(async (refresh = false) => {
     if (refresh) setRefreshing(true);

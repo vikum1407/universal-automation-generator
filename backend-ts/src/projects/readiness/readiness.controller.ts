@@ -2,6 +2,7 @@ import { Controller, Get, Param, Query } from "@nestjs/common";
 import * as fs from "fs";
 import * as path from "path";
 import { InsightEngine } from "../insights/insights.engine";
+import { PrismaService } from "../../../prisma/prisma.service";
 
 const BASE = "./qlitz-output";
 
@@ -338,6 +339,144 @@ export class ReadinessController {
       },
       openCriticalInsights,
       openHighInsights,
+    };
+  }
+}
+
+// ─── Org-scoped readiness (aggregated across all projects) ─────────────────────
+
+interface OrgProjectSummary {
+  projectId: string;
+  name: string;
+  type: string;
+  url: string | null;
+  status: ReadinessStatus;
+  overallScore: number;
+  gatesPassed: number;
+  gatesTotal: number;
+  criticalBlockers: number;
+  coveragePct: number | null;
+  stabilityPct: number | null;
+  totalRequirements: number;
+  generatedAt: string;
+}
+
+interface OrgReadinessReport {
+  totalProjects: number;
+  readyCount: number;
+  atRiskCount: number;
+  notReadyCount: number;
+  averageScore: number;
+  totalCriticalBlockers: number;
+  projects: OrgProjectSummary[];
+  generatedAt: string;
+}
+
+@Controller("org/readiness")
+export class OrgReadinessController {
+  constructor(private readonly prisma: PrismaService) {}
+
+  @Get()
+  async assess(): Promise<OrgReadinessReport> {
+    const projects = await this.prisma.project.findMany({
+      orderBy: { createdAt: "desc" },
+    }).catch(() => []);
+
+    const summaries: OrgProjectSummary[] = await Promise.all(
+      projects.map(p => this.summarize(p))
+    );
+
+    const ready    = summaries.filter(s => s.status === "ready").length;
+    const atRisk   = summaries.filter(s => s.status === "at-risk").length;
+    const notReady = summaries.filter(s => s.status === "not-ready").length;
+    const totalCritical = summaries.reduce((acc, s) => acc + s.criticalBlockers, 0);
+    const avgScore = summaries.length > 0
+      ? Math.round(summaries.reduce((acc, s) => acc + s.overallScore, 0) / summaries.length)
+      : 0;
+
+    return {
+      totalProjects:        summaries.length,
+      readyCount:           ready,
+      atRiskCount:          atRisk,
+      notReadyCount:        notReady,
+      averageScore:         avgScore,
+      totalCriticalBlockers: totalCritical,
+      projects:             summaries,
+      generatedAt:          new Date().toISOString(),
+    };
+  }
+
+  private async summarize(project: any): Promise<OrgProjectSummary> {
+    const pid = project.id;
+    const dir = path.join(BASE, pid);
+
+    const rtm         = loadJson<any>(path.join(dir, "rtm.json"));
+    const testResults = loadJson<any>(path.join(dir, "test-results.json"));
+    const reqs: any[] = rtm?.requirements ?? [];
+
+    const specDir    = path.join(dir, "tests");
+    const rootSpecs  = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith(".spec.ts")) : [];
+    const subSpecs   = fs.existsSync(specDir) ? fs.readdirSync(specDir).filter(f => f.endsWith(".spec.ts")) : [];
+    const totalTests = rootSpecs.length + subSpecs.length;
+
+    const coveredReqs = reqs.filter(r => r.coveredBy?.length > 0).length;
+    const reqPct      = reqs.length > 0 ? coveredReqs / reqs.length : null;
+
+    const criticalReqs    = reqs.filter(r => r.businessPriority === "critical" || r.riskLevel === "high");
+    const coveredCritical = criticalReqs.filter(r => r.coveredBy?.length > 0).length;
+    const criticalPct     = criticalReqs.length > 0 ? coveredCritical / criticalReqs.length : 1.0;
+    const highRiskUncov   = reqs.filter(r => !r.coveredBy?.length && (r.riskLevel === "high" || r.businessPriority === "critical")).length;
+
+    const failedTests = testResults?.failures?.length ?? (testResults?.status === "failed" ? 1 : 0);
+    const passedTests = Math.max(totalTests - failedTests, 0);
+    const passRate    = totalTests > 0 ? passedTests / totalTests : null;
+    const failureRate = totalTests > 0 ? failedTests / totalTests : 0;
+
+    let openCritical = 0;
+    try {
+      const engine = new InsightEngine();
+      const open   = engine.list(pid, { statuses: ["open", "in-progress"] });
+      openCritical = open.filter(i => i.severity === "critical").length;
+    } catch {}
+
+    // Gates (subset — just the status-determining ones)
+    const gateResults = [
+      criticalPct >= POLICY.coverageCriticalRequirements || criticalReqs.length === 0, // critical coverage
+      reqPct === null || reqPct >= POLICY.coverageOverall,                              // overall coverage
+      totalTests === 0 || failureRate <= POLICY.maxFailureRate,                         // failure rate
+      passRate === null || passRate >= POLICY.minPassRate,                              // pass rate
+      openCritical <= POLICY.maxOpenCriticalInsights,                                   // no critical insights
+      highRiskUncov === 0,                                                               // no high-risk gaps
+    ];
+    const criticalGateResults = [gateResults[0], gateResults[4]]; // critical gates
+    const gatesPassed = gateResults.filter(Boolean).length;
+    const criticalBlockers = criticalGateResults.filter(r => !r).length + openCritical;
+
+    const coverageScore  = clamp((reqPct ?? 0) * 100);
+    const riskScore      = clamp((1 - highRiskUncov / Math.max(reqs.length, 1)) * 100);
+    const stabilityScore = clamp((passRate ?? 0.5) * 100);
+    const overallScore   = clamp(coverageScore * 0.40 + riskScore * 0.35 + stabilityScore * 0.25);
+
+    const criticalFail    = !gateResults[0] || !gateResults[4];
+    const nonCriticalFail = gateResults.some(r => !r);
+    const status: ReadinessStatus = criticalFail ? "not-ready" : nonCriticalFail ? "at-risk" : "ready";
+
+    const name = (project.name ?? project.url ?? project.swaggerUrl ?? pid) as string;
+
+    return {
+      projectId:         pid,
+      name:              typeof name === "string" ? name : pid,
+      type:              project.type ?? "ui",
+      url:               project.url ?? project.swaggerUrl ?? null,
+      status,
+      overallScore,
+      gatesPassed,
+      gatesTotal:        gateResults.length,
+      criticalBlockers,
+      coveragePct:       reqPct !== null ? clamp(reqPct * 100) : null,
+      stabilityPct:      passRate !== null ? clamp(passRate * 100) : null,
+      totalRequirements: reqs.length,
+      generatedAt:       new Date().toISOString(),
     };
   }
 }

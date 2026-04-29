@@ -1,4 +1,4 @@
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 
 const COLS = [
   { label: "ID", width: 110 },
@@ -12,9 +12,8 @@ const COLS = [
 ];
 
 export default function RTMTableHeader() {
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const headerBg = isDark ? "#1A1A2E" : "#F5EEFF";
+  const { BDR: border, P, dark } = useColors();
+  const headerBg = dark ? "#1A1A2E" : "#F5EEFF";
 
   return (
     <thead>
@@ -26,7 +25,7 @@ export default function RTMTableHeader() {
               padding: "11px 12px",
               borderBottom: `1px solid ${border}`,
               textAlign: "left",
-              color: theme.colors.primary,
+              color: P,
               fontWeight: 700,
               fontSize: 11,
               letterSpacing: "0.05em",

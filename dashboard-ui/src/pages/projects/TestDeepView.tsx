@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { TestItem } from "@/api/tests";
 import { STATUS_COLOR, TYPE_COLOR } from "@/api/tests";
 
@@ -15,15 +15,14 @@ function Badge({ label, color }: { label: string; color: string }) {
 }
 
 function ScoreBar({ label, value, color }: { label: string; value: number; color: string }) {
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { TXT2: textLight, dark } = useColors();
   return (
     <div style={{ marginBottom: 8 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
         <span style={{ fontSize: 11, color: textLight }}>{label}</span>
         <span style={{ fontSize: 11, fontWeight: 700, color }}>{value}%</span>
       </div>
-      <div style={{ height: 5, borderRadius: 3, background: isDark ? "#333" : "#eee" }}>
+      <div style={{ height: 5, borderRadius: 3, background: dark ? "#333" : "#eee" }}>
         <div style={{ height: "100%", width: `${value}%`, background: color, borderRadius: 3, transition: "width 0.4s" }} />
       </div>
     </div>
@@ -57,13 +56,9 @@ export default function TestDeepView({ test, actionLoadingId, onClose, onAction 
 
   if (!test) return null;
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? theme.colors.darkBackground : "#f5f5f8";
-  const codeBg = isDark ? "#0d0d1a" : "#fff";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, dark } = useColors();
+  const bg = dark ? "#1a1a2e" : "#f5f5f8";
+  const codeBg = dark ? "#0d0d1a" : "#fff";
 
   const statusColor = STATUS_COLOR[test.status];
   const typeColor = TYPE_COLOR[test.type] ?? "#888";
@@ -101,7 +96,7 @@ export default function TestDeepView({ test, actionLoadingId, onClose, onAction 
               cursor: "pointer", fontSize: 17, color: textLight, padding: "2px 6px",
             }}>✕</button>
           </div>
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: theme.colors.primary, lineHeight: 1.4 }}>
+          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: P, lineHeight: 1.4 }}>
             {test.name}
           </h3>
           <div style={{ fontSize: 11, color: textLight, marginTop: 4, fontFamily: "monospace" }}>
@@ -131,7 +126,7 @@ export default function TestDeepView({ test, actionLoadingId, onClose, onAction 
             ].map(({ label, value }) => (
               <div key={label} style={{ padding: "10px 12px", borderRadius: 8, background: bg }}>
                 <div style={{ fontSize: 10, color: textLight, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: theme.colors.primary, marginTop: 2 }}>{value}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: P, marginTop: 2 }}>{value}</div>
               </div>
             ))}
           </div>
@@ -227,7 +222,7 @@ export default function TestDeepView({ test, actionLoadingId, onClose, onAction 
                       padding: "10px 16px", borderRadius: 10,
                       border: action.primary ? "none" : `1px solid ${border}`,
                       background: action.primary
-                        ? (isThisLoading ? "#9e7de0" : theme.colors.primary)
+                        ? (isThisLoading ? "#9e7de0" : P)
                         : "transparent",
                       color: action.primary ? "#fff" : text,
                       fontWeight: 600, fontSize: 13,
@@ -247,9 +242,9 @@ export default function TestDeepView({ test, actionLoadingId, onClose, onAction 
             {isLoading && (
               <div style={{
                 marginTop: 10, padding: "9px 12px", borderRadius: 8,
-                background: `${theme.colors.primary}15`,
-                border: `1px solid ${theme.colors.primary}33`,
-                fontSize: 12, color: theme.colors.primary, fontWeight: 500,
+                background: `${P}15`,
+                border: `1px solid ${P}33`,
+                fontSize: 12, color: P, fontWeight: 500,
               }}>
                 ⏳ Processing… please wait.
               </div>

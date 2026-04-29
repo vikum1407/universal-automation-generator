@@ -1,4 +1,5 @@
 import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import {
@@ -13,13 +14,16 @@ import { useNavigate } from "react-router-dom";
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
 
-const P = theme.colors.primary;
-const BDR = theme.colors.border;
-const BG = theme.colors.background;
-const TXT = theme.colors.textDark;
-const TXT2 = theme.colors.textLight;
+function makeInputStyle(TXT: string, BDR: string): React.CSSProperties {
+  return {
+    width: "100%", padding: "8px 12px", fontSize: 13, color: TXT,
+    background: "transparent", border: `1px solid ${BDR}`, borderRadius: theme.radii.md,
+    outline: "none", boxSizing: "border-box",
+  };
+}
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  const { BG, BDR } = useColors();
   return (
     <div style={{
       background: BG, border: `1px solid ${BDR}`,
@@ -32,14 +36,17 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
+  const { P } = useColors();
   return <h3 style={{ color: P, margin: "0 0 16px", fontSize: 15, fontWeight: 700 }}>{children}</h3>;
 }
 
 function Label({ children }: { children: React.ReactNode }) {
+  const { TXT2 } = useColors();
   return <div style={{ fontSize: 12, color: TXT2, fontWeight: 600, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>{children}</div>;
 }
 
 function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
+  const { TXT2 } = useColors();
   return (
     <div style={{ marginBottom: 18 }}>
       <Label>{label}</Label>
@@ -49,35 +56,32 @@ function Field({ label, children, hint }: { label: string; children: React.React
   );
 }
 
-const inputStyle: React.CSSProperties = {
-  width: "100%", padding: "8px 12px", fontSize: 13, color: TXT,
-  background: "#fff", border: `1px solid ${BDR}`, borderRadius: theme.radii.md,
-  outline: "none", boxSizing: "border-box",
-};
-
-const selectStyle: React.CSSProperties = { ...inputStyle, cursor: "pointer" };
-
 function Input({ value, onChange, placeholder, type = "text" }: { value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
-  return <input style={inputStyle} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} type={type} />;
+  const { TXT, BDR } = useColors();
+  return <input style={makeInputStyle(TXT, BDR)} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} type={type} />;
 }
 
 function NumberInput({ value, onChange, min, max }: { value: number; onChange: (v: number) => void; min?: number; max?: number }) {
-  return <input style={{ ...inputStyle, width: 120 }} type="number" value={value} onChange={e => onChange(Number(e.target.value))} min={min} max={max} />;
+  const { TXT, BDR } = useColors();
+  return <input style={{ ...makeInputStyle(TXT, BDR), width: 120 }} type="number" value={value} onChange={e => onChange(Number(e.target.value))} min={min} max={max} />;
 }
 
 function Textarea({ value, onChange, placeholder, rows = 3 }: { value: string; onChange: (v: string) => void; placeholder?: string; rows?: number }) {
-  return <textarea style={{ ...inputStyle, resize: "vertical" }} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows} />;
+  const { TXT, BDR } = useColors();
+  return <textarea style={{ ...makeInputStyle(TXT, BDR), resize: "vertical" }} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows} />;
 }
 
 function Select({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+  const { TXT, BDR } = useColors();
   return (
-    <select style={selectStyle} value={value} onChange={e => onChange(e.target.value)}>
+    <select style={{ ...makeInputStyle(TXT, BDR), cursor: "pointer" }} value={value} onChange={e => onChange(e.target.value)}>
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
   );
 }
 
 function Toggle({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) {
+  const { P, TXT } = useColors();
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
       <button
@@ -100,6 +104,7 @@ function Toggle({ value, onChange, label }: { value: boolean; onChange: (v: bool
 }
 
 function SaveButton({ onClick, saving }: { onClick: () => void; saving: boolean }) {
+  const { P } = useColors();
   return (
     <button
       onClick={onClick}
@@ -116,6 +121,7 @@ function SaveButton({ onClick, saving }: { onClick: () => void; saving: boolean 
 }
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  const { P } = useColors();
   return (
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 4,
@@ -149,6 +155,8 @@ const NAV_ITEMS: { id: SettingsSection; label: string; icon: string }[] = [
 // ─── Section: General ─────────────────────────────────────────────────────────
 
 function GeneralSection({ settings, projectId, onChange }: { settings: ProjectSettings; projectId: string; onChange: (s: ProjectSettings) => void }) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
+  const inputStyle = makeInputStyle(TXT, BDR);
   const [saving, setSaving] = useState(false);
   const g = settings.general;
   const [tagInput, setTagInput] = useState("");
@@ -241,6 +249,9 @@ function GeneralSection({ settings, projectId, onChange }: { settings: ProjectSe
 // ─── Section: Environments ────────────────────────────────────────────────────
 
 function EnvironmentsSection({ settings, projectId, onChange }: { settings: ProjectSettings; projectId: string; onChange: (s: ProjectSettings) => void }) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
+  const inputStyle = makeInputStyle(TXT, BDR);
+  const selectStyle = { ...inputStyle, cursor: "pointer" } as React.CSSProperties;
   const [editing, setEditing] = useState<EnvironmentConfig | null>(null);
   const [saving, setSaving] = useState(false);
   const [adding, setAdding] = useState(false);
@@ -311,7 +322,7 @@ function EnvironmentsSection({ settings, projectId, onChange }: { settings: Proj
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => setEditing(env)} style={{ padding: "5px 12px", border: `1px solid ${BDR}`, borderRadius: theme.radii.md, background: BG, cursor: "pointer", fontSize: 13, color: TXT }}>Edit</button>
-              <button onClick={() => handleDelete(env.id)} style={{ padding: "5px 12px", border: `1px solid ${theme.colors.danger}40`, borderRadius: theme.radii.md, background: "transparent", cursor: "pointer", fontSize: 13, color: theme.colors.danger }}>Delete</button>
+              <button onClick={() => handleDelete(env.id)} style={{ padding: "5px 12px", border: `1px solid ${"#EF5350"}40`, borderRadius: theme.radii.md, background: "transparent", cursor: "pointer", fontSize: 13, color: "#EF5350" }}>Delete</button>
             </div>
           </div>
         </Card>
@@ -388,6 +399,7 @@ function EnvironmentsSection({ settings, projectId, onChange }: { settings: Proj
 // ─── Section: Scanning & Pipelines ───────────────────────────────────────────
 
 function ScanningSection({ settings, projectId, onChange }: { settings: ProjectSettings; projectId: string; onChange: (s: ProjectSettings) => void }) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
   const [saving, setSaving] = useState(false);
   const sc = settings.scanning;
 
@@ -450,6 +462,7 @@ function ScanningSection({ settings, projectId, onChange }: { settings: ProjectS
 // ─── Section: Testing & Execution ────────────────────────────────────────────
 
 function TestingSection({ settings, projectId, onChange }: { settings: ProjectSettings; projectId: string; onChange: (s: ProjectSettings) => void }) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
   const [saving, setSaving] = useState(false);
   const t = settings.testing;
   function set(patch: Partial<typeof t>) { onChange({ ...settings, testing: { ...t, ...patch } }); }
@@ -516,6 +529,7 @@ function TestingSection({ settings, projectId, onChange }: { settings: ProjectSe
 // ─── Section: AI & Automation ─────────────────────────────────────────────────
 
 function AISection({ settings, projectId, onChange }: { settings: ProjectSettings; projectId: string; onChange: (s: ProjectSettings) => void }) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
   const [saving, setSaving] = useState(false);
   const ai = settings.ai;
   function set(patch: Partial<typeof ai>) { onChange({ ...settings, ai: { ...ai, ...patch } }); }
@@ -583,6 +597,8 @@ function AISection({ settings, projectId, onChange }: { settings: ProjectSetting
 // ─── Section: Integrations ────────────────────────────────────────────────────
 
 function IntegrationsSection({ settings, projectId, onChange }: { settings: ProjectSettings; projectId: string; onChange: (s: ProjectSettings) => void }) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
+  const inputStyle = makeInputStyle(TXT, BDR);
   const [saving, setSaving] = useState(false);
   const intg = settings.integrations;
   const [whName, setWhName] = useState(""); const [whUrl, setWhUrl] = useState("");
@@ -667,7 +683,7 @@ function IntegrationsSection({ settings, projectId, onChange }: { settings: Proj
               <div style={{ fontSize: 13, fontWeight: 600, color: TXT }}>{wh.name}</div>
               <div style={{ fontSize: 12, color: TXT2 }}>{wh.url}</div>
             </div>
-            <button onClick={() => handleDeleteWebhook(wh.id)} style={{ padding: "4px 10px", border: `1px solid ${theme.colors.danger}40`, borderRadius: theme.radii.md, background: "transparent", color: theme.colors.danger, cursor: "pointer", fontSize: 12 }}>Remove</button>
+            <button onClick={() => handleDeleteWebhook(wh.id)} style={{ padding: "4px 10px", border: `1px solid ${"#EF5350"}40`, borderRadius: theme.radii.md, background: "transparent", color: "#EF5350", cursor: "pointer", fontSize: 12 }}>Remove</button>
           </div>
         ))}
         <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
@@ -685,6 +701,9 @@ function IntegrationsSection({ settings, projectId, onChange }: { settings: Proj
 // ─── Section: Access Control ──────────────────────────────────────────────────
 
 function AccessSection({ settings, projectId, onChange }: { settings: ProjectSettings; projectId: string; onChange: (s: ProjectSettings) => void }) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
+  const inputStyle = makeInputStyle(TXT, BDR);
+  const selectStyle = { ...inputStyle, cursor: "pointer" } as React.CSSProperties;
   const [saving, setSaving] = useState(false);
   const ac = settings.access;
   const [email, setEmail] = useState(""); const [role, setRole] = useState<AccessRole["role"]>("developer");
@@ -743,7 +762,7 @@ function AccessSection({ settings, projectId, onChange }: { settings: ProjectSet
               <select style={{ ...selectStyle, width: 130, fontSize: 12, padding: "4px 8px" }} value={r.role} onChange={e => handleRoleChange(r.id, e.target.value as any)}>
                 {(Object.keys(ROLE_LABEL) as AccessRole["role"][]).map(rl => <option key={rl} value={rl}>{ROLE_LABEL[rl]}</option>)}
               </select>
-              <button onClick={() => handleRemove(r.id)} style={{ padding: "4px 10px", border: `1px solid ${theme.colors.danger}40`, borderRadius: theme.radii.md, background: "transparent", color: theme.colors.danger, cursor: "pointer", fontSize: 12 }}>Remove</button>
+              <button onClick={() => handleRemove(r.id)} style={{ padding: "4px 10px", border: `1px solid ${"#EF5350"}40`, borderRadius: theme.radii.md, background: "transparent", color: "#EF5350", cursor: "pointer", fontSize: 12 }}>Remove</button>
             </div>
           </div>
         ))}
@@ -763,6 +782,8 @@ function AccessSection({ settings, projectId, onChange }: { settings: ProjectSet
 // ─── Section: Data & Privacy ──────────────────────────────────────────────────
 
 function DataSection({ settings, projectId, onChange }: { settings: ProjectSettings; projectId: string; onChange: (s: ProjectSettings) => void }) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
+  const inputStyle = makeInputStyle(TXT, BDR);
   const [saving, setSaving] = useState(false);
   const d = settings.data;
   const [ruleInput, setRuleInput] = useState("");
@@ -817,6 +838,7 @@ function DataSection({ settings, projectId, onChange }: { settings: ProjectSetti
 // ─── Section: Notifications ───────────────────────────────────────────────────
 
 function NotificationsSection({ settings, projectId, onChange }: { settings: ProjectSettings; projectId: string; onChange: (s: ProjectSettings) => void }) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
   const [saving, setSaving] = useState(false);
   const n = settings.notifications;
   function set(p: Partial<typeof n>) { onChange({ ...settings, notifications: { ...n, ...p } }); }
@@ -887,6 +909,7 @@ function NotificationsSection({ settings, projectId, onChange }: { settings: Pro
 // ─── Section: Appearance ──────────────────────────────────────────────────────
 
 function AppearanceSection({ settings, projectId, onChange }: { settings: ProjectSettings; projectId: string; onChange: (s: ProjectSettings) => void }) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
   const [saving, setSaving] = useState(false);
   const ap = settings.appearance;
   function set(p: Partial<typeof ap>) { onChange({ ...settings, appearance: { ...ap, ...p } }); }
@@ -956,6 +979,7 @@ function AppearanceSection({ settings, projectId, onChange }: { settings: Projec
 // ─── Danger Zone ──────────────────────────────────────────────────────────────
 
 function DangerZone({ projectId }: { projectId: string }) {
+  const { TXT, TXT2 } = useColors();
   const navigate = useNavigate();
 
   async function handleDelete() {
@@ -967,7 +991,7 @@ function DangerZone({ projectId }: { projectId: string }) {
   }
 
   return (
-    <Card style={{ border: `1px solid ${theme.colors.danger}40` }}>
+    <Card style={{ border: `1px solid ${"#EF5350"}40` }}>
       <SectionTitle>Danger Zone</SectionTitle>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
@@ -975,7 +999,7 @@ function DangerZone({ projectId }: { projectId: string }) {
           <div style={{ fontSize: 12, color: TXT2 }}>Permanently remove this project, all its tests, history, and settings.</div>
         </div>
         <button onClick={handleDelete}
-          style={{ padding: "8px 18px", background: theme.colors.danger, color: "#fff", border: "none", borderRadius: theme.radii.md, cursor: "pointer", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
+          style={{ padding: "8px 18px", background: "#EF5350", color: "#fff", border: "none", borderRadius: theme.radii.md, cursor: "pointer", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
           Delete Project
         </button>
       </div>
@@ -991,6 +1015,7 @@ interface SettingsProps {
 }
 
 export default function Settings({ project }: SettingsProps) {
+  const { P, BDR, BG, TXT, TXT2 } = useColors();
   const [active, setActive] = useState<SettingsSection>("general");
   const [settings, setSettings] = useState<ProjectSettings | null>(null);
   const [loading, setLoading] = useState(true);

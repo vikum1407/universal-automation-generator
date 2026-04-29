@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Loader from "../../components/Loader";
 import EmptyState from "../../components/EmptyState";
-import { theme } from "../../theme";
+import { useColors } from "../../hooks/useColors";
 
 const API_BASE = "http://localhost:3000";
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
 const TYPE_COLOR: Record<string, string> = { ui: "#9C27B0", api: "#448AFF" };
 const STATUS_COLOR: Record<string, string> = {
   ready: "#00C853", processing: "#FFA726", failed: "#EF5350",
@@ -23,10 +22,7 @@ function RenameModal({
   project, onClose, onSave,
 }: { project: any; onClose: () => void; onSave: (name: string) => void }) {
   const [value, setValue] = useState(project.name || "");
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { CARD: surface, BDR: border, TXT: text, P } = useColors();
 
   const submit = () => {
     const trimmed = value.trim();
@@ -45,7 +41,7 @@ function RenameModal({
         boxShadow: "0 8px 40px rgba(0,0,0,0.25)",
         display: "flex", flexDirection: "column", gap: 16,
       }}>
-        <div style={{ fontSize: 16, fontWeight: 700, color: theme.colors.primary }}>
+        <div style={{ fontSize: 16, fontWeight: 700, color: P }}>
           Rename Project
         </div>
         <input
@@ -56,7 +52,7 @@ function RenameModal({
           placeholder="Enter project name…"
           style={{
             padding: "10px 14px", borderRadius: 8, fontSize: 14,
-            border: `1px solid ${border}`, background: isDark ? "#111" : "#fff",
+            border: `1px solid ${border}`, background: surface,
             color: text, outline: "none", width: "100%", boxSizing: "border-box",
           }}
         />
@@ -73,7 +69,7 @@ function RenameModal({
             disabled={!value.trim()}
             style={{
               padding: "8px 18px", borderRadius: 8, border: "none",
-              background: value.trim() ? theme.colors.primary : "#ccc",
+              background: value.trim() ? P : "#ccc",
               color: "#fff", cursor: value.trim() ? "pointer" : "not-allowed",
               fontSize: 13, fontWeight: 700,
             }}
@@ -88,11 +84,7 @@ function RenameModal({
 function DeleteModal({
   project, onClose, onConfirm,
 }: { project: any; onClose: () => void; onConfirm: () => void }) {
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight } = useColors();
 
   return (
     <div style={{
@@ -145,10 +137,7 @@ function DotsMenu({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? "#1E1E2E" : "#fff";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, dark } = useColors();
 
   useEffect(() => {
     if (!open) return;
@@ -173,7 +162,7 @@ function DotsMenu({
       }}
       onMouseEnter={e => {
         (e.currentTarget as HTMLButtonElement).style.background =
-          danger ? "#EF535015" : (isDark ? "#2A1A40" : "#F5EEFF");
+          danger ? "#EF535015" : (dark ? "#2A1A40" : "#F5EEFF");
       }}
       onMouseLeave={e => {
         (e.currentTarget as HTMLButtonElement).style.background = "transparent";
@@ -190,23 +179,21 @@ function DotsMenu({
         onClick={e => { e.stopPropagation(); setOpen(v => !v); }}
         style={{
           width: 32, height: 32, borderRadius: 8, border: `1px solid ${border}`,
-          background: open ? (isDark ? "#2A1A40" : "#EDE4FF") : "transparent",
-          color: open ? theme.colors.primary : (isDark ? theme.colors.darkTextLight : theme.colors.textLight),
+          background: open ? (dark ? "#2A1A40" : "#EDE4FF") : "transparent",
+          color: open ? P : textLight,
           cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center",
           justifyContent: "center", transition: "all 0.12s", fontWeight: 700,
         }}
         onMouseEnter={e => {
           if (!open) {
-            (e.currentTarget as HTMLButtonElement).style.background =
-              isDark ? "#2A1A40" : "#EDE4FF";
-            (e.currentTarget as HTMLButtonElement).style.color = theme.colors.primary;
+            (e.currentTarget as HTMLButtonElement).style.background = dark ? "#2A1A40" : "#EDE4FF";
+            (e.currentTarget as HTMLButtonElement).style.color = P;
           }
         }}
         onMouseLeave={e => {
           if (!open) {
             (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-            (e.currentTarget as HTMLButtonElement).style.color =
-              isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+            (e.currentTarget as HTMLButtonElement).style.color = textLight;
           }
         }}
         title="More options"
@@ -239,11 +226,7 @@ function ProjectCard({
   onPin: () => void; onRename: () => void; onDelete: () => void;
 }) {
   const navigate = useNavigate();
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P } = useColors();
 
   const typeColor = TYPE_COLOR[project.type] ?? "#888";
   const statusColor = STATUS_COLOR[project.status] ?? "#888";
@@ -259,7 +242,7 @@ function ProjectCard({
         borderRadius: 16,
         background: surface,
         border: `1px solid ${border}`,
-        boxShadow: theme.shadow.card,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
         cursor: "pointer",
         position: "relative",
         transition: "box-shadow 0.15s ease, transform 0.15s ease",
@@ -272,19 +255,14 @@ function ProjectCard({
       }}
       onMouseLeave={e => {
         const el = e.currentTarget as HTMLDivElement;
-        el.style.boxShadow = theme.shadow.card;
+        el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
         el.style.transform = "translateY(0)";
       }}
     >
-      {/* Pin indicator */}
       {project.pinned && (
-        <div
-          title="Pinned"
-          style={{ position: "absolute", top: 12, right: 12, fontSize: 14 }}
-        >📌</div>
+        <div title="Pinned" style={{ position: "absolute", top: 12, right: 12, fontSize: 14 }}>📌</div>
       )}
 
-      {/* Type badge + title */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
         <span style={{
           padding: "2px 9px", borderRadius: 6, fontSize: 11, fontWeight: 700,
@@ -292,7 +270,7 @@ function ProjectCard({
         }}>{project.type.toUpperCase()}</span>
       </div>
 
-      <div style={{ fontSize: 16, fontWeight: 700, color: theme.colors.primary, marginBottom: 4, paddingRight: 28 }}>
+      <div style={{ fontSize: 16, fontWeight: 700, color: P, marginBottom: 4, paddingRight: 28 }}>
         {project.name}
       </div>
 
@@ -305,7 +283,6 @@ function ProjectCard({
         </div>
       )}
 
-      {/* Stats */}
       <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
           <span style={{
@@ -338,7 +315,6 @@ function ProjectCard({
         )}
       </div>
 
-      {/* Footer: Open button + 3-dots */}
       <div
         style={{ display: "flex", alignItems: "center", gap: 8, marginTop: "auto" }}
         onClick={e => e.stopPropagation()}
@@ -347,7 +323,7 @@ function ProjectCard({
           onClick={open}
           style={{
             flex: 1, padding: "9px 0", borderRadius: 10, border: "none",
-            background: theme.colors.primary, color: "#fff",
+            background: P, color: "#fff",
             fontWeight: 700, fontSize: 13, cursor: "pointer",
             transition: "opacity 0.12s",
           }}
@@ -375,19 +351,16 @@ export default function ProjectsList() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Modal state
   const [renameTarget, setRenameTarget] = useState<any>(null);
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
 
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { TXT2: textLight, P } = useColors();
 
   const load = async () => {
     try {
       const res = await fetch(`${API_BASE}/projects`);
       const data: any[] = await res.json();
 
-      // Enrich each project with analytics (coverage, tests, lastRun) in parallel
       const enriched = await Promise.all(
         data.map(async p => {
           try {
@@ -412,7 +385,6 @@ export default function ProjectsList() {
 
   const pin = async (project: any) => {
     const newPinned = !project.pinned;
-    // Optimistic update
     setProjects(prev => prev.map(p => p.id === project.id ? { ...p, pinned: newPinned } : p));
     try {
       const res = await fetch(`${API_BASE}/projects/${project.id}`, {
@@ -424,7 +396,6 @@ export default function ProjectsList() {
       toast.success(newPinned ? "Project pinned" : "Project unpinned");
       load();
     } catch {
-      // Revert optimistic update
       setProjects(prev => prev.map(p => p.id === project.id ? { ...p, pinned: !newPinned } : p));
       toast.error("Failed to update pin status");
     }
@@ -432,7 +403,6 @@ export default function ProjectsList() {
 
   const rename = async (project: any, name: string) => {
     const oldName = project.name;
-    // Optimistic update
     setProjects(prev => prev.map(p => p.id === project.id ? { ...p, name } : p));
     setRenameTarget(null);
     try {
@@ -445,7 +415,6 @@ export default function ProjectsList() {
       toast.success("Project renamed");
       load();
     } catch {
-      // Revert optimistic update
       setProjects(prev => prev.map(p => p.id === project.id ? { ...p, name: oldName } : p));
       toast.error("Failed to rename project");
     }
@@ -453,7 +422,6 @@ export default function ProjectsList() {
 
   const deleteProject = async (project: any) => {
     setDeleteTarget(null);
-    // Optimistic remove
     setProjects(prev => prev.filter(p => p.id !== project.id));
     try {
       const res = await fetch(`${API_BASE}/projects/${project.id}`, { method: "DELETE" });
@@ -461,7 +429,7 @@ export default function ProjectsList() {
       toast.success("Project deleted");
     } catch {
       toast.error("Failed to delete project");
-      load(); // restore list on failure
+      load();
     }
   };
 
@@ -476,16 +444,16 @@ export default function ProjectsList() {
   const rest = projects.filter(p => !p.pinned);
 
   return (
-    <div style={{ padding: theme.spacing.xl }}>
+    <div style={{ padding: 32 }}>
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: theme.spacing.lg }}>
-        <h1 style={{ color: theme.colors.primary, margin: 0 }}>Projects</h1>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+        <h1 style={{ color: P, margin: 0 }}>Projects</h1>
         <button
           onClick={() => navigate("/projects/new")}
           style={{
             padding: "10px 20px", borderRadius: 10,
-            background: theme.colors.primary, border: "none",
+            background: P, border: "none",
             fontWeight: 700, cursor: "pointer", color: "white", fontSize: 14,
             transition: "opacity 0.12s",
           }}
@@ -508,7 +476,7 @@ export default function ProjectsList() {
           }}>
             📌 Pinned ({pinned.length})
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: theme.spacing.lg }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
             {pinned.map(p => (
               <ProjectCard
                 key={p.id}
@@ -533,7 +501,7 @@ export default function ProjectsList() {
               All Projects ({rest.length})
             </div>
           )}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: theme.spacing.lg }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
             {rest.map(p => (
               <ProjectCard
                 key={p.id}
@@ -547,7 +515,6 @@ export default function ProjectsList() {
         </div>
       )}
 
-      {/* Rename modal */}
       {renameTarget && (
         <RenameModal
           project={renameTarget}
@@ -556,7 +523,6 @@ export default function ProjectsList() {
         />
       )}
 
-      {/* Delete confirm modal */}
       {deleteTarget && (
         <DeleteModal
           project={deleteTarget}

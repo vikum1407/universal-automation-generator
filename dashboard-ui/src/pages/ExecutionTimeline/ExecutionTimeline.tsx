@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { TimelineEvent, TimelineSummary, TimelineProject, TimelineFilters } from "@/api/timeline";
 import {
   fetchTimeline, fetchTimelineSummary, fetchTimelineProjects,
@@ -89,14 +89,10 @@ function ProjectTypeBadge({ type }: { type: string }) {
 // ── Summary bar ────────────────────────────────────────────────────────────
 
 function SummaryBar({ summary }: { summary: TimelineSummary }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, dark } = useColors();
 
   const tiles = [
-    { icon: "🗂️", label: "Active Projects", value: summary.projectsActive, sub: "in workspace", color: theme.colors.primary },
+    { icon: "🗂️", label: "Active Projects", value: summary.projectsActive, sub: "in workspace", color: P },
     { icon: "🔍", label: "Scans (7d)", value: summary.scansLast7d, sub: `${summary.scansLast24h} in last 24h`, color: "#42A5F5" },
     { icon: "▶️", label: "Runs (7d)", value: summary.runsLast7d, sub: `${summary.runsLast24h} in last 24h`, color: "#66BB6A" },
     { icon: "🔧", label: "Auto-Heals (7d)", value: summary.autoHealsLast7d, sub: "AI-applied fixes", color: "#7B2FF7" },
@@ -110,7 +106,7 @@ function SummaryBar({ summary }: { summary: TimelineSummary }) {
         {tiles.map(t => (
           <div key={t.label} style={{
             flex: "1 1 110px", minWidth: 0, padding: "14px 16px", borderRadius: 14,
-            background: surface, border: `1px solid ${border}`, boxShadow: theme.shadow.card,
+            background: surface, border: `1px solid ${border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
           }}>
             <div style={{ fontSize: 18, marginBottom: 4 }}>{t.icon}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: t.color, lineHeight: 1 }}>{t.value}</div>
@@ -124,7 +120,7 @@ function SummaryBar({ summary }: { summary: TimelineSummary }) {
       {summary.coverageTrend.length > 0 && (
         <div style={{
           padding: "14px 16px", borderRadius: 14, background: surface,
-          border: `1px solid ${border}`, boxShadow: theme.shadow.card,
+          border: `1px solid ${border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
         }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: textLight, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 10 }}>
             Coverage Trend — by Project
@@ -138,7 +134,7 @@ function SummaryBar({ summary }: { summary: TimelineSummary }) {
                   <div style={{ width: 130, fontSize: 11, color: text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flexShrink: 0 }}>
                     {p.label}
                   </div>
-                  <div style={{ flex: 1, height: 6, borderRadius: 3, background: isDark ? "#333" : "#eee", overflow: "hidden" }}>
+                  <div style={{ flex: 1, height: 6, borderRadius: 3, background: dark ? "#333" : "#eee", overflow: "hidden" }}>
                     <div style={{ height: "100%", width: `${p.after}%`, background: c, borderRadius: 3, transition: "width 0.4s" }} />
                   </div>
                   <div style={{ fontSize: 11, fontWeight: 700, color: c, width: 52, textAlign: "right", flexShrink: 0 }}>
@@ -170,13 +166,9 @@ function FilterBar({ filters, projects, onChange, total }: {
   onChange: (f: Partial<ActiveFilters>) => void;
   total: number;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight } = useColors();
 
-  const ss = { padding: "7px 10px", borderRadius: 8, border: `1px solid ${border}`, background: isDark ? surface : "#fff", color: text, fontSize: 12 };
+  const ss = { padding: "7px 10px", borderRadius: 8, border: `1px solid ${border}`, background: surface, color: text, fontSize: 12 };
 
   const hasFilter = filters.timeRange !== "" || filters.projectId !== "all" ||
     filters.type !== "all" || filters.severity !== "all" || filters.search !== "";
@@ -221,11 +213,7 @@ function EventCard({ event, selected, onClick }: {
   selected: boolean;
   onClick: () => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, dark } = useColors();
 
   const sevColor = SEVERITY_COLOR[event.severity] ?? "#90A4AE";
 
@@ -238,15 +226,15 @@ function EventCard({ event, selected, onClick }: {
         display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 16px",
         borderRadius: 12, cursor: "pointer", transition: "background 0.12s",
         background: selected
-          ? isDark ? "#1e1230" : "#f0eaff"
-          : isDark ? surface : "#fff",
-        border: `1px solid ${selected ? theme.colors.primary : border}`,
+          ? dark ? "#1e1230" : "#f0eaff"
+          : surface,
+        border: `1px solid ${selected ? P : border}`,
         borderLeft: `4px solid ${sevColor}`,
         marginBottom: 8,
-        boxShadow: selected ? `0 0 0 1px ${theme.colors.primary}33` : theme.shadow.card,
+        boxShadow: selected ? `0 0 0 1px ${P}33` : "0 2px 8px rgba(0,0,0,0.06)",
       }}
-      onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = isDark ? "#1a1a2e" : "#fafafa"; }}
-      onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = isDark ? surface : "#fff"; }}
+      onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = dark ? "#1a1a2e" : "#fafafa"; }}
+      onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = surface; }}
     >
       {/* Type icon */}
       <div style={{
@@ -282,7 +270,7 @@ function EventCard({ event, selected, onClick }: {
 
         {/* Row 3: project name + metric chips */}
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 10, color: theme.colors.primary, fontWeight: 600 }}>{event.projectName}</span>
+          <span style={{ fontSize: 10, color: P, fontWeight: 600 }}>{event.projectName}</span>
           {metrics.testsAdded != null && metrics.testsAdded > 0 && (
             <MetricChip icon="🧪" value={`+${metrics.testsAdded}`} label="tests" color="#42A5F5" />
           )}
@@ -312,9 +300,7 @@ function TimelineStream({ events, selectedId, onSelect, loading }: {
   onSelect: (e: TimelineEvent) => void;
   loading: boolean;
 }) {
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
+  const { BDR: border, TXT2: textLight, P } = useColors();
 
   if (loading) {
     return (
@@ -345,7 +331,7 @@ function TimelineStream({ events, selectedId, onSelect, loading }: {
             display: "flex", alignItems: "center", gap: 10,
             padding: "6px 0", marginBottom: 8,
           }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: theme.colors.primary, textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: P, textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>
               {day}
             </span>
             <div style={{ flex: 1, height: 1, background: border, opacity: 0.5 }} />
@@ -376,12 +362,8 @@ function EventDetailDrawer({ event, onClose, onGoToProject }: {
 }) {
   if (!event) return null;
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? theme.colors.darkBackground : "#f5f5f8";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: pageBg, dark } = useColors();
+  const bg = dark ? pageBg : "#f5f5f8";
 
   const sevColor = SEVERITY_COLOR[event.severity] ?? "#90A4AE";
   const metrics = event.metrics ?? {};
@@ -426,7 +408,7 @@ function EventDetailDrawer({ event, onClose, onGoToProject }: {
           <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: text, lineHeight: 1.4 }}>{event.title}</h3>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 11, color: theme.colors.primary, fontWeight: 600 }}>{event.projectName}</span>
+            <span style={{ fontSize: 11, color: P, fontWeight: 600 }}>{event.projectName}</span>
             <span style={{ fontSize: 10, color: textLight }}>
               {new Date(event.timestamp).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
             </span>
@@ -441,9 +423,9 @@ function EventDetailDrawer({ event, onClose, onGoToProject }: {
             onClick={() => { onGoToProject(event.projectId); onClose(); }}
             style={{
               padding: "10px 16px", borderRadius: 10,
-              border: `1px solid ${theme.colors.primary}44`,
-              background: `${theme.colors.primary}10`,
-              color: theme.colors.primary, fontSize: 12, fontWeight: 600,
+              border: `1px solid ${P}44`,
+              background: `${P}10`,
+              color: P, fontSize: 12, fontWeight: 600,
               cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
               textAlign: "left",
             }}
@@ -515,7 +497,7 @@ function EventDetailDrawer({ event, onClose, onGoToProject }: {
               {event.tags.map(tag => (
                 <span key={tag} style={{
                   padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 600,
-                  background: isDark ? "#2a2a3a" : "#f0f0f8",
+                  background: dark ? "#2a2a3a" : "#f0f0f8",
                   color: textLight, border: `1px solid ${border}`,
                 }}>#{tag}</span>
               ))}
@@ -525,10 +507,10 @@ function EventDetailDrawer({ event, onClose, onGoToProject }: {
           {/* AI Insight */}
           <div style={{
             padding: "12px 14px", borderRadius: 10,
-            background: isDark ? "#13082a" : "#faf5ff",
-            border: `1px solid ${isDark ? "#3a1a6a" : "#e8d5ff"}`,
+            background: dark ? "#13082a" : "#faf5ff",
+            border: `1px solid ${dark ? "#3a1a6a" : "#e8d5ff"}`,
           }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: theme.colors.primary, textTransform: "uppercase", marginBottom: 6 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: P, textTransform: "uppercase", marginBottom: 6 }}>
               🧠 AI Insight
             </div>
             <div style={{ fontSize: 12, color: text, lineHeight: 1.7 }}>
@@ -540,8 +522,8 @@ function EventDetailDrawer({ event, onClose, onGoToProject }: {
           {(event.severity === "high" || event.severity === "critical") && (
             <div style={{
               padding: "10px 12px", borderRadius: 8,
-              background: isDark ? "#1a0000" : "#fff5f5",
-              border: `1px solid ${isDark ? "#3a0000" : "#FFCDD2"}`,
+              background: dark ? "#1a0000" : "#fff5f5",
+              border: `1px solid ${dark ? "#3a0000" : "#FFCDD2"}`,
             }}>
               <div style={{ fontSize: 10, fontWeight: 700, color: "#EF5350", textTransform: "uppercase", marginBottom: 5 }}>
                 ⚠️ Action Required
@@ -563,8 +545,7 @@ function EventDetailDrawer({ event, onClose, onGoToProject }: {
 
 export default function ExecutionTimeline() {
   const navigate = useNavigate();
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { TXT2: textLight, P } = useColors();
 
   const [summary, setSummary] = useState<TimelineSummary | null>(null);
   const [events, setEvents] = useState<TimelineEvent[]>([]);
@@ -625,7 +606,7 @@ export default function ExecutionTimeline() {
     <div style={{ padding: "24px 28px", maxWidth: 1100, margin: "0 auto" }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: theme.colors.primary }}>
+        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: P }}>
           Timeline
         </h1>
         <p style={{ margin: "4px 0 0", fontSize: 13, color: textLight }}>

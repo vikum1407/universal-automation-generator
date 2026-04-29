@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type {
   TestRun, TestRunResult, ReplaySummary, RunComparison, RunStatus, ResultStatus,
 } from "@/api/replay";
@@ -42,11 +42,7 @@ function formatTestName(name: string): string {
 function SummaryBar({
   summary, running, onRunAll,
 }: { summary: ReplaySummary; running: boolean; onRunAll: () => void }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P: primary } = useColors();
 
   const lastStatusColor = summary.lastRunStatus ? RUN_STATUS_COLOR[summary.lastRunStatus] : "#90A4AE";
 
@@ -60,7 +56,7 @@ function SummaryBar({
       }}>
         <button onClick={onRunAll} disabled={running} style={{
           padding: "8px 20px", borderRadius: 9, border: "none",
-          background: running ? "#9e7de0" : theme.colors.primary,
+          background: running ? "#9e7de0" : primary,
           color: "#fff", fontWeight: 700, fontSize: 13,
           cursor: running ? "not-allowed" : "pointer",
           display: "flex", alignItems: "center", gap: 6,
@@ -74,7 +70,7 @@ function SummaryBar({
           </span>
         )}
         {running && (
-          <span style={{ fontSize: 12, color: theme.colors.primary, fontWeight: 500 }}>
+          <span style={{ fontSize: 12, color: primary, fontWeight: 500 }}>
             Executing all tests — this may take a minute…
           </span>
         )}
@@ -85,7 +81,7 @@ function SummaryBar({
         {[
           {
             icon: "📋", label: "Total Runs", value: summary.totalRuns,
-            sub: `${summary.last24hRuns} in last 24h`, color: theme.colors.primary,
+            sub: `${summary.last24hRuns} in last 24h`, color: primary,
           },
           {
             icon: summary.lastRunStatus === "passed" ? "✅" : summary.lastRunStatus === "failed" ? "❌" : "🔄",
@@ -112,7 +108,7 @@ function SummaryBar({
         ].map(({ icon, label, value, sub, color }) => (
           <div key={label} style={{
             flex: "1 1 120px", minWidth: 0, padding: "14px 16px", borderRadius: 14,
-            background: surface, border: `1px solid ${border}`, boxShadow: theme.shadow.card,
+            background: surface, border: `1px solid ${border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
           }}>
             <div style={{ fontSize: 20, marginBottom: 5 }}>{icon}</div>
             <div style={{ fontSize: 20, fontWeight: 800, color, lineHeight: 1 }}>{value}</div>
@@ -136,11 +132,7 @@ function RunsTable({
   onSelect: (r: TestRun) => void;
   onToggleCompare: (id: string) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P: primary, dark: isDark } = useColors();
 
   if (!runs.length) {
     return (
@@ -178,7 +170,7 @@ function RunsTable({
                 style={{
                   cursor: "pointer",
                   background: selected ? (isDark ? "#1e1230" : "#f0eaff") : "transparent",
-                  borderLeft: `3px solid ${selected ? theme.colors.primary : inCompare ? "#FFA726" : "transparent"}`,
+                  borderLeft: `3px solid ${selected ? primary : inCompare ? "#FFA726" : "transparent"}`,
                   transition: "background 0.1s",
                 }}
                 onMouseEnter={e => {
@@ -284,12 +276,7 @@ function RunDetailPanel({
 
   if (!run) return null;
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? theme.colors.darkBackground : "#f5f5f8";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, BG: bg, P: primary, dark: isDark } = useColors();
   const codeBg = isDark ? "#0d0d1a" : "#1a1a2e";
 
   const results = run.results ?? [];
@@ -319,7 +306,7 @@ function RunDetailPanel({
             </div>
             <button onClick={onClose} style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 17, color: textLight, padding: "2px 6px" }}>✕</button>
           </div>
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: theme.colors.primary }}>{run.label}</h3>
+          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: primary }}>{run.label}</h3>
           <div style={{ fontSize: 11, color: textLight, marginTop: 3 }}>
             {new Date(run.startedAt).toLocaleString()} · {fmtDuration(run.durationMs)}
           </div>
@@ -337,7 +324,7 @@ function RunDetailPanel({
               {[
                 { label: "Passed", v: run.summary.passed, color: "#66BB6A" },
                 { label: "Failed", v: run.summary.failed, color: "#EF5350" },
-                { label: "Total", v: run.summary.total, color: theme.colors.primary },
+                { label: "Total", v: run.summary.total, color: primary },
                 { label: "Duration", v: fmtDuration(run.durationMs), color: textLight },
               ].map(({ label, v, color }) => (
                 <div key={label} style={{ textAlign: "center" }}>
@@ -383,7 +370,7 @@ function RunDetailPanel({
                       padding: "10px 16px", borderBottom: `1px solid ${border}`,
                       cursor: "pointer",
                       background: isSelected ? (isDark ? "#1e1230" : "#f0eaff") : "transparent",
-                      borderLeft: `3px solid ${isSelected ? theme.colors.primary : "transparent"}`,
+                      borderLeft: `3px solid ${isSelected ? primary : "transparent"}`,
                       transition: "background 0.1s",
                     }}
                   >
@@ -412,7 +399,7 @@ function RunDetailPanel({
                         disabled={!!loadingId}
                         style={{
                           padding: "3px 9px", borderRadius: 5, border: "none",
-                          background: isLoading ? "#9e7de0" : theme.colors.primary,
+                          background: isLoading ? "#9e7de0" : primary,
                           color: "#fff", fontSize: 10, fontWeight: 700,
                           cursor: loadingId ? "not-allowed" : "pointer",
                         }}
@@ -436,7 +423,7 @@ function RunDetailPanel({
                   <Badge label={selectedResult.status.toUpperCase()} color={RESULT_STATUS_COLOR[selectedResult.status]} />
                   {selectedResult.retries > 0 && <Badge label={`${selectedResult.retries} retries`} color="#FFA726" />}
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: theme.colors.primary }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: primary }}>
                   {formatTestName(selectedResult.testId)}
                 </div>
                 <div style={{ fontSize: 10, color: textLight, fontFamily: "monospace", marginTop: 2 }}>
@@ -528,7 +515,7 @@ function RunDetailPanel({
                       onClick={() => onRunSingle(selectedResult.testId)}
                       style={{
                         padding: "8px 14px", borderRadius: 8, border: "none",
-                        background: theme.colors.primary, color: "#fff",
+                        background: primary, color: "#fff",
                         fontWeight: 600, fontSize: 12, cursor: "pointer",
                         display: "flex", alignItems: "center", gap: 6,
                       }}
@@ -561,12 +548,7 @@ function RunDetailPanel({
 function CompareView({
   comparison, onClose,
 }: { comparison: RunComparison; onClose: () => void }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? theme.colors.darkBackground : "#f5f5f8";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, BG: bg, P: primary, dark: isDark } = useColors();
 
   return (
     <>
@@ -582,7 +564,7 @@ function CompareView({
         {/* Header */}
         <div style={{ padding: "16px 20px 12px", borderBottom: `1px solid ${border}`, flexShrink: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: theme.colors.primary }}>
+            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: primary }}>
               Run Comparison
             </h3>
             <button onClick={onClose} style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 17, color: textLight }}>✕</button>
@@ -677,11 +659,7 @@ function CompareView({
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function ReplayViewer({ projectId }: { projectId: string; testName?: string }) {
-  const isDark = theme.mode === "dark";
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P: primary, dark: isDark } = useColors();
 
   const [runs, setRuns] = useState<TestRun[]>([]);
   const [summary, setSummary] = useState<ReplaySummary | null>(null);
@@ -801,7 +779,7 @@ export default function ReplayViewer({ projectId }: { projectId: string; testNam
     <div style={{ width: "100%", minWidth: 0 }}>
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
-        <h2 style={{ margin: 0, color: theme.colors.primary, fontSize: 20, fontWeight: 800 }}>
+        <h2 style={{ margin: 0, color: primary, fontSize: 20, fontWeight: 800 }}>
           Replay
         </h2>
         <p style={{ margin: "4px 0 0", fontSize: 13, color: textLight }}>

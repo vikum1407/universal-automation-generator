@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { HistoryEvent, HistorySummary, HistoryFilters } from "@/api/history";
 import {
   fetchHistory, fetchHistorySummary,
@@ -88,14 +88,10 @@ function ImpactBadges({ metadata }: { metadata?: Record<string, any> }) {
 // ── Summary bar ───────────────────────────────────────────────────────────────
 
 function SummaryBar({ summary }: { summary: HistorySummary }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const tiles = [
-    { icon: "📅", label: "Last 24h", value: summary.last24h, sub: `${summary.last7d} in 7 days`, color: theme.colors.primary },
+    { icon: "📅", label: "Last 24h", value: summary.last24h, sub: `${summary.last7d} in 7 days`, color: P },
     { icon: "🤖", label: "AI-Driven", value: summary.aiDriven, sub: `of ${summary.total} total`, color: "#7B2FF7" },
     { icon: "👤", label: "Manual", value: summary.userDriven, sub: "user actions", color: "#42A5F5" },
     { icon: "📈", label: "Coverage Impact", value: summary.coverageImpacting, sub: "events", color: "#FF9800" },
@@ -108,7 +104,7 @@ function SummaryBar({ summary }: { summary: HistorySummary }) {
       {tiles.map(t => (
         <div key={t.label} style={{
           flex: "1 1 110px", minWidth: 0, padding: "14px 16px", borderRadius: 14,
-          background: surface, border: `1px solid ${border}`, boxShadow: theme.shadow.card,
+          background: surface, border: `1px solid ${border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
         }}>
           <div style={{ fontSize: 18, marginBottom: 5 }}>{t.icon}</div>
           <div style={{ fontSize: 22, fontWeight: 800, color: t.color, lineHeight: 1 }}>{t.value}</div>
@@ -136,15 +132,11 @@ function FilterBar({ filters, onChange, total }: {
   onChange: (f: Partial<ActiveFilters>) => void;
   total: number;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const sel = (val: string, key: keyof ActiveFilters) => (
     <select value={val} onChange={e => onChange({ [key]: e.target.value })}
-      style={{ padding: "7px 10px", borderRadius: 8, border: `1px solid ${border}`, background: isDark ? surface : "#fff", color: text, fontSize: 12 }}>
+      style={{ padding: "7px 10px", borderRadius: 8, border: `1px solid ${border}`, background: dark ? surface : "#fff", color: text, fontSize: 12 }}>
       {key === "timeRange" && TIME_RANGES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
       {key === "entityType" && ENTITY_TYPES.map(t => <option key={t} value={t}>{t === "all" ? "All entities" : ENTITY_LABEL[t as any] ?? t}</option>)}
       {key === "eventType" && EVENT_TYPES.map(t => <option key={t} value={t}>{t === "all" ? "All events" : EVENT_LABEL[t as any] ?? t}</option>)}
@@ -162,7 +154,7 @@ function FilterBar({ filters, onChange, total }: {
         placeholder="Search events…"
         value={filters.search}
         onChange={e => onChange({ search: e.target.value })}
-        style={{ flex: "1 1 160px", padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: isDark ? surface : "#fff", color: text, fontSize: 12, outline: "none" }}
+        style={{ flex: "1 1 160px", padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: dark ? surface : "#fff", color: text, fontSize: 12, outline: "none" }}
       />
       {sel(filters.timeRange, "timeRange")}
       {sel(filters.entityType, "entityType")}
@@ -187,10 +179,7 @@ function EventItem({ event, selected, onClick }: {
   selected: boolean;
   onClick: () => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const entityColor = ENTITY_COLOR[event.entityType] ?? "#90A4AE";
   const eventColor = EVENT_COLOR[event.eventType] ?? "#90A4AE";
@@ -202,11 +191,11 @@ function EventItem({ event, selected, onClick }: {
       style={{
         display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 14px",
         borderRadius: 10, cursor: "pointer", transition: "background 0.12s",
-        background: selected ? (isDark ? "#1e1230" : "#f0eaff") : "transparent",
-        borderLeft: `3px solid ${selected ? theme.colors.primary : "transparent"}`,
+        background: selected ? (`${P}15`) : "transparent",
+        borderLeft: `3px solid ${selected ? P : "transparent"}`,
         marginBottom: 2,
       }}
-      onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = isDark ? "#1a1a2e" : "#fafafa"; }}
+      onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = bg; }}
       onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
     >
       {/* Timeline dot */}
@@ -268,10 +257,7 @@ function EventStream({ events, selectedId, onSelect, loading }: {
   onSelect: (e: HistoryEvent) => void;
   loading: boolean;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   if (loading) {
     return (
@@ -300,10 +286,10 @@ function EventStream({ events, selectedId, onSelect, loading }: {
           <div style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "8px 16px",
-            background: isDark ? "#1a1a2e" : "#f8f4ff",
+            background: dark ? "#1a1a2e" : "#f8f4ff",
             borderBottom: `1px solid ${border}`,
           }}>
-            <span style={{ fontSize: 10, fontWeight: 700, color: theme.colors.primary, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: P, textTransform: "uppercase", letterSpacing: "0.08em" }}>
               {day}
             </span>
             <div style={{ flex: 1, height: 1, background: border, opacity: 0.5 }} />
@@ -330,15 +316,13 @@ function EventStream({ events, selectedId, onSelect, loading }: {
 // ── Change diff ───────────────────────────────────────────────────────────────
 
 function ChangeDiff({ before, after }: { before: any; after: any }) {
-  const isDark = theme.mode === "dark";
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   if (!before && !after) return null;
 
   const codeSx = (color: string): React.CSSProperties => ({
     padding: "8px 12px", borderRadius: 8,
-    background: isDark ? `${color}0d` : `${color}0a`,
+    background: dark ? `${color}0d` : `${color}0a`,
     border: `1px solid ${color}30`,
     fontFamily: "monospace", fontSize: 11,
     color: text, whiteSpace: "pre-wrap", wordBreak: "break-word",
@@ -378,12 +362,7 @@ function EventDetailPanel({ event, allEvents, onClose, onNavigate }: {
 }) {
   if (!event) return null;
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? theme.colors.darkBackground : "#f5f5f8";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const entityColor = ENTITY_COLOR[event.entityType] ?? "#90A4AE";
   const eventColor = EVENT_COLOR[event.eventType] ?? "#90A4AE";
@@ -448,9 +427,9 @@ function EventDetailPanel({ event, allEvents, onClose, onNavigate }: {
                 onClick={() => { onNavigate(targetTab); onClose(); }}
                 style={{
                   padding: "8px 16px", borderRadius: 8,
-                  border: `1px solid ${theme.colors.primary}44`,
-                  background: `${theme.colors.primary}12`,
-                  color: theme.colors.primary, fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  border: `1px solid ${P}44`,
+                  background: `${P}12`,
+                  color: P, fontSize: 12, fontWeight: 600, cursor: "pointer",
                 }}
               >
                 Open in {ENTITY_LABEL[event.entityType]} →
@@ -496,7 +475,7 @@ function EventDetailPanel({ event, allEvents, onClose, onNavigate }: {
               <div style={{ fontSize: 10, fontWeight: 700, color: textLight, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Details</div>
               <pre style={{
                 padding: "10px 12px", borderRadius: 8, fontSize: 10, lineHeight: 1.6,
-                background: isDark ? "#0d0d1a" : "#f8f8ff",
+                background: dark ? "#0d0d1a" : "#f8f8ff",
                 border: `1px solid ${border}`,
                 color: text, whiteSpace: "pre-wrap", wordBreak: "break-word", maxHeight: 240, overflowY: "auto",
               }}>
@@ -509,10 +488,10 @@ function EventDetailPanel({ event, allEvents, onClose, onNavigate }: {
           {event.actorType === "ai" && (
             <div style={{
               padding: "12px 14px", borderRadius: 10,
-              background: isDark ? "#13082a" : "#faf5ff",
-              border: `1px solid ${isDark ? "#3a1a6a" : "#e8d5ff"}`,
+              background: dark ? "#13082a" : "#faf5ff",
+              border: `1px solid ${dark ? "#3a1a6a" : "#e8d5ff"}`,
             }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: theme.colors.primary, textTransform: "uppercase", marginBottom: 6 }}>🧠 AI Reasoning</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: P, textTransform: "uppercase", marginBottom: 6 }}>🧠 AI Reasoning</div>
               <div style={{ fontSize: 12, color: text, lineHeight: 1.7 }}>
                 {AI_REASONING[event.entityType] ?? "This action was performed automatically by the AI engine based on pattern analysis and historical project data."}
               </div>
@@ -561,8 +540,7 @@ export default function History({ projectId, onNavigate }: {
   projectId: string;
   onNavigate?: (tab: string) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const [summary, setSummary] = useState<HistorySummary | null>(null);
   const [events, setEvents] = useState<HistoryEvent[]>([]);
@@ -615,7 +593,7 @@ export default function History({ projectId, onNavigate }: {
     <div style={{ width: "100%", minWidth: 0 }}>
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
-        <h2 style={{ margin: 0, color: theme.colors.primary, fontSize: 20, fontWeight: 800 }}>
+        <h2 style={{ margin: 0, color: P, fontSize: 20, fontWeight: 800 }}>
           History
         </h2>
         <p style={{ margin: "4px 0 0", fontSize: 13, color: textLight }}>

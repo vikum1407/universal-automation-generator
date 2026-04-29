@@ -1,21 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { TabId } from "@/dashboard/pages/projects/layout/ProjectSidebar";
 
 const API = "http://localhost:3000";
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
-
-function useC() {
-  return {
-    P:    theme.colors.primary,
-    CARD: theme.colors.background,
-    BDR:  theme.colors.border,
-    TXT:  theme.colors.textDark,
-    TXT2: theme.colors.textLight,
-    BG:   theme.colors.appBackground,
-  };
-}
 
 // ─── Colour palette ───────────────────────────────────────────────────────────
 
@@ -110,6 +100,7 @@ function DetailDrawer({ item, mode, onClose, onNavigate, CARD, BDR, TXT, TXT2 }:
   onNavigate?: (tab: TabId) => void;
   CARD: string; BDR: string; TXT: string; TXT2: string;
 }) {
+  const { P } = useColors();
   if (!item) return null;
 
   const rows: { label: string; value: string | number | null }[] = [];
@@ -219,7 +210,7 @@ function DetailDrawer({ item, mode, onClose, onNavigate, CARD, BDR, TXT, TXT2 }:
             onClick={() => onNavigate(TAB_NAV[mode]!)}
             style={{
               width: "100%", padding: "9px", borderRadius: 8,
-              background: theme.colors.primary, color: "#fff",
+              background: P, color: "#fff",
               border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600,
             }}
           >
@@ -234,12 +225,13 @@ function DetailDrawer({ item, mode, onClose, onNavigate, CARD, BDR, TXT, TXT2 }:
 // ─── Legend ───────────────────────────────────────────────────────────────────
 
 function Legend({ items }: { items: { color: string; label: string }[] }) {
+  const { TXT2 } = useColors();
   return (
     <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
       {items.map(it => (
         <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
           <div style={{ width: 12, height: 12, borderRadius: 2, background: it.color, flexShrink: 0 }} />
-          <span style={{ fontSize: 11, color: theme.colors.textLight }}>{it.label}</span>
+          <span style={{ fontSize: 11, color: TXT2 }}>{it.label}</span>
         </div>
       ))}
     </div>
@@ -249,7 +241,7 @@ function Legend({ items }: { items: { color: string; label: string }[] }) {
 // ─── Summary stat ─────────────────────────────────────────────────────────────
 
 function Stat({ label, value, color }: { label: string; value: string | number; color?: string }) {
-  const { TXT, TXT2, CARD, BDR } = useC();
+  const { TXT, TXT2, CARD, BDR } = useColors();
   return (
     <div style={{ background: CARD, border: `1px solid ${BDR}`, borderRadius: 10, padding: "12px 16px", textAlign: "center", minWidth: 90 }}>
       <div style={{ fontSize: 22, fontWeight: 800, color: color ?? TXT }}>{value}</div>
@@ -261,7 +253,7 @@ function Stat({ label, value, color }: { label: string; value: string | number; 
 // ─── 1. Coverage HeatMap view ─────────────────────────────────────────────────
 
 function CoverageView({ projectId, onSelect }: { projectId: string; onSelect: (item: any) => void }) {
-  const { CARD, BDR, TXT, TXT2 } = useC();
+  const { P, CARD, BDR, TXT, TXT2 } = useColors();
   const [data, setData] = useState<any[]>([]);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -311,9 +303,9 @@ function CoverageView({ projectId, onSelect }: { projectId: string; onSelect: (i
         {["all", "covered", "uncovered", "high-risk"].map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
             padding: "5px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600,
-            border: `1px solid ${filter === f ? theme.colors.primary : BDR}`,
-            background: filter === f ? `${theme.colors.primary}18` : CARD,
-            color: filter === f ? theme.colors.primary : TXT2, cursor: "pointer",
+            border: `1px solid ${filter === f ? P : BDR}`,
+            background: filter === f ? `${P}18` : CARD,
+            color: filter === f ? P : TXT2, cursor: "pointer",
           }}>{f.replace("-", " ")}</button>
         ))}
       </div>
@@ -321,7 +313,7 @@ function CoverageView({ projectId, onSelect }: { projectId: string; onSelect: (i
       {/* Matrix header */}
       <div style={{ background: CARD, border: `1px solid ${BDR}`, borderRadius: 12, overflow: "hidden" }}>
         {/* Column headers */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr repeat(4, 80px)", gap: 0, background: `${theme.colors.primary}08`, borderBottom: `1px solid ${BDR}`, padding: "8px 16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr repeat(4, 80px)", gap: 0, background: `${P}08`, borderBottom: `1px solid ${BDR}`, padding: "8px 16px" }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.07em" }}>Requirement</span>
           {DIMS.map(d => (
             <span key={d} style={{ fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.07em", textAlign: "center" }}>{d}</span>
@@ -384,7 +376,7 @@ function CoverageView({ projectId, onSelect }: { projectId: string; onSelect: (i
 // ─── 2. Flow Stability HeatMap ────────────────────────────────────────────────
 
 function FlowsView({ projectId, onSelect }: { projectId: string; onSelect: (item: any) => void }) {
-  const { CARD, BDR, TXT, TXT2 } = useC();
+  const { P, CARD, BDR, TXT, TXT2 } = useColors();
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -417,7 +409,7 @@ function FlowsView({ projectId, onSelect }: { projectId: string; onSelect: (item
 
       {/* Grid */}
       <div style={{ background: CARD, border: `1px solid ${BDR}`, borderRadius: 12, overflow: "hidden" }}>
-        <div style={{ padding: "8px 16px 8px", borderBottom: `1px solid ${BDR}`, background: `${theme.colors.primary}08` }}>
+        <div style={{ padding: "8px 16px 8px", borderBottom: `1px solid ${BDR}`, background: `${P}08` }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.07em" }}>
             Flow — Last 8 runs →
           </span>
@@ -433,7 +425,7 @@ function FlowsView({ projectId, onSelect }: { projectId: string; onSelect: (item
                 cursor: "pointer", borderBottom: i < data.length - 1 ? `1px solid ${BDR}` : "none",
                 transition: "background 0.15s",
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = `${theme.colors.primary}06`)}
+              onMouseEnter={e => (e.currentTarget.style.background = `${P}06`)}
               onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
             >
               {/* Flow name */}
@@ -470,7 +462,7 @@ function FlowsView({ projectId, onSelect }: { projectId: string; onSelect: (item
 // ─── 3. Endpoint Health HeatMap ───────────────────────────────────────────────
 
 function EndpointsView({ projectId, onSelect }: { projectId: string; onSelect: (item: any) => void }) {
-  const { CARD, BDR, TXT, TXT2 } = useC();
+  const { P, CARD, BDR, TXT, TXT2 } = useColors();
   const [data, setData] = useState<any[]>([]);
   const [filterStatus, setFilterStatus] = useState("all");
 
@@ -523,7 +515,7 @@ function EndpointsView({ projectId, onSelect }: { projectId: string; onSelect: (
 
       {/* Grid */}
       <div style={{ background: CARD, border: `1px solid ${BDR}`, borderRadius: 12, overflow: "hidden" }}>
-        <div style={{ padding: "8px 16px", borderBottom: `1px solid ${BDR}`, background: `${theme.colors.primary}08`, display: "grid", gridTemplateColumns: "80px 1fr 120px 100px" }}>
+        <div style={{ padding: "8px 16px", borderBottom: `1px solid ${BDR}`, background: `${P}08`, display: "grid", gridTemplateColumns: "80px 1fr 120px 100px" }}>
           {["Method", "Path", "Status", "Response"].map(h => (
             <span key={h} style={{ fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.07em" }}>{h}</span>
           ))}
@@ -565,7 +557,7 @@ function EndpointsView({ projectId, onSelect }: { projectId: string; onSelect: (
 // ─── 4. Risk HeatMap ──────────────────────────────────────────────────────────
 
 function RiskView({ projectId, onSelect }: { projectId: string; onSelect: (item: any) => void }) {
-  const { CARD, BDR, TXT, TXT2 } = useC();
+  const { CARD, BDR, TXT, TXT2 } = useColors();
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -637,7 +629,7 @@ function RiskView({ projectId, onSelect }: { projectId: string; onSelect: (item:
 // ─── 5. AI Activity HeatMap ───────────────────────────────────────────────────
 
 function AIView({ projectId, onSelect }: { projectId: string; onSelect: (item: any) => void }) {
-  const { CARD, BDR, TXT, TXT2 } = useC();
+  const { P, CARD, BDR, TXT, TXT2 } = useColors();
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -666,7 +658,7 @@ function AIView({ projectId, onSelect }: { projectId: string; onSelect: (item: a
       ]} />
 
       <div style={{ background: CARD, border: `1px solid ${BDR}`, borderRadius: 12, overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 80px 80px 100px", padding: "8px 16px", borderBottom: `1px solid ${BDR}`, background: `${theme.colors.primary}08` }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 80px 80px 100px", padding: "8px 16px", borderBottom: `1px solid ${BDR}`, background: `${P}08` }}>
           {["Requirement", "Suggest.", "Applied", "Heals", "Heal OK", "Activity"].map(h => (
             <span key={h} style={{ fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.06em" }}>{h}</span>
           ))}
@@ -713,7 +705,7 @@ function AIView({ projectId, onSelect }: { projectId: string; onSelect: (item: a
 // ─── 6. Trend HeatMap (GitHub-style) ─────────────────────────────────────────
 
 function TrendsView({ projectId }: { projectId: string }) {
-  const { CARD, BDR, TXT, TXT2 } = useC();
+  const { CARD, BDR, TXT, TXT2 } = useColors();
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -792,7 +784,7 @@ interface Props {
 }
 
 export default function HeatMapPage({ projectId, onNavigate }: Props) {
-  const { P, CARD, BDR, TXT, TXT2 } = useC();
+  const { P, CARD, BDR, TXT, TXT2 } = useColors();
   const [activeTab, setActiveTab] = useState<HMTab>("coverage");
   const [selected, setSelected] = useState<any>(null);
   const [selectedMode, setSelectedMode] = useState<HMTab>("coverage");

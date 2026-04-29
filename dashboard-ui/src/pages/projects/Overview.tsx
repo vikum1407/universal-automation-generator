@@ -1,24 +1,11 @@
 import { useEffect, useState } from "react";
 import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import { socket } from "@/socket";
 import ProgressModal from "@/components/ProgressModal";
 import type { TabId } from "@/dashboard/pages/projects/layout/ProjectSidebar";
 
 const API = "http://localhost:3000";
-
-// ─── Theme helpers ─────────────────────────────────────────────────────────────
-
-function useTheme() {
-  const isDark = theme.mode === "dark";
-  return {
-    P:    theme.colors.primary,
-    CARD: isDark ? theme.colors.darkSurface    : theme.colors.background,
-    BDR:  isDark ? theme.colors.darkBorder     : theme.colors.border,
-    TXT:  isDark ? theme.colors.darkText       : theme.colors.textDark,
-    TXT2: isDark ? theme.colors.darkTextLight  : theme.colors.textLight,
-    APP:  isDark ? theme.colors.appBackground  : "#f4f4f8",
-  };
-}
 
 // ─── Health status config ──────────────────────────────────────────────────────
 
@@ -55,7 +42,7 @@ function Card({
   action?: () => void; actionLabel?: string;
   style?: React.CSSProperties;
 }) {
-  const { CARD, BDR, TXT, TXT2, P } = useTheme();
+  const { CARD, BDR, TXT, TXT2, P } = useColors();
   return (
     <div style={{
       background: CARD, border: `1px solid ${BDR}`, borderRadius: 14,
@@ -88,7 +75,7 @@ function Card({
 // ─── Stat row ──────────────────────────────────────────────────────────────────
 
 function StatRow({ label, value, color, sub }: { label: string; value: string | number; color?: string; sub?: string }) {
-  const { TXT, TXT2 } = useTheme();
+  const { TXT, TXT2 } = useColors();
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
       <span style={{ fontSize: 12, color: TXT2 }}>{label}</span>
@@ -103,7 +90,7 @@ function StatRow({ label, value, color, sub }: { label: string; value: string | 
 // ─── Mini coverage bar ─────────────────────────────────────────────────────────
 
 function CoverageBar({ label, pct, color }: { label: string; pct: number | null; color?: string }) {
-  const { TXT, TXT2, BDR, P } = useTheme();
+  const { TXT, TXT2, BDR, P } = useColors();
   const c = color ?? P;
   const val = pct ?? 0;
   const barColor = val >= 80 ? "#4CAF50" : val >= 50 ? "#FF9800" : "#EF5350";
@@ -142,7 +129,7 @@ function SevBadge({ severity }: { severity: string }) {
 // ─── Loading skeleton ──────────────────────────────────────────────────────────
 
 function Skeleton({ h = 14, w = "100%" }: { h?: number; w?: string }) {
-  const { BDR } = useTheme();
+  const { BDR } = useColors();
   return (
     <div style={{ height: h, width: w, borderRadius: 6, background: BDR, opacity: 0.5 }} />
   );
@@ -178,7 +165,7 @@ interface OverviewProps {
 // ─── Main component ────────────────────────────────────────────────────────────
 
 export default function Overview({ project, onNavigate }: OverviewProps) {
-  const { P, CARD, BDR, TXT, TXT2 } = useTheme();
+  const { P, CARD, BDR, TXT, TXT2 } = useColors();
   const isUI = project.type === "ui";
 
   const [data, setData]       = useState<any>(null);

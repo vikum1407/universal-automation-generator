@@ -1,4 +1,4 @@
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { TestSummary } from "@/api/tests";
 
 function Tile({
@@ -6,20 +6,16 @@ function Tile({
 }: {
   icon: string; label: string; value: number | string; sub?: string; color?: string;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P } = useColors();
 
   return (
     <div style={{
       flex: "1 1 130px", minWidth: 0, padding: "14px 16px", borderRadius: 14,
       background: surface, border: `1px solid ${border}`,
-      boxShadow: theme.shadow.card,
+      boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
     }}>
       <div style={{ fontSize: 20, marginBottom: 5 }}>{icon}</div>
-      <div style={{ fontSize: 24, fontWeight: 800, color: color ?? theme.colors.primary, lineHeight: 1 }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: color ?? P, lineHeight: 1 }}>
         {value}
       </div>
       <div style={{ fontSize: 11, fontWeight: 600, color: text, marginTop: 4 }}>{label}</div>
@@ -33,10 +29,7 @@ function RunBar({
 }: {
   running: boolean; onRun: () => void; lastRunAt: string | null;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT2: textLight, P } = useColors();
 
   return (
     <div style={{
@@ -49,7 +42,7 @@ function RunBar({
         disabled={running}
         style={{
           padding: "8px 20px", borderRadius: 9, border: "none",
-          background: running ? "#9e7de0" : theme.colors.primary,
+          background: running ? "#9e7de0" : P,
           color: "#fff", fontWeight: 700, fontSize: 13,
           cursor: running ? "not-allowed" : "pointer",
           transition: "opacity 0.12s",
@@ -73,7 +66,7 @@ function RunBar({
       )}
 
       {running && (
-        <span style={{ fontSize: 12, color: theme.colors.primary, fontWeight: 500 }}>
+        <span style={{ fontSize: 12, color: P, fontWeight: 500 }}>
           Executing test suite — this may take a minute…
         </span>
       )}

@@ -1,4 +1,4 @@
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import { useState, useEffect } from "react";
 import {
   ResponsiveContainer, LineChart, Line, AreaChart, Area,
@@ -11,13 +11,7 @@ import {
   type TrendsOverview, type DateRange, type TrendPoint,
 } from "@/api/trends";
 
-// ─── Theme ────────────────────────────────────────────────────────────────────
-
-const P    = theme.colors.primary;
-const BDR  = theme.colors.border;
-const BG   = theme.colors.background;
-const TXT  = theme.colors.textDark;
-const TXT2 = theme.colors.textLight;
+// ─── Fixed accent palette ─────────────────────────────────────────────────────
 
 const C = {
   purple: "#7B2FF7", cyan: "#2FF7D1", blue: "#448AFF",
@@ -27,17 +21,32 @@ const C = {
 
 const PROJECT_COLORS = [C.purple, C.blue, C.green, C.orange, C.cyan, C.pink, C.indigo, C.teal, C.red];
 
+// ─── Chart helpers (parameterized — plain functions, no hooks) ────────────────
+
+function chartTT(surface: string, border: string, text: string) {
+  return {
+    contentStyle: { background: surface, border: `1px solid ${border}`, borderRadius: 8, fontSize: 12 },
+    labelStyle: { fontWeight: 600, color: text },
+  };
+}
+
+function gridEl(stroke: string) {
+  return <CartesianGrid strokeDasharray="3 3" stroke={stroke} />;
+}
+
 // ─── Shared UI ────────────────────────────────────────────────────────────────
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  const { CARD: bg, BDR: border } = useColors();
   return (
-    <div style={{ background: BG, border: `1px solid ${BDR}`, borderRadius: theme.radii.lg, padding: "20px 24px", ...style }}>
+    <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "20px 24px", ...style }}>
       {children}
     </div>
   );
 }
 
 function SH({ children }: { children: React.ReactNode }) {
+  const { TXT2 } = useColors();
   return (
     <div style={{ fontSize: 12, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 12 }}>
       {children}
@@ -46,31 +55,21 @@ function SH({ children }: { children: React.ReactNode }) {
 }
 
 function Spinner() {
+  const { TXT2 } = useColors();
   return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 240, color: TXT2, fontSize: 13 }}>Loading…</div>;
-}
-
-const TT = {
-  contentStyle: { background: "#fff", border: `1px solid ${BDR}`, borderRadius: 8, fontSize: 12 },
-  labelStyle: { fontWeight: 600, color: TXT },
-};
-
-function grid() { return <CartesianGrid strokeDasharray="3 3" stroke={BDR} />; }
-
-function fmtDate(d: string, days: number) {
-  const dt = new Date(d);
-  if (days <= 7)  return dt.toLocaleDateString("en-US", { weekday: "short" });
-  return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 // ─── KPI Tile ─────────────────────────────────────────────────────────────────
 
-function KpiTile({ label, value, unit = "", delta, invert = false, color = P, sub }:
+function KpiTile({ label, value, unit = "", delta, invert = false, color, sub }:
   { label: string; value: number; unit?: string; delta?: number; invert?: boolean; color?: string; sub?: string }) {
+  const { TXT2, P } = useColors();
+  const c = color ?? P;
   const good = invert ? (delta ?? 0) <= 0 : (delta ?? 0) >= 0;
   return (
     <Card style={{ flex: 1, minWidth: 140, padding: "16px 18px" }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 800, color, lineHeight: 1 }}>
+      <div style={{ fontSize: 26, fontWeight: 800, color: c, lineHeight: 1 }}>
         {Math.round(value * 10) / 10}
         <span style={{ fontSize: 13, fontWeight: 400, color: TXT2, marginLeft: 2 }}>{unit}</span>
       </div>
@@ -86,7 +85,6 @@ function KpiTile({ label, value, unit = "", delta, invert = false, color = P, su
 
 // ─── Data helpers ─────────────────────────────────────────────────────────────
 
-// Average multiple same-length series into one
 function avgSeries(all: TrendPoint[][]): TrendPoint[] {
   if (!all.length) return [];
   const len = Math.min(...all.map(s => s.length));
@@ -94,6 +92,12 @@ function avgSeries(all: TrendPoint[][]): TrendPoint[] {
     date: pt.date,
     value: Math.round((all.reduce((sum, s) => sum + (s[i]?.value ?? 0), 0) / all.length) * 10) / 10,
   }));
+}
+
+function fmtDate(d: string, days: number) {
+  const dt = new Date(d);
+  if (days <= 7) return dt.toLocaleDateString("en-US", { weekday: "short" });
+  return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 function fmtDateTick(days: number) {
@@ -118,6 +122,9 @@ function ComparisonChart({
   unit?: string;
   color: string;
 }) {
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight } = useColors();
+  const TT = chartTT(surface, border, text);
+
   const bars = projects
     .map(p => ({ name: p.name.length > 14 ? p.name.slice(0, 12) + "…" : p.name, value: data[p.id] ?? 0 }))
     .sort((a, b) => b.value - a.value);
@@ -128,9 +135,9 @@ function ComparisonChart({
       <div style={{ height: 200 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={bars} layout="vertical" margin={{ top: 0, right: 24, left: 8, bottom: 0 }}>
-            {grid()}
-            <XAxis type="number" tick={{ fontSize: 11, fill: TXT2 }} tickFormatter={(v: number) => `${v}${unit}`} />
-            <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: TXT2 }} width={100} />
+            {gridEl(border)}
+            <XAxis type="number" tick={{ fontSize: 11, fill: textLight }} tickFormatter={(v: number) => `${v}${unit}`} />
+            <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: textLight }} width={100} />
             <Tooltip {...TT} formatter={(v: any) => [`${v}${unit}`, metric]} />
             <Bar dataKey="value" fill={color} radius={[0, 4, 4, 0]} maxBarSize={18} />
           </BarChart>
@@ -148,9 +155,11 @@ export default function ExecutionTrendsPanel() {
   const [overviews, setOverviews] = useState<Record<string, TrendsOverview>>({});
   const [loading, setLoading]   = useState(true);
 
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, BG: bg, P } = useColors();
+  const TT = chartTT(surface, border, text);
+
   const days = DATE_RANGE_OPTIONS.find(o => o.value === range)?.days ?? 30;
 
-  // Load projects then their overviews in parallel
   useEffect(() => {
     setLoading(true);
     setOverviews({});
@@ -180,7 +189,6 @@ export default function ExecutionTrendsPanel() {
   const avgDelta = (key: keyof TrendsOverview["kpis"]) =>
     Math.round((loaded.reduce((s, o) => s + o.kpis[key].delta, 0) / n) * 10) / 10;
 
-  // Per-project snapshot values for comparison charts
   const covMap:  Record<string, number> = {};
   const passMap: Record<string, number> = {};
   const riskMap: Record<string, number> = {};
@@ -192,13 +200,11 @@ export default function ExecutionTrendsPanel() {
     testsMap[id] = o.kpis.testsTotal.value;
   });
 
-  // Aggregate trend series (average per day across projects)
   const covSeries  = avgSeries(loaded.map(o => o.series.coverage));
   const passSeries = avgSeries(loaded.map(o => o.series.passRate));
   const riskSeries = avgSeries(loaded.map(o => o.series.riskScore));
   const flakySeries = avgSeries(loaded.map(o => o.series.flakyCount));
 
-  // Multi-series for coverage: each project is a line
   const visibleProjects = projects.slice(0, 8);
   const multiCovData: Record<string, any>[] = (() => {
     if (!visibleProjects.length) return [];
@@ -216,7 +222,6 @@ export default function ExecutionTrendsPanel() {
   const thinnedFlaky = thin(flakySeries.map(p => ({ date: p.date, flakyCount: p.value })), days);
   const thinnedMulti = thin(multiCovData, days);
 
-  // Project health table
   const healthRows = visibleProjects.map(p => ({
     p,
     coverage: covMap[p.id] ?? 0,
@@ -227,8 +232,8 @@ export default function ExecutionTrendsPanel() {
 
   if (loading) return (
     <div>
-      <h1 style={{ fontSize: 22, fontWeight: 800, color: TXT, margin: "0 0 8px" }}>Org Trends</h1>
-      <p style={{ color: TXT2, fontSize: 13, marginBottom: 24 }}>Cross-project quality analytics</p>
+      <h1 style={{ fontSize: 22, fontWeight: 800, color: text, margin: "0 0 8px" }}>Org Trends</h1>
+      <p style={{ color: textLight, fontSize: 13, marginBottom: 24 }}>Cross-project quality analytics</p>
       <Spinner />
     </div>
   );
@@ -238,18 +243,18 @@ export default function ExecutionTrendsPanel() {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: TXT }}>Org Trends</h1>
-          <p style={{ margin: "4px 0 0", color: TXT2, fontSize: 13 }}>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: text }}>Org Trends</h1>
+          <p style={{ margin: "4px 0 0", color: textLight, fontSize: 13 }}>
             Cross-project quality analytics · {projects.length} project{projects.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <div style={{ display: "flex", gap: 4, background: BG, border: `1px solid ${BDR}`, borderRadius: theme.radii.md, padding: 4 }}>
+        <div style={{ display: "flex", gap: 4, background: bg, border: `1px solid ${border}`, borderRadius: 10, padding: 4 }}>
           {DATE_RANGE_OPTIONS.map(opt => (
             <button key={opt.value} onClick={() => setRange(opt.value)}
               style={{
-                padding: "6px 14px", borderRadius: theme.radii.sm, border: "none",
+                padding: "6px 14px", borderRadius: 6, border: "none",
                 background: range === opt.value ? P : "transparent",
-                color: range === opt.value ? "#fff" : TXT2,
+                color: range === opt.value ? "#fff" : textLight,
                 cursor: "pointer", fontSize: 13, fontWeight: range === opt.value ? 700 : 400,
                 transition: "background 0.15s",
               }}>
@@ -274,9 +279,9 @@ export default function ExecutionTrendsPanel() {
         <div style={{ height: 260 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={thinnedCov} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-              {grid()}
-              <XAxis dataKey="date" tickFormatter={fmtDateTick(days)} tick={{ fontSize: 11, fill: TXT2 }} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 11, fill: TXT2 }} width={40} tickFormatter={(v: number) => `${v}%`} />
+              {gridEl(border)}
+              <XAxis dataKey="date" tickFormatter={fmtDateTick(days)} tick={{ fontSize: 11, fill: textLight }} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 11, fill: textLight }} width={40} tickFormatter={(v: number) => `${v}%`} />
               <Tooltip {...TT} formatter={(v: any) => [`${v}%`]} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Line dataKey="coverage"  name="Avg Coverage %"   stroke={C.purple} strokeWidth={2.5} dot={false} />
@@ -294,9 +299,9 @@ export default function ExecutionTrendsPanel() {
           <div style={{ height: 260 }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={thinnedMulti} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-                {grid()}
-                <XAxis dataKey="date" tickFormatter={fmtDateTick(days)} tick={{ fontSize: 11, fill: TXT2 }} interval="preserveStartEnd" />
-                <YAxis tick={{ fontSize: 11, fill: TXT2 }} width={40} tickFormatter={(v: number) => `${v}%`} />
+                {gridEl(border)}
+                <XAxis dataKey="date" tickFormatter={fmtDateTick(days)} tick={{ fontSize: 11, fill: textLight }} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 11, fill: textLight }} width={40} tickFormatter={(v: number) => `${v}%`} />
                 <Tooltip {...TT} formatter={(v: any) => (v !== null ? [`${v}%`] : ["N/A"])} />
                 <Legend wrapperStyle={{ fontSize: 11 }} formatter={(val: string) => {
                   const p = visibleProjects.find(x => x.id === val);
@@ -323,9 +328,9 @@ export default function ExecutionTrendsPanel() {
                   <stop offset="95%" stopColor={C.orange} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              {grid()}
-              <XAxis dataKey="date" tickFormatter={fmtDateTick(days)} tick={{ fontSize: 11, fill: TXT2 }} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 11, fill: TXT2 }} width={36} />
+              {gridEl(border)}
+              <XAxis dataKey="date" tickFormatter={fmtDateTick(days)} tick={{ fontSize: 11, fill: textLight }} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 11, fill: textLight }} width={36} />
               <Tooltip {...TT} />
               <Area dataKey="flakyCount" name="Avg Flaky Tests" stroke={C.orange} fill="url(#flakyOrgGrad)" strokeWidth={2} dot={false} />
             </AreaChart>
@@ -349,16 +354,16 @@ export default function ExecutionTrendsPanel() {
           <SH>Project Health Matrix</SH>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
-              <tr style={{ borderBottom: `2px solid ${BDR}` }}>
+              <tr style={{ borderBottom: `2px solid ${border}` }}>
                 {["Project", "Type", "Coverage", "Pass Rate", "Risk", "Tests"].map(h => (
-                  <th key={h} style={{ textAlign: "left", padding: "6px 12px", fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
+                  <th key={h} style={{ textAlign: "left", padding: "6px 12px", fontSize: 11, fontWeight: 700, color: textLight, textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {healthRows.map(({ p, coverage, passRate, risk, tests }) => (
-                <tr key={p.id} style={{ borderBottom: `1px solid ${BDR}` }}>
-                  <td style={{ padding: "10px 12px", fontWeight: 600, color: TXT }}>{p.name}</td>
+                <tr key={p.id} style={{ borderBottom: `1px solid ${border}` }}>
+                  <td style={{ padding: "10px 12px", fontWeight: 600, color: text }}>{p.name}</td>
                   <td style={{ padding: "10px 12px" }}>
                     <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 4, fontWeight: 700, background: `${p.type === "ui" ? C.purple : p.type === "api" ? C.blue : C.orange}18`, color: p.type === "ui" ? C.purple : p.type === "api" ? C.blue : C.orange }}>
                       {p.type.toUpperCase()}
@@ -378,7 +383,7 @@ export default function ExecutionTrendsPanel() {
                   <td style={{ padding: "10px 12px" }}>
                     <span style={{ fontWeight: 600, color: risk <= 30 ? C.green : risk <= 60 ? C.orange : C.red }}>{risk}%</span>
                   </td>
-                  <td style={{ padding: "10px 12px", color: TXT2 }}>{tests}</td>
+                  <td style={{ padding: "10px 12px", color: textLight }}>{tests}</td>
                 </tr>
               ))}
             </tbody>

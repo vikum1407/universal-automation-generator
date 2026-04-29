@@ -1,29 +1,22 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useColors } from "@/hooks/useColors";
 import {
   fetchOrgInsights, fetchOrgInsightSummary, updateInsightStatus,
   SEVERITY_COLOR, SEVERITY_BG, TYPE_LABEL, TYPE_ICON, STATUS_LABEL, STATUS_COLOR,
   type Insight, type InsightSeverity, type InsightStatus, type InsightType, type OrgInsightSummary,
 } from "../../api/insights";
 
-// ─── Palette ───────────────────────────────────────────────────────────────────
-
-const P     = "#7B2FF7";
-const BG    = "#0f0f1a";
-const CARD  = "#141424";
-const BDR   = "#2a2a3d";
-const TXT   = "#e8e8f0";
-const TXT2  = "#8888aa";
-
 // ─── Summary tile ──────────────────────────────────────────────────────────────
 
 function SummaryTile({
   label, value, color, icon,
 }: { label: string; value: number; color: string; icon: string }) {
+  const { CARD: surface, BDR: border, TXT2: textLight } = useColors();
   return (
     <div style={{
-      background: CARD, border: `1px solid ${BDR}`, borderRadius: 12,
+      background: surface, border: `1px solid ${border}`, borderRadius: 12,
       padding: "18px 22px", display: "flex", alignItems: "center", gap: 14, flex: 1,
     }}>
       <div style={{
@@ -34,7 +27,7 @@ function SummaryTile({
       }}>{icon}</div>
       <div>
         <div style={{ fontSize: 26, fontWeight: 800, color, lineHeight: 1 }}>{value}</div>
-        <div style={{ fontSize: 12, color: TXT2, marginTop: 3, fontWeight: 500 }}>{label}</div>
+        <div style={{ fontSize: 12, color: textLight, marginTop: 3, fontWeight: 500 }}>{label}</div>
       </div>
     </div>
   );
@@ -74,7 +67,8 @@ function StatusChip({ status }: { status: InsightStatus }) {
 function InsightRow({
   insight, active, onClick,
 }: { insight: Insight; active: boolean; onClick: () => void }) {
-  const icon = TYPE_ICON[insight.type] ?? "💡";
+  const { TXT: text, TXT2: textLight, P } = useColors();
+  const icon  = TYPE_ICON[insight.type] ?? "💡";
   const label = TYPE_LABEL[insight.type] ?? insight.type;
   const color = SEVERITY_COLOR[insight.severity];
 
@@ -101,24 +95,24 @@ function InsightRow({
       }} />
 
       <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: TXT, lineHeight: 1.4 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: text, lineHeight: 1.4 }}>
           {insight.title}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
           <span style={{ fontSize: 12 }}>{icon}</span>
-          <span style={{ fontSize: 11, color: TXT2 }}>{label}</span>
-          {insight.area && <span style={{ fontSize: 11, color: TXT2 }}>· {insight.area}</span>}
+          <span style={{ fontSize: 11, color: textLight }}>{label}</span>
+          {insight.area && <span style={{ fontSize: 11, color: textLight }}>· {insight.area}</span>}
         </div>
       </div>
 
-      <div style={{ fontSize: 12, color: TXT2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <div style={{ fontSize: 12, color: textLight, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {insight.projectName ?? "—"}
       </div>
 
       <div><SeverityBadge severity={insight.severity} /></div>
       <div><StatusChip status={insight.status} /></div>
 
-      <div style={{ fontSize: 11, color: TXT2 }}>{fmtAge(insight.createdAt)}</div>
+      <div style={{ fontSize: 11, color: textLight }}>{fmtAge(insight.createdAt)}</div>
     </div>
   );
 }
@@ -133,7 +127,10 @@ function DetailDrawer({
   onStatusChange: (id: string, status: InsightStatus) => void;
 }) {
   const navigate = useNavigate();
-  const icon = TYPE_ICON[insight.type] ?? "💡";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, BG: pageBg, P, dark } = useColors();
+  const metricBg = dark ? "#1a1a2e" : "#f0f0f8";
+
+  const icon  = TYPE_ICON[insight.type] ?? "💡";
   const color = SEVERITY_COLOR[insight.severity];
   const statuses: InsightStatus[] = ["open", "in-progress", "resolved", "dismissed"];
 
@@ -157,28 +154,28 @@ function DetailDrawer({
       <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)" }} onClick={onClose} />
       <div style={{
         position: "relative", width: 480, height: "100%",
-        background: CARD, borderLeft: `1px solid ${BDR}`,
+        background: surface, borderLeft: `1px solid ${border}`,
         display: "flex", flexDirection: "column", overflow: "hidden", zIndex: 1,
         boxShadow: "-8px 0 40px rgba(0,0,0,0.4)",
       }}>
         {/* Header */}
-        <div style={{ padding: "20px 24px", borderBottom: `1px solid ${BDR}`, display: "flex", alignItems: "flex-start", gap: 12 }}>
+        <div style={{ padding: "20px 24px", borderBottom: `1px solid ${border}`, display: "flex", alignItems: "flex-start", gap: 12 }}>
           <div style={{
             width: 42, height: 42, borderRadius: 10, flexShrink: 0,
             background: `${color}18`, border: `1px solid ${color}30`,
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
           }}>{icon}</div>
           <div style={{ flex: 1, overflow: "hidden" }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: TXT, lineHeight: 1.4 }}>{insight.title}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: text, lineHeight: 1.4 }}>{insight.title}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
               <SeverityBadge severity={insight.severity} />
               <StatusChip status={insight.status} />
-              <span style={{ fontSize: 11, color: TXT2 }}>{TYPE_LABEL[insight.type]}</span>
+              <span style={{ fontSize: 11, color: textLight }}>{TYPE_LABEL[insight.type]}</span>
             </div>
           </div>
           <button onClick={onClose} style={{
             width: 28, height: 28, borderRadius: 6, border: "none",
-            background: "transparent", color: TXT2, cursor: "pointer",
+            background: "transparent", color: textLight, cursor: "pointer",
             fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center",
           }}>✕</button>
         </div>
@@ -187,7 +184,7 @@ function DetailDrawer({
         <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
 
           <DrawerSection title="What this means">
-            <p style={{ fontSize: 13, color: TXT2, lineHeight: 1.7, margin: 0 }}>{insight.description}</p>
+            <p style={{ fontSize: 13, color: textLight, lineHeight: 1.7, margin: 0 }}>{insight.description}</p>
           </DrawerSection>
 
           {Object.keys(insight.metricsSnapshot ?? {}).length > 0 && (
@@ -196,10 +193,10 @@ function DetailDrawer({
                 {Object.entries(insight.metricsSnapshot).map(([k, v]) => (
                   <div key={k} style={{
                     padding: "6px 12px", borderRadius: 8,
-                    background: "#1a1a2e", border: `1px solid ${BDR}`, fontSize: 12,
+                    background: metricBg, border: `1px solid ${border}`, fontSize: 12,
                   }}>
-                    <span style={{ color: TXT2 }}>{fmtMetricKey(k)}: </span>
-                    <span style={{ color: TXT, fontWeight: 700 }}>{v}</span>
+                    <span style={{ color: textLight }}>{fmtMetricKey(k)}: </span>
+                    <span style={{ color: text, fontWeight: 700 }}>{v}</span>
                   </div>
                 ))}
               </div>
@@ -236,7 +233,7 @@ function DetailDrawer({
                   >
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 600, color: P }}>{action.label}</div>
-                      {action.description && <div style={{ fontSize: 11, color: TXT2, marginTop: 2 }}>{action.description}</div>}
+                      {action.description && <div style={{ fontSize: 11, color: textLight, marginTop: 2 }}>{action.description}</div>}
                     </div>
                     <span style={{ color: P, fontSize: 14 }}>→</span>
                   </button>
@@ -251,15 +248,15 @@ function DetailDrawer({
                 <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 11, fontWeight: 700, background: `${P}18`, color: P }}>
                   {insight.projectType?.toUpperCase() ?? "PROJECT"}
                 </span>
-                <span style={{ fontSize: 13, color: TXT }}>{insight.projectName}</span>
+                <span style={{ fontSize: 13, color: text }}>{insight.projectName}</span>
               </div>
             </DrawerSection>
           )}
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "16px 24px", borderTop: `1px solid ${BDR}` }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+        <div style={{ padding: "16px 24px", borderTop: `1px solid ${border}` }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
             Update status
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -289,22 +286,24 @@ function DetailDrawer({
 // ─── Small helpers ─────────────────────────────────────────────────────────────
 
 function DrawerSection({ title, children }: { title: string; children: React.ReactNode }) {
+  const { TXT2: textLight } = useColors();
   return (
     <div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>{title}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: textLight, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>{title}</div>
       {children}
     </div>
   );
 }
 
 function EntityPill({ label, count, color }: { label: string; count: number; color: string }) {
+  const { TXT: text } = useColors();
   return (
     <div style={{
       display: "flex", alignItems: "center", gap: 8,
       padding: "6px 12px", borderRadius: 8, background: `${color}10`, border: `1px solid ${color}25`, fontSize: 12,
     }}>
       <span style={{ width: 20, height: 20, borderRadius: 5, background: `${color}25`, color, fontWeight: 800, fontSize: 11, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>
-      <span style={{ color: TXT }}>{label}</span>
+      <span style={{ color: text }}>{label}</span>
     </div>
   );
 }
@@ -319,15 +318,16 @@ const TYPE_OPTIONS: InsightType[]         = [
 ];
 
 function FilterChip({ label, active, color, onClick }: { label: string; active: boolean; color?: string; onClick: () => void }) {
+  const { BDR: border, TXT2: textLight, P } = useColors();
   const c = color ?? P;
   return (
     <button
       onClick={onClick}
       style={{
         padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600,
-        border: `1px solid ${active ? c : BDR}`,
+        border: `1px solid ${active ? c : border}`,
         background: active ? `${c}18` : "transparent",
-        color: active ? c : TXT2,
+        color: active ? c : textLight,
         cursor: "pointer", transition: "all 0.12s",
       }}
     >{label}</button>
@@ -338,10 +338,11 @@ function FilterChip({ label, active, color, onClick }: { label: string; active: 
 
 function TopProjectsWidget({ projects }: { projects: OrgInsightSummary["topProjects"] }) {
   const navigate = useNavigate();
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight } = useColors();
   const max = projects[0]?.total ?? 1;
   return (
-    <div style={{ background: CARD, border: `1px solid ${BDR}`, borderRadius: 12, padding: "16px 20px" }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
+    <div style={{ background: surface, border: `1px solid ${border}`, borderRadius: 12, padding: "16px 20px" }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
         Top projects by open insights
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -349,7 +350,7 @@ function TopProjectsWidget({ projects }: { projects: OrgInsightSummary["topProje
           <div key={p.id} style={{ cursor: "pointer" }} onClick={() => navigate(`/projects/${p.id}`)}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
               <span style={{
-                fontSize: 12, color: TXT, fontWeight: 500,
+                fontSize: 12, color: text, fontWeight: 500,
                 flex: 1, minWidth: 0,
                 overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
               }}>
@@ -361,10 +362,10 @@ function TopProjectsWidget({ projects }: { projects: OrgInsightSummary["topProje
                     {p.critical}c
                   </span>
                 )}
-                <span style={{ fontSize: 11, color: TXT2, whiteSpace: "nowrap" }}>{p.total}</span>
+                <span style={{ fontSize: 11, color: textLight, whiteSpace: "nowrap" }}>{p.total}</span>
               </div>
             </div>
-            <div style={{ height: 4, borderRadius: 2, background: BDR, overflow: "hidden" }}>
+            <div style={{ height: 4, borderRadius: 2, background: border, overflow: "hidden" }}>
               <div style={{
                 height: "100%", borderRadius: 2,
                 width: `${Math.round((p.total / max) * 100)}%`,
@@ -423,6 +424,8 @@ export default function ExecutionInsightsPanel() {
   const [filterStatus,   setFilterStatus]   = useState<InsightStatus | null>("open");
   const [filterType,     setFilterType]     = useState<InsightType | null>(null);
 
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, BG: bg, P } = useColors();
+
   const load = useCallback(async () => {
     try {
       const [ins, sum] = await Promise.all([
@@ -467,13 +470,13 @@ export default function ExecutionInsightsPanel() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: BG, color: TXT, fontFamily: "system-ui, -apple-system, sans-serif", padding: "28px 32px" }}>
+    <div style={{ minHeight: "100vh", background: bg, color: text, fontFamily: "system-ui, -apple-system, sans-serif", padding: "28px 32px" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: TXT }}>Insights</h1>
-          <p style={{ margin: "4px 0 0", fontSize: 13, color: TXT2 }}>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: text }}>Insights</h1>
+          <p style={{ margin: "4px 0 0", fontSize: 13, color: textLight }}>
             Prioritized signals across all projects — what to care about right now
           </p>
         </div>
@@ -481,7 +484,7 @@ export default function ExecutionInsightsPanel() {
           onClick={handleRefresh} disabled={refreshing}
           style={{
             padding: "9px 18px", borderRadius: 10, border: "none",
-            background: refreshing ? BDR : P, color: "#fff",
+            background: refreshing ? border : P, color: "#fff",
             fontWeight: 700, fontSize: 13, cursor: refreshing ? "wait" : "pointer",
             opacity: refreshing ? 0.7 : 1,
           }}
@@ -491,7 +494,7 @@ export default function ExecutionInsightsPanel() {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: "center", color: TXT2, paddingTop: 80, fontSize: 14 }}>
+        <div style={{ textAlign: "center", color: textLight, paddingTop: 80, fontSize: 14 }}>
           Analyzing all projects…
         </div>
       ) : (
@@ -510,19 +513,19 @@ export default function ExecutionInsightsPanel() {
             <div>
               {/* Filters */}
               <div style={{ marginBottom: 14, display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
-                <span style={{ fontSize: 12, color: TXT2, fontWeight: 600 }}>Severity:</span>
+                <span style={{ fontSize: 12, color: textLight, fontWeight: 600 }}>Severity:</span>
                 {SEVERITY_OPTIONS.map(s => (
                   <FilterChip key={s} label={s} active={filterSeverity === s} color={SEVERITY_COLOR[s]}
                     onClick={() => setFilterSeverity(filterSeverity === s ? null : s)} />
                 ))}
-                <div style={{ width: 1, height: 16, background: BDR, margin: "0 4px" }} />
-                <span style={{ fontSize: 12, color: TXT2, fontWeight: 600 }}>Status:</span>
+                <div style={{ width: 1, height: 16, background: border, margin: "0 4px" }} />
+                <span style={{ fontSize: 12, color: textLight, fontWeight: 600 }}>Status:</span>
                 {STATUS_OPTIONS.map(s => (
                   <FilterChip key={s} label={STATUS_LABEL[s]} active={filterStatus === s} color={STATUS_COLOR[s]}
                     onClick={() => setFilterStatus(filterStatus === s ? null : s)} />
                 ))}
-                <div style={{ width: 1, height: 16, background: BDR, margin: "0 4px" }} />
-                <span style={{ fontSize: 12, color: TXT2, fontWeight: 600 }}>Type:</span>
+                <div style={{ width: 1, height: 16, background: border, margin: "0 4px" }} />
+                <span style={{ fontSize: 12, color: textLight, fontWeight: 600 }}>Type:</span>
                 {TYPE_OPTIONS.map(t => (
                   <FilterChip key={t} label={TYPE_LABEL[t]} active={filterType === t}
                     onClick={() => setFilterType(filterType === t ? null : t)} />
@@ -530,23 +533,23 @@ export default function ExecutionInsightsPanel() {
               </div>
 
               {/* Table */}
-              <div style={{ background: CARD, border: `1px solid ${BDR}`, borderRadius: 12, overflow: "hidden" }}>
+              <div style={{ background: surface, border: `1px solid ${border}`, borderRadius: 12, overflow: "hidden" }}>
                 <div style={{
                   display: "grid", gridTemplateColumns: "36px 1fr 120px 110px 100px 90px",
-                  gap: 12, padding: "10px 18px", borderBottom: `1px solid ${BDR}`,
-                  fontSize: 11, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.07em",
+                  gap: 12, padding: "10px 18px", borderBottom: `1px solid ${border}`,
+                  fontSize: 11, fontWeight: 700, color: textLight, textTransform: "uppercase", letterSpacing: "0.07em",
                 }}>
                   <div /><div>Insight</div><div>Project</div><div>Severity</div><div>Status</div><div>Age</div>
                 </div>
 
                 {insights.length === 0 ? (
-                  <div style={{ padding: "40px 20px", textAlign: "center", color: TXT2, fontSize: 13 }}>
+                  <div style={{ padding: "40px 20px", textAlign: "center", color: textLight, fontSize: 13 }}>
                     {filterStatus === "open"
                       ? "No open insights — your projects look healthy 🎉"
                       : "No insights match the current filters"}
                   </div>
                 ) : insights.map(insight => (
-                  <div key={insight.id} style={{ borderBottom: `1px solid ${BDR}` }}>
+                  <div key={insight.id} style={{ borderBottom: `1px solid ${border}` }}>
                     <InsightRow
                       insight={insight}
                       active={selected?.id === insight.id}
@@ -557,7 +560,7 @@ export default function ExecutionInsightsPanel() {
               </div>
 
               {insights.length > 0 && (
-                <div style={{ fontSize: 11, color: TXT2, marginTop: 8, textAlign: "right" }}>
+                <div style={{ fontSize: 11, color: textLight, marginTop: 8, textAlign: "right" }}>
                   {insights.length} insight{insights.length !== 1 ? "s" : ""}
                 </div>
               )}
@@ -567,8 +570,8 @@ export default function ExecutionInsightsPanel() {
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {summary?.topProjects?.length ? <TopProjectsWidget projects={summary.topProjects} /> : null}
 
-              <div style={{ background: CARD, border: `1px solid ${BDR}`, borderRadius: 12, padding: "16px 20px" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: TXT2, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
+              <div style={{ background: surface, border: `1px solid ${border}`, borderRadius: 12, padding: "16px 20px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: textLight, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
                   By type
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -579,7 +582,7 @@ export default function ExecutionInsightsPanel() {
                       <div key={type} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}
                         onClick={() => setFilterType(filterType === type ? null : type)}>
                         <span style={{ fontSize: 14 }}>{TYPE_ICON[type]}</span>
-                        <span style={{ fontSize: 12, color: TXT, flex: 1 }}>{TYPE_LABEL[type]}</span>
+                        <span style={{ fontSize: 12, color: text, flex: 1 }}>{TYPE_LABEL[type]}</span>
                         <span style={{ fontSize: 11, fontWeight: 700, color: P, background: `${P}15`, padding: "1px 7px", borderRadius: 10 }}>
                           {count}
                         </span>

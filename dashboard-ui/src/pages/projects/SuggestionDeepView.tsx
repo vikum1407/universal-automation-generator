@@ -1,4 +1,4 @@
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { Suggestion } from "@/api/suggestions";
 import { TYPE_COLOR, TYPE_LABEL, RISK_COLOR } from "@/api/suggestions";
 
@@ -14,9 +14,8 @@ function Badge({ label, color }: { label: string; color: string }) {
 }
 
 function ScoreBar({ value, color, label }: { value: number; color: string; label: string }) {
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? "#2a2a3a" : "#eee";
+  const { TXT2: textLight, dark } = useColors();
+  const bg = dark ? "#2a2a3a" : "#eee";
 
   return (
     <div style={{ marginBottom: 10 }}>
@@ -32,9 +31,7 @@ function ScoreBar({ value, color, label }: { value: number; color: string; label
 }
 
 function InfoRow({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
-  const isDark = theme.mode === "dark";
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { TXT: text, TXT2: textLight } = useColors();
 
   return (
     <div style={{ marginBottom: 8 }}>
@@ -72,12 +69,8 @@ interface Props {
 export default function SuggestionDeepView({ suggestion, applyingAction, onClose, onApply, onDismiss }: Props) {
   if (!suggestion) return null;
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? theme.colors.darkBackground : "#f5f5f8";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, dark } = useColors();
+  const bg = dark ? "#1a1a2e" : "#f5f5f8";
 
   const typeColor = TYPE_COLOR[suggestion.type];
   const riskColor = RISK_COLOR[suggestion.riskLevel];
@@ -131,7 +124,7 @@ export default function SuggestionDeepView({ suggestion, applyingAction, onClose
 
           <h3 style={{
             margin: 0, fontSize: 14, fontWeight: 700,
-            color: theme.colors.primary, lineHeight: 1.4,
+            color: P, lineHeight: 1.4,
           }}>
             {suggestion.title}
           </h3>
@@ -215,7 +208,7 @@ export default function SuggestionDeepView({ suggestion, applyingAction, onClose
                         padding: "10px 16px", borderRadius: 10,
                         border: isPrimary ? "none" : `1px solid ${border}`,
                         background: isPrimary
-                          ? (isThisLoading ? "#9e7de0" : theme.colors.primary)
+                          ? (isThisLoading ? "#9e7de0" : P)
                           : "transparent",
                         color: isPrimary ? "#fff" : text,
                         fontWeight: 600, fontSize: 13,
@@ -251,9 +244,9 @@ export default function SuggestionDeepView({ suggestion, applyingAction, onClose
               {applyingAction && (
                 <div style={{
                   marginTop: 10, padding: "10px 14px", borderRadius: 8,
-                  background: `${theme.colors.primary}15`,
-                  border: `1px solid ${theme.colors.primary}33`,
-                  fontSize: 12, color: theme.colors.primary, fontWeight: 500,
+                  background: `${P}15`,
+                  border: `1px solid ${P}33`,
+                  fontSize: 12, color: P, fontWeight: 500,
                   display: "flex", alignItems: "center", gap: 8,
                 }}>
                   <span style={{ fontSize: 14 }}>⏳</span>
@@ -281,7 +274,7 @@ export default function SuggestionDeepView({ suggestion, applyingAction, onClose
               }}
               onMouseEnter={e => {
                 (e.currentTarget as HTMLButtonElement).style.background =
-                  isDark ? "#2a2a3a" : "#f5f5f8";
+                  dark ? "#2a2a3a" : "#f5f5f8";
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLButtonElement).style.background = "transparent";

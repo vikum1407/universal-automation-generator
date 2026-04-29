@@ -1,4 +1,4 @@
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { RTMInsights as RTMInsightsType, RTMRequirement } from "@/api/rtm";
 
 const RISK_COLOR: Record<string, string> = {
@@ -15,21 +15,18 @@ function InsightCard({
   icon: string; title: string; count: number; color: string;
   children: React.ReactNode;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight } = useColors();
 
   return (
     <div style={{
       padding: "16px 18px", borderRadius: 14,
       background: surface, border: `1px solid ${border}`,
-      boxShadow: theme.shadow.card
+      boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
         <span style={{ fontSize: 20 }}>{icon}</span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: isDark ? theme.colors.darkText : theme.colors.textDark }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: text }}>
             {title}
           </div>
         </div>
@@ -48,10 +45,7 @@ function InsightCard({
 }
 
 function ReqChip({ req, onSelect }: { req: RTMRequirement; onSelect: () => void }) {
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
+  const { BDR: border, TXT: text, TXT2: textLight, dark } = useColors();
 
   return (
     <div
@@ -63,7 +57,7 @@ function ReqChip({ req, onSelect }: { req: RTMRequirement; onSelect: () => void 
         transition: "background 0.12s ease"
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLDivElement).style.background = isDark ? "#2A1A40" : "#EDE4FF";
+        (e.currentTarget as HTMLDivElement).style.background = dark ? "#2A1A40" : "#EDE4FF";
       }}
       onMouseLeave={e => {
         (e.currentTarget as HTMLDivElement).style.background = "transparent";
@@ -93,8 +87,7 @@ export default function RTMInsights({
   insights: RTMInsightsType;
   onSelectReq: (req: RTMRequirement) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { TXT: text, TXT2: textLight, BDR: border } = useColors();
 
   const totalIssues = insights.highRiskUncovered.length +
     insights.duplicateSuspects.length +
@@ -116,7 +109,7 @@ export default function RTMInsights({
   return (
     <div style={{ marginTop: 24 }}>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 16, fontWeight: 700, color: isDark ? theme.colors.darkText : theme.colors.textDark }}>
+        <div style={{ fontSize: 16, fontWeight: 700, color: text }}>
           AI Insights
         </div>
         <div style={{ fontSize: 12, color: textLight, marginTop: 3 }}>
@@ -150,26 +143,20 @@ export default function RTMInsights({
           count={insights.duplicateSuspects.length}
           color="#FFA726"
         >
-          {insights.duplicateSuspects.slice(0, 4).map((d, i) => {
-            const isDark2 = theme.mode === "dark";
-            const border = isDark2 ? theme.colors.darkBorder : theme.colors.border;
-            const text = isDark2 ? theme.colors.darkText : theme.colors.textDark;
-            const tl = isDark2 ? theme.colors.darkTextLight : theme.colors.textLight;
-            return (
-              <div key={i} style={{
-                padding: "8px 12px", borderRadius: 8,
-                border: `1px solid ${border}`, marginBottom: 6
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                  <span style={{ fontSize: 10, color: "#FFA726", fontWeight: 700 }}>
-                    {d.similarity}% similar
-                  </span>
-                </div>
-                <div style={{ fontSize: 11, color: text, marginBottom: 2 }}>{d.titles[0]}</div>
-                <div style={{ fontSize: 11, color: tl }}>{d.titles[1]}</div>
+          {insights.duplicateSuspects.slice(0, 4).map((d, i) => (
+            <div key={i} style={{
+              padding: "8px 12px", borderRadius: 8,
+              border: `1px solid ${border}`, marginBottom: 6
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                <span style={{ fontSize: 10, color: "#FFA726", fontWeight: 700 }}>
+                  {d.similarity}% similar
+                </span>
               </div>
-            );
-          })}
+              <div style={{ fontSize: 11, color: text, marginBottom: 2 }}>{d.titles[0]}</div>
+              <div style={{ fontSize: 11, color: textLight }}>{d.titles[1]}</div>
+            </div>
+          ))}
         </InsightCard>
 
         {/* Needs rewrite */}

@@ -1,4 +1,4 @@
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { RTMAnalytics } from "@/api/rtm";
 
 const SCORE_COLOR = (v: number) => v >= 75 ? "#00C853" : v >= 50 ? "#FFA726" : "#EF5350";
@@ -10,20 +10,16 @@ function MetricTile({
   label: string; value: string | number; sub?: string;
   valueColor?: string; icon: string;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P } = useColors();
 
   return (
     <div style={{
       flex: "1 1 140px", padding: "16px 18px", borderRadius: 14,
       background: surface, border: `1px solid ${border}`,
-      boxShadow: theme.shadow.card, minWidth: 0,
+      boxShadow: "0 2px 8px rgba(0,0,0,0.06)", minWidth: 0,
     }}>
       <div style={{ fontSize: 22, marginBottom: 6 }}>{icon}</div>
-      <div style={{ fontSize: 24, fontWeight: 800, color: valueColor ?? theme.colors.primary, lineHeight: 1 }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: valueColor ?? P, lineHeight: 1 }}>
         {value}
       </div>
       <div style={{ fontSize: 12, fontWeight: 600, color: text, marginTop: 5 }}>{label}</div>
@@ -33,8 +29,7 @@ function MetricTile({
 }
 
 function TrendBadge({ label, count, color }: { label: string; count: number; color: string }) {
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { TXT2: textLight } = useColors();
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
       <span style={{
@@ -47,10 +42,7 @@ function TrendBadge({ label, count, color }: { label: string; count: number; col
 }
 
 export default function RTMDashboard({ analytics }: { analytics: RTMAnalytics }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT2: textLight } = useColors();
 
   const coveragePct = analytics.coveragePercent;
   const uncoveredCount = analytics.totalRequirements - analytics.coveredRequirements;

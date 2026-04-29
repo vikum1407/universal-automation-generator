@@ -1,4 +1,5 @@
 import { theme } from "../../../../theme";
+import { useColors } from "@/hooks/useColors";
 import { useState } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -192,12 +193,8 @@ export default function ProjectSidebar({
   collapsed: boolean;
   setCollapsed: (v: boolean) => void;
 }) {
-  const P       = theme.colors.primary;
-  const BDR     = theme.colors.border;
-  const BG      = theme.colors.background;
-  const TXT     = theme.colors.textDark;
-  const TXT2    = theme.colors.textLight;
-  const APP_BG  = theme.colors.appBackground;
+  const { P, BDR, CARD: BG, TXT, TXT2 } = useColors();
+  const APP_BG = BG;
 
   const projectName: string = project.name || project.title || (
     project.type === "ui" ? "UI Project" : "API Project"

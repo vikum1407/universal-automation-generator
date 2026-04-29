@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { Suggestion, SuggestionType, RiskLevel } from "@/api/suggestions";
 import { TYPE_COLOR, TYPE_LABEL, RISK_COLOR } from "@/api/suggestions";
 
@@ -31,10 +31,7 @@ function Select({
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
 }) {
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const bg = isDark ? theme.colors.darkSurface : "#fff";
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
+  const { BDR: border, CARD: bg, TXT: text } = useColors();
 
   return (
     <select
@@ -74,11 +71,7 @@ function SuggestionRow({
   onApply: (s: Suggestion, actionType: string, payload?: any) => void;
   onDismiss: (s: Suggestion) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { BDR: border, TXT: text, TXT2: textLight, CARD: surface, P, dark } = useColors();
 
   const typeColor = TYPE_COLOR[suggestion.type];
   const riskColor = RISK_COLOR[suggestion.riskLevel];
@@ -92,16 +85,16 @@ function SuggestionRow({
       style={{
         cursor: "pointer",
         background: selected
-          ? isDark ? "#1e1230" : "#f0eaff"
+          ? dark ? "#1e1230" : "#f0eaff"
           : "transparent",
-        borderLeft: selected ? `3px solid ${theme.colors.primary}` : "3px solid transparent",
+        borderLeft: selected ? `3px solid ${P}` : "3px solid transparent",
         transition: "background 0.1s",
         opacity: suggestion.status === "dismissed" ? 0.45 : 1,
       }}
       onMouseEnter={e => {
         if (!selected) {
           (e.currentTarget as HTMLTableRowElement).style.background =
-            isDark ? "#1a1a2e" : "#fafafa";
+            dark ? "#1a1a2e" : "#fafafa";
         }
       }}
       onMouseLeave={e => {
@@ -152,7 +145,7 @@ function SuggestionRow({
         <div style={{ fontSize: 11, fontWeight: 700, color: impactColor, marginBottom: 3 }}>
           {suggestion.impact}%
         </div>
-        <div style={{ height: 4, borderRadius: 3, background: isDark ? "#333" : "#eee", overflow: "hidden" }}>
+        <div style={{ height: 4, borderRadius: 3, background: dark ? "#333" : "#eee", overflow: "hidden" }}>
           <div style={{
             height: "100%", width: `${suggestion.impact}%`,
             background: impactColor, borderRadius: 3,
@@ -189,7 +182,7 @@ function SuggestionRow({
               disabled={!!applyingAction}
               style={{
                 padding: "5px 11px", borderRadius: 7, border: "none",
-                background: applyingAction ? "#9e7de0" : theme.colors.primary,
+                background: applyingAction ? "#9e7de0" : P,
                 color: "#fff",
                 fontSize: 11, fontWeight: 700,
                 cursor: applyingAction ? "not-allowed" : "pointer",
@@ -240,11 +233,7 @@ export default function SuggestionsTable({
   onApply: (s: Suggestion, actionType: string, payload?: any) => void;
   onDismiss: (s: Suggestion) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, dark } = useColors();
 
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
@@ -273,7 +262,7 @@ export default function SuggestionsTable({
           onChange={e => setSearch(e.target.value)}
           style={{
             flex: "1 1 200px", padding: "7px 12px", borderRadius: 8,
-            border: `1px solid ${border}`, background: isDark ? theme.colors.darkSurface : "#fff",
+            border: `1px solid ${border}`, background: surface,
             color: text, fontSize: 12, outline: "none",
           }}
         />
@@ -297,7 +286,7 @@ export default function SuggestionsTable({
       {/* Table */}
       <div style={{
         borderRadius: 14, border: `1px solid ${border}`,
-        background: surface, boxShadow: theme.shadow.card,
+        background: surface, boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
         width: "100%", overflowX: "auto",
       }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 680 }}>

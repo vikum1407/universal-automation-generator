@@ -42,7 +42,7 @@ import { SettingsController } from './settings/settings.controller';
 import { TrendsController } from './trends/trends.controller';
 import { InsightsController, OrgInsightsController } from './insights/insights.controller';
 import { OverviewController } from './overview/overview.controller';
-import { ReadinessController } from './readiness/readiness.controller';
+import { ReadinessController, OrgReadinessController } from './readiness/readiness.controller';
 import { HeatMapController } from './heatmap/heatmap.controller';
 import { StoryController } from './story/story.controller';
 
@@ -77,6 +77,7 @@ import { StoryController } from './story/story.controller';
     OrgInsightsController,
     OverviewController,
     ReadinessController,
+    OrgReadinessController,
     HeatMapController,
     StoryController,
   ],

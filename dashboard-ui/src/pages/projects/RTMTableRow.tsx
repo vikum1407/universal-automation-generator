@@ -1,4 +1,4 @@
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { RTMRequirement } from "@/api/rtm";
 
 const RISK_COLOR: Record<string, string> = {
@@ -25,17 +25,13 @@ export default function RTMTableRow({
   onSelect: () => void;
   onRegenerate: () => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, dark } = useColors();
 
   const baseBg = isSelected
-    ? (isDark ? "#2A1A40" : "#EDE4FF")
+    ? (dark ? "#2A1A40" : "#EDE4FF")
     : idx % 2 === 0
     ? surface
-    : (isDark ? "#111118" : "#FAF7FF");
+    : (dark ? "#111118" : "#FAF7FF");
 
   const typeColor = TYPE_COLOR[req.type] ?? "#888";
   const riskColor = RISK_COLOR[req.riskLevel] ?? "#FFA726";
@@ -50,12 +46,12 @@ export default function RTMTableRow({
         background: baseBg,
         cursor: "pointer",
         transition: "background 0.12s ease",
-        borderLeft: isSelected ? `3px solid ${theme.colors.primary}` : "3px solid transparent",
+        borderLeft: isSelected ? `3px solid ${P}` : "3px solid transparent",
       }}
       onMouseEnter={e => {
         if (!isSelected)
           (e.currentTarget as HTMLTableRowElement).style.background =
-            isDark ? "#1E1E30" : "#F5EEFF";
+            dark ? "#1E1E30" : "#F5EEFF";
       }}
       onMouseLeave={e => {
         if (!isSelected)
@@ -65,7 +61,7 @@ export default function RTMTableRow({
 
       {/* ID */}
       <td style={{ padding: "11px 12px", borderBottom: `1px solid ${border}` }}>
-        <code style={{ fontSize: 11, color: theme.colors.primary, fontWeight: 700 }}>
+        <code style={{ fontSize: 11, color: P, fontWeight: 700 }}>
           {req.id}
         </code>
       </td>
@@ -89,7 +85,7 @@ export default function RTMTableRow({
             {req.tags.slice(0, 3).map((t, i) => (
               <span key={i} style={{
                 padding: "1px 6px", borderRadius: 8, fontSize: 10,
-                background: isDark ? "#2A1A40" : "#EDE4FF", color: theme.colors.primary
+                background: dark ? "#2A1A40" : "#EDE4FF", color: P
               }}>{t}</span>
             ))}
             {req.tags.length > 3 && (
@@ -143,7 +139,7 @@ export default function RTMTableRow({
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <div style={{
             width: 36, height: 6, borderRadius: 4, overflow: "hidden",
-            background: isDark ? "#333" : "#eee"
+            background: dark ? "#333" : "#eee"
           }}>
             <div style={{
               width: `${confidence}%`, height: "100%",
@@ -164,7 +160,7 @@ export default function RTMTableRow({
             onClick={onRegenerate}
             style={{
               padding: "4px 10px", borderRadius: 7, border: "none",
-              background: theme.colors.primary, color: "#fff",
+              background: P, color: "#fff",
               fontSize: 11, fontWeight: 600, cursor: "pointer",
               transition: "opacity 0.12s"
             }}
@@ -182,8 +178,8 @@ export default function RTMTableRow({
               transition: "all 0.12s"
             }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = theme.colors.primary;
-              (e.currentTarget as HTMLButtonElement).style.color = theme.colors.primary;
+              (e.currentTarget as HTMLButtonElement).style.borderColor = P;
+              (e.currentTarget as HTMLButtonElement).style.color = P;
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLButtonElement).style.borderColor = border;

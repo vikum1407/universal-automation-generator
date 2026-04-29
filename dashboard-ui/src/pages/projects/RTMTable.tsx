@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import { fetchRTM, regenerateRTM, exportRTMUrl } from "@/api/rtm";
 import type { RTMEnterpriseResponse, RTMRequirement } from "@/api/rtm";
 
@@ -37,17 +38,13 @@ function Toolbar({
   projectId: string;
   onBulkRegen: () => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const selStyle = (active: boolean) => ({
     padding: "6px 10px", borderRadius: 8, fontSize: 12, fontWeight: active ? 700 : 400,
-    border: `1px solid ${active ? theme.colors.primary : border}`,
-    background: active ? `${theme.colors.primary}22` : "transparent",
-    color: active ? theme.colors.primary : textLight,
+    border: `1px solid ${active ? P : border}`,
+    background: active ? `${P}22` : "transparent",
+    color: active ? P : textLight,
     cursor: "pointer", transition: "all 0.12s ease"
   });
 
@@ -65,7 +62,7 @@ function Toolbar({
         placeholder="Search requirements…"
         style={{
           flex: "1 1 200px", padding: "7px 12px", borderRadius: 8,
-          border: `1px solid ${border}`, background: isDark ? "#111" : "#fff",
+          border: `1px solid ${border}`, background: surface,
           color: text, fontSize: 13, outline: "none"
         }}
       />
@@ -76,7 +73,7 @@ function Toolbar({
         onChange={e => onType(e.target.value)}
         style={{
           padding: "7px 10px", borderRadius: 8, border: `1px solid ${border}`,
-          background: isDark ? "#111" : "#fff", color: text, fontSize: 12, cursor: "pointer"
+          background: surface, color: text, fontSize: 12, cursor: "pointer"
         }}
       >
         <option value="all">All Types</option>
@@ -94,7 +91,7 @@ function Toolbar({
         onChange={e => onPriority(e.target.value)}
         style={{
           padding: "7px 10px", borderRadius: 8, border: `1px solid ${border}`,
-          background: isDark ? "#111" : "#fff", color: text, fontSize: 12, cursor: "pointer"
+          background: surface, color: text, fontSize: 12, cursor: "pointer"
         }}
       >
         <option value="all">All Priorities</option>
@@ -110,7 +107,7 @@ function Toolbar({
         onChange={e => onRisk(e.target.value)}
         style={{
           padding: "7px 10px", borderRadius: 8, border: `1px solid ${border}`,
-          background: isDark ? "#111" : "#fff", color: text, fontSize: 12, cursor: "pointer"
+          background: surface, color: text, fontSize: 12, cursor: "pointer"
         }}
       >
         <option value="all">All Risk</option>
@@ -153,8 +150,8 @@ function Toolbar({
           display: "flex", alignItems: "center", gap: 4, transition: "all 0.12s"
         }}
         onMouseEnter={e => {
-          (e.currentTarget as HTMLAnchorElement).style.borderColor = theme.colors.primary;
-          (e.currentTarget as HTMLAnchorElement).style.color = theme.colors.primary;
+          (e.currentTarget as HTMLAnchorElement).style.borderColor = P;
+          (e.currentTarget as HTMLAnchorElement).style.color = P;
         }}
         onMouseLeave={e => {
           (e.currentTarget as HTMLAnchorElement).style.borderColor = border;
@@ -168,7 +165,7 @@ function Toolbar({
         onClick={onBulkRegen}
         style={{
           padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600,
-          border: "none", background: theme.colors.primary, color: "#fff",
+          border: "none", background: P, color: "#fff",
           cursor: "pointer", transition: "opacity 0.12s"
         }}
         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
@@ -208,11 +205,7 @@ export default function RTMTable({ projectId }: { projectId: string }) {
   const [regenOpen, setRegenOpen] = useState(false);
   const [regenTarget, setRegenTarget] = useState<{ id: string; title: string } | null>(null);
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const load = () => {
     setLoading(true);
@@ -275,7 +268,7 @@ export default function RTMTable({ projectId }: { projectId: string }) {
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: 20 }}>
-        <h3 style={{ color: theme.colors.primary, margin: 0 }}>
+        <h3 style={{ color: P, margin: 0 }}>
           Requirements Traceability Matrix
         </h3>
         <div style={{ fontSize: 12, color: textLight, marginTop: 4 }}>

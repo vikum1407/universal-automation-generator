@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { TestItem, TestSummary, TestView, TestStatus, TestType } from "@/api/tests";
 import {
   fetchTests, fetchTestSummary,
@@ -64,11 +65,7 @@ function TestListView({
   onSelect: (t: TestItem) => void;
   onAction: (t: TestItem, action: string) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   if (!tests.length) {
     return (
@@ -102,13 +99,13 @@ function TestListView({
                 onClick={() => onSelect(t)}
                 style={{
                   cursor: "pointer",
-                  background: selected ? (isDark ? "#1e1230" : "#f0eaff") : "transparent",
-                  borderLeft: `3px solid ${selected ? theme.colors.primary : "transparent"}`,
+                  background: selected ? (`${P}15`) : "transparent",
+                  borderLeft: `3px solid ${selected ? P : "transparent"}`,
                   transition: "background 0.1s",
                 }}
                 onMouseEnter={e => {
                   if (!selected) (e.currentTarget as HTMLTableRowElement).style.background =
-                    isDark ? "#1a1a2e" : "#fafafa";
+                    bg;
                 }}
                 onMouseLeave={e => {
                   if (!selected) (e.currentTarget as HTMLTableRowElement).style.background = "transparent";
@@ -139,7 +136,7 @@ function TestListView({
                       {t.requirements.length} req{t.requirements.length !== 1 ? "s" : ""}
                     </span>
                   ) : (
-                    <span style={{ fontSize: 11, color: isDark ? "#444" : "#ccc" }}>—</span>
+                    <span style={{ fontSize: 11, color: border }}>—</span>
                   )}
                 </td>
                 {/* Stability */}
@@ -166,7 +163,7 @@ function TestListView({
                       background: "#9C27B022", color: "#9C27B0",
                     }}>{t.aiSuggestions}</span>
                   ) : (
-                    <span style={{ fontSize: 11, color: isDark ? "#444" : "#ccc" }}>—</span>
+                    <span style={{ fontSize: 11, color: border }}>—</span>
                   )}
                 </td>
                 {/* Actions */}
@@ -178,7 +175,7 @@ function TestListView({
                       title="Run test"
                       style={{
                         padding: "4px 10px", borderRadius: 6, border: "none",
-                        background: isActionLoading ? "#9e7de0" : theme.colors.primary,
+                        background: isActionLoading ? "#9e7de0" : P,
                         color: "#fff", fontSize: 11, fontWeight: 700,
                         cursor: isActionLoading ? "not-allowed" : "pointer",
                       }}
@@ -217,11 +214,7 @@ function TestTreeView({
   onSelect: (t: TestItem) => void;
   onAction: (t: TestItem, action: string) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const uiTests = tests.filter(t => t.type === "ui");
   const apiTests = tests.filter(t => t.type === "api");
@@ -265,8 +258,8 @@ function TestTreeView({
                   onClick={() => onSelect(t)}
                   style={{
                     padding: "9px 14px", borderRadius: 8,
-                    border: `1px solid ${isSelected ? theme.colors.primary : border}`,
-                    background: isSelected ? (isDark ? "#1e1230" : "#f0eaff") : surface,
+                    border: `1px solid ${isSelected ? P : border}`,
+                    background: isSelected ? (`${P}15`) : surface,
                     cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
                     transition: "background 0.1s",
                   }}
@@ -287,7 +280,7 @@ function TestTreeView({
                     disabled={isActionLoading}
                     style={{
                       padding: "3px 9px", borderRadius: 6, border: "none",
-                      background: isActionLoading ? "#9e7de0" : theme.colors.primary,
+                      background: isActionLoading ? "#9e7de0" : P,
                       color: "#fff", fontSize: 10, fontWeight: 700,
                       cursor: isActionLoading ? "not-allowed" : "pointer", flexShrink: 0,
                     }}
@@ -326,11 +319,7 @@ function TestRequirementView({
   selectedId: string | null;
   onSelect: (t: TestItem) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   // Group tests by first requirement
   const groups: Record<string, TestItem[]> = {};
@@ -345,12 +334,12 @@ function TestRequirementView({
       {Object.entries(groups).map(([req, reqTests]) => (
         <div key={req} style={{ borderRadius: 12, border: `1px solid ${border}`, background: surface, overflow: "hidden" }}>
           <div style={{
-            padding: "10px 16px", background: isDark ? "#1a1230" : "#f5eeff",
+            padding: "10px 16px", background: dark ? "#1a1230" : "#f5eeff",
             borderBottom: `1px solid ${border}`,
             display: "flex", alignItems: "center", gap: 10,
           }}>
             <span style={{ fontSize: 14 }}>📋</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: theme.colors.primary, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: P, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {req}
             </span>
             <span style={{ fontSize: 11, color: textLight }}>{reqTests.length} test{reqTests.length !== 1 ? "s" : ""}</span>
@@ -362,7 +351,7 @@ function TestRequirementView({
               style={{
                 padding: "9px 16px", display: "flex", alignItems: "center", gap: 10,
                 cursor: "pointer", borderBottom: `1px solid ${border}`,
-                background: t.id === selectedId ? (isDark ? "#1e1230" : "#f0eaff") : "transparent",
+                background: t.id === selectedId ? (`${P}15`) : "transparent",
                 transition: "background 0.1s",
               }}
             >
@@ -388,10 +377,7 @@ function TestRequirementView({
 function TestRiskView({ tests, selectedId, onSelect }: {
   tests: TestItem[]; selectedId: string | null; onSelect: (t: TestItem) => void;
 }) {
-  const isDark = theme.mode === "dark";
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const sorted = [...tests].sort((a, b) => b.riskScore - a.riskScore);
 
@@ -405,8 +391,8 @@ function TestRiskView({ tests, selectedId, onSelect }: {
             onClick={() => onSelect(t)}
             style={{
               padding: "12px 16px", borderRadius: 10,
-              border: `1px solid ${t.id === selectedId ? theme.colors.primary : border}`,
-              background: t.id === selectedId ? (isDark ? "#1e1230" : "#f0eaff") : surface,
+              border: `1px solid ${t.id === selectedId ? P : border}`,
+              background: t.id === selectedId ? (`${P}15`) : surface,
               cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
               transition: "background 0.1s",
             }}
@@ -436,11 +422,7 @@ function TestRiskView({ tests, selectedId, onSelect }: {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function TestRunner({ projectId }: { projectId: string }) {
-  const isDark = theme.mode === "dark";
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const [tests, setTests] = useState<TestItem[]>([]);
   const [summary, setSummary] = useState<TestSummary | null>(null);
@@ -556,7 +538,7 @@ export default function TestRunner({ projectId }: { projectId: string }) {
     <div style={{ width: "100%", minWidth: 0 }}>
       {/* Page header */}
       <div style={{ marginBottom: 20 }}>
-        <h2 style={{ margin: 0, color: theme.colors.primary, fontSize: 20, fontWeight: 800 }}>
+        <h2 style={{ margin: 0, color: P, fontSize: 20, fontWeight: 800 }}>
           Tests
         </h2>
         <p style={{ margin: "4px 0 0", fontSize: 13, color: textLight }}>
@@ -576,7 +558,7 @@ export default function TestRunner({ projectId }: { projectId: string }) {
           color: textLight, fontSize: 13,
         }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🧪</div>
-          <h3 style={{ margin: "0 0 8px", color: theme.colors.primary }}>No Tests Yet</h3>
+          <h3 style={{ margin: "0 0 8px", color: P }}>No Tests Yet</h3>
           <p style={{ maxWidth: 360, margin: "0 auto", lineHeight: 1.6 }}>
             Generate tests from the AI Suggestions tab or run a project scan to create your first test suite.
           </p>
@@ -598,7 +580,7 @@ export default function TestRunner({ projectId }: { projectId: string }) {
               onChange={e => setSearch(e.target.value)}
               style={{
                 flex: "1 1 180px", padding: "7px 12px", borderRadius: 8,
-                border: `1px solid ${border}`, background: isDark ? surface : "#fff",
+                border: `1px solid ${border}`, background: dark ? surface : "#fff",
                 color: text, fontSize: 12, outline: "none",
               }}
             />
@@ -609,7 +591,7 @@ export default function TestRunner({ projectId }: { projectId: string }) {
               onChange={e => setTypeFilter(e.target.value as any)}
               style={{
                 padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`,
-                background: isDark ? surface : "#fff", color: text, fontSize: 12,
+                background: dark ? surface : "#fff", color: text, fontSize: 12,
               }}
             >
               <option value="all">All Types</option>
@@ -623,7 +605,7 @@ export default function TestRunner({ projectId }: { projectId: string }) {
               onChange={e => setStatusFilter(e.target.value as any)}
               style={{
                 padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`,
-                background: isDark ? surface : "#fff", color: text, fontSize: 12,
+                background: dark ? surface : "#fff", color: text, fontSize: 12,
               }}
             >
               <option value="all">All Status</option>
@@ -645,10 +627,10 @@ export default function TestRunner({ projectId }: { projectId: string }) {
                   title={v.label}
                   style={{
                     padding: "6px 12px", borderRadius: 8,
-                    border: `1px solid ${activeView === v.id ? theme.colors.primary : border}`,
+                    border: `1px solid ${activeView === v.id ? P : border}`,
                     background: activeView === v.id
-                      ? `${theme.colors.primary}20` : "transparent",
-                    color: activeView === v.id ? theme.colors.primary : text,
+                      ? `${P}20` : "transparent",
+                    color: activeView === v.id ? P : text,
                     fontSize: 12, fontWeight: 600, cursor: "pointer",
                     display: "flex", alignItems: "center", gap: 5,
                   }}

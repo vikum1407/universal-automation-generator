@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import ReactFlow, { Background, Controls, MiniMap, Handle, Position } from "reactflow";
 import "reactflow/dist/style.css";
 import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { EnrichedFlow, EnrichedEndpoint, SystemMapSummary } from "@/api/system-map";
 import {
   fetchSystemMapSummary, fetchSystemFlows, fetchSystemEndpoints,
@@ -22,15 +23,14 @@ function Badge({ label, color, small }: { label: string; color: string; small?: 
 }
 
 function ScoreBar({ label, value, color }: { label: string; value: number; color: string }) {
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
   return (
     <div style={{ marginBottom: 8 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
         <span style={{ fontSize: 10, color: textLight }}>{label}</span>
         <span style={{ fontSize: 10, fontWeight: 700, color }}>{value}%</span>
       </div>
-      <div style={{ height: 4, borderRadius: 2, background: isDark ? "#333" : "#eee" }}>
+      <div style={{ height: 4, borderRadius: 2, background: border }}>
         <div style={{ height: "100%", width: `${value}%`, background: color, borderRadius: 2, transition: "width 0.4s" }} />
       </div>
     </div>
@@ -63,17 +63,13 @@ function MethodBadge({ method }: { method: string }) {
 function SummaryTiles({
   summary, rebuilding, onRebuild,
 }: { summary: SystemMapSummary; rebuilding: boolean; onRebuild: () => void }) {
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const tiles = [
     {
       icon: "🌐", label: "Total Flows", value: summary.totalFlows,
       sub: `${summary.coveredFlowsPct}% covered`,
-      color: theme.colors.primary,
+      color: P,
     },
     {
       icon: "🔌", label: "Total Endpoints", value: summary.totalEndpoints,
@@ -114,7 +110,7 @@ function SummaryTiles({
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
         <button onClick={onRebuild} disabled={rebuilding} style={{
           padding: "8px 18px", borderRadius: 8, border: "none",
-          background: rebuilding ? "#9e7de0" : theme.colors.primary,
+          background: rebuilding ? "#9e7de0" : P,
           color: "#fff", fontWeight: 700, fontSize: 12,
           cursor: rebuilding ? "not-allowed" : "pointer",
           display: "flex", alignItems: "center", gap: 6,
@@ -159,12 +155,7 @@ function FlowDetailPanel({
 
   if (!flow) return null;
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? theme.colors.darkBackground : "#f5f5f8";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const covColor = flow.coverageScore >= 70 ? "#66BB6A" : flow.coverageScore >= 30 ? "#FFA726" : "#EF5350";
   const riskColor = flow.riskScore >= 70 ? "#EF5350" : flow.riskScore >= 40 ? "#FFA726" : "#66BB6A";
@@ -192,13 +183,13 @@ function FlowDetailPanel({
     target: e.to,
     label: e.action,
     animated: true,
-    style: { stroke: theme.colors.primary, strokeWidth: 1.5 },
-    labelStyle: { fill: theme.colors.primary, fontSize: 9 },
+    style: { stroke: P, strokeWidth: 1.5 },
+    labelStyle: { fill: P, fontSize: 9 },
   }));
 
   const MiniFlowNode = ({ data }: any) => (
     <div style={{
-      padding: "6px 10px", borderRadius: 8, border: `1.5px solid ${theme.colors.primary}`,
+      padding: "6px 10px", borderRadius: 8, border: `1.5px solid ${P}`,
       background: surface, color: text, fontSize: 10, fontWeight: 600,
       width: 160, wordBreak: "break-word",
     }}>
@@ -227,7 +218,7 @@ function FlowDetailPanel({
             </div>
             <button onClick={onClose} style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 17, color: textLight }}>✕</button>
           </div>
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: theme.colors.primary }}>{flow.name}</h3>
+          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: P }}>{flow.name}</h3>
           <div style={{ fontSize: 11, color: textLight, marginTop: 3, fontFamily: "monospace", wordBreak: "break-all" }}>{flow.url}</div>
         </div>
 
@@ -243,7 +234,7 @@ function FlowDetailPanel({
             ].map(({ label, value }) => (
               <div key={label} style={{ padding: "10px 12px", borderRadius: 8, background: bg }}>
                 <div style={{ fontSize: 10, color: textLight, fontWeight: 700, textTransform: "uppercase" }}>{label}</div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: theme.colors.primary, marginTop: 2 }}>{value}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: P, marginTop: 2 }}>{value}</div>
               </div>
             ))}
           </div>
@@ -302,7 +293,7 @@ function FlowDetailPanel({
                   padding: "5px 10px", marginBottom: 3, borderRadius: 6,
                   background: bg, fontSize: 11, color: text, display: "flex", gap: 6,
                 }}>
-                  <span style={{ color: theme.colors.primary }}>→</span>{a}
+                  <span style={{ color: P }}>→</span>{a}
                 </div>
               ))}
             </div>
@@ -312,8 +303,8 @@ function FlowDetailPanel({
           {flow.coverageScore === 0 && (
             <div style={{
               padding: "10px 12px", borderRadius: 8,
-              background: isDark ? "#1a0e00" : "#fffbf0",
-              border: `1px solid ${isDark ? "#3a2a00" : "#FFE082"}`,
+              background: dark ? "#1a0e00" : "#fffbf0",
+              border: `1px solid ${dark ? "#3a2a00" : "#FFE082"}`,
             }}>
               <div style={{ fontSize: 10, fontWeight: 700, color: "#FFA726", textTransform: "uppercase", marginBottom: 4 }}>🧠 AI Insight</div>
               <div style={{ fontSize: 12, color: text, lineHeight: 1.6 }}>
@@ -341,7 +332,7 @@ function FlowDetailPanel({
                   nodeTypes={{ flowNode: MiniFlowNode }}
                   minZoom={0.4}
                 >
-                  <Background color={isDark ? "#333" : "#ddd"} gap={16} />
+                  <Background color={border} gap={16} />
                   <Controls />
                 </ReactFlow>
               </div>
@@ -369,13 +360,8 @@ function EndpointDetailPanel({
 
   if (!endpoint) return null;
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
-  const bg = isDark ? theme.colors.darkBackground : "#f5f5f8";
-  const codeBg = isDark ? "#0d0d1a" : "#f8f8ff";
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
+  const codeBg = dark ? "#0d0d1a" : "#f8f8ff";
 
   const methodColor = METHOD_COLOR[endpoint.method] ?? "#90A4AE";
   const covColor = endpoint.coverageScore >= 70 ? "#66BB6A" : endpoint.coverageScore >= 30 ? "#FFA726" : "#EF5350";
@@ -409,7 +395,7 @@ function EndpointDetailPanel({
             </div>
             <button onClick={onClose} style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 17, color: textLight }}>✕</button>
           </div>
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: theme.colors.primary, fontFamily: "monospace" }}>
+          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: P, fontFamily: "monospace" }}>
             {endpoint.path}
           </h3>
           {endpoint.summary && (
@@ -425,7 +411,7 @@ function EndpointDetailPanel({
         {/* Tab bar */}
         <div style={{
           display: "flex", borderBottom: `1px solid ${border}`, flexShrink: 0,
-          background: isDark ? theme.colors.darkBackground : "#fafafa",
+          background: dark ? theme.colors.darkBackground : "#fafafa",
         }}>
           {TABS.map(tab => (
             <button
@@ -433,9 +419,9 @@ function EndpointDetailPanel({
               onClick={() => setActiveTab(tab.id)}
               style={{
                 flex: 1, padding: "9px 4px", border: "none",
-                borderBottom: `2px solid ${activeTab === tab.id ? theme.colors.primary : "transparent"}`,
+                borderBottom: `2px solid ${activeTab === tab.id ? P : "transparent"}`,
                 background: "transparent",
-                color: activeTab === tab.id ? theme.colors.primary : textLight,
+                color: activeTab === tab.id ? P : textLight,
                 fontWeight: activeTab === tab.id ? 700 : 500, fontSize: 11,
                 cursor: "pointer", transition: "color 0.15s",
               }}
@@ -496,7 +482,7 @@ function EndpointDetailPanel({
                       padding: "7px 10px", marginBottom: 4, borderRadius: 6,
                       background: bg, border: `1px solid ${border}`, fontSize: 11,
                     }}>
-                      <span style={{ color: theme.colors.primary, fontWeight: 700 }}>{p.name}</span>
+                      <span style={{ color: P, fontWeight: 700 }}>{p.name}</span>
                       <span style={{ color: textLight, marginLeft: 6 }}>{p.in}</span>
                       {p.required && <Badge label="required" color="#EF5350" small />}
                       {p.description && <div style={{ color: textLight, fontSize: 10, marginTop: 2 }}>{p.description}</div>}
@@ -593,7 +579,7 @@ function EndpointDetailPanel({
           {activeTab === "insights" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {endpoint.coverageScore === 0 && (
-                <div style={{ padding: "12px 14px", borderRadius: 8, background: isDark ? "#1a0a00" : "#fff8f0", border: `1px solid ${isDark ? "#3a1500" : "#FFE0B2"}` }}>
+                <div style={{ padding: "12px 14px", borderRadius: 8, background: dark ? "#1a0a00" : "#fff8f0", border: `1px solid ${dark ? "#3a1500" : "#FFE0B2"}` }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: "#FF9800", textTransform: "uppercase", marginBottom: 6 }}>🔍 No Test Coverage</div>
                   <div style={{ fontSize: 12, color: text, lineHeight: 1.6 }}>
                     This endpoint has no automated tests. Any regressions or schema changes will go undetected.
@@ -603,7 +589,7 @@ function EndpointDetailPanel({
               )}
 
               {endpoint.riskScore >= 70 && (
-                <div style={{ padding: "12px 14px", borderRadius: 8, background: isDark ? "#1a0000" : "#fff5f5", border: `1px solid ${isDark ? "#3a0000" : "#FFCDD2"}` }}>
+                <div style={{ padding: "12px 14px", borderRadius: 8, background: dark ? "#1a0000" : "#fff5f5", border: `1px solid ${dark ? "#3a0000" : "#FFCDD2"}` }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: "#EF5350", textTransform: "uppercase", marginBottom: 6 }}>🔥 High Risk Endpoint</div>
                   <div style={{ fontSize: 12, color: text, lineHeight: 1.6 }}>
                     Risk score of {endpoint.riskScore}%. This endpoint may have high business impact or limited test stability.
@@ -613,7 +599,7 @@ function EndpointDetailPanel({
               )}
 
               {endpoint.hasFailingTests && (
-                <div style={{ padding: "12px 14px", borderRadius: 8, background: isDark ? "#1a0000" : "#fff5f5", border: `1px solid ${isDark ? "#3a0000" : "#FFCDD2"}` }}>
+                <div style={{ padding: "12px 14px", borderRadius: 8, background: dark ? "#1a0000" : "#fff5f5", border: `1px solid ${dark ? "#3a0000" : "#FFCDD2"}` }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: "#EF5350", textTransform: "uppercase", marginBottom: 6 }}>❌ Tests Failing</div>
                   <div style={{ fontSize: 12, color: text, lineHeight: 1.6 }}>
                     One or more tests for this endpoint are currently failing. Check the Auto-Heal tab for patch suggestions.
@@ -622,7 +608,7 @@ function EndpointDetailPanel({
               )}
 
               {endpoint.unused && (
-                <div style={{ padding: "12px 14px", borderRadius: 8, background: isDark ? "#1a1000" : "#fffbf0", border: `1px solid ${isDark ? "#3a2500" : "#FFE082"}` }}>
+                <div style={{ padding: "12px 14px", borderRadius: 8, background: dark ? "#1a1000" : "#fffbf0", border: `1px solid ${dark ? "#3a2500" : "#FFE082"}` }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: "#FFA726", textTransform: "uppercase", marginBottom: 6 }}>⚠️ Unused Endpoint</div>
                   <div style={{ fontSize: 12, color: text, lineHeight: 1.6 }}>
                     No tests or requirements are linked to this endpoint. It may be deprecated, undocumented, or a coverage gap.
@@ -657,11 +643,7 @@ function FlowsTab({
   const [showFullGraph, setShowFullGraph] = useState(false);
   const [riskFilter, setRiskFilter] = useState<"all" | "high" | "low">("all");
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const filtered = flows.filter(f => {
     if (riskFilter === "high") return f.riskScore >= 70;
@@ -683,13 +665,13 @@ function FlowsTab({
     target: e.to,
     label: e.action,
     animated: true,
-    style: { stroke: theme.colors.primary, strokeWidth: 1.5 },
-    labelStyle: { fill: theme.colors.primary, fontSize: 9 },
+    style: { stroke: P, strokeWidth: 1.5 },
+    labelStyle: { fill: P, fontSize: 9 },
   }));
 
   const FlowNode = ({ data }: any) => (
     <div style={{
-      padding: "8px 12px", borderRadius: 10, border: `1.5px solid ${theme.colors.primary}`,
+      padding: "8px 12px", borderRadius: 10, border: `1.5px solid ${P}`,
       background: surface, color: text, fontSize: 11, fontWeight: 600,
       width: 200, wordBreak: "break-word",
     }}>
@@ -707,7 +689,7 @@ function FlowsTab({
       {/* Toolbar */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
         <select value={riskFilter} onChange={e => setRiskFilter(e.target.value as any)}
-          style={{ padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: isDark ? surface : "#fff", color: text, fontSize: 12 }}>
+          style={{ padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: dark ? surface : "#fff", color: text, fontSize: 12 }}>
           <option value="all">All Risk Levels ({flows.length})</option>
           <option value="high">High Risk ({flows.filter(f => f.riskScore >= 70).length})</option>
           <option value="low">Low Risk ({flows.filter(f => f.riskScore < 40).length})</option>
@@ -715,9 +697,9 @@ function FlowsTab({
         <span style={{ fontSize: 12, color: textLight }}>{filtered.length} flow{filtered.length !== 1 ? "s" : ""}</span>
         <button onClick={() => setShowFullGraph(v => !v)} style={{
           marginLeft: "auto", padding: "7px 14px", borderRadius: 8,
-          border: `1px solid ${showFullGraph ? theme.colors.primary : border}`,
-          background: showFullGraph ? `${theme.colors.primary}15` : "transparent",
-          color: showFullGraph ? theme.colors.primary : text, fontSize: 12, fontWeight: 600, cursor: "pointer",
+          border: `1px solid ${showFullGraph ? P : border}`,
+          background: showFullGraph ? `${P}15` : "transparent",
+          color: showFullGraph ? P : text, fontSize: 12, fontWeight: 600, cursor: "pointer",
         }}>
           🌐 {showFullGraph ? "Hide Graph" : "Full Graph"}
         </button>
@@ -725,12 +707,12 @@ function FlowsTab({
 
       {/* Full graph */}
       {showFullGraph && (
-        <div style={{ height: 480, marginBottom: 16, borderRadius: 12, border: `1px solid ${border}`, overflow: "hidden", background: isDark ? theme.colors.darkBackground : "#fafafa" }}>
+        <div style={{ height: 480, marginBottom: 16, borderRadius: 12, border: `1px solid ${border}`, overflow: "hidden", background: dark ? theme.colors.darkBackground : "#fafafa" }}>
           {rfNodes.length > 0 ? (
             <ReactFlow nodes={rfNodes} edges={rfEdges} fitView nodeTypes={{ flowNode: FlowNode }}>
-              <Background color={isDark ? "#333" : "#ddd"} gap={16} />
+              <Background color={border} gap={16} />
               <Controls />
-              <MiniMap nodeColor={() => surface} maskColor={isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"} />
+              <MiniMap nodeColor={() => surface} maskColor={dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"} />
             </ReactFlow>
           ) : (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: textLight, fontSize: 13 }}>
@@ -763,10 +745,10 @@ function FlowsTab({
                   <tr key={flow.id} onClick={() => onSelect(flow)}
                     style={{
                       cursor: "pointer",
-                      background: selected ? (isDark ? "#1e1230" : "#f0eaff") : "transparent",
-                      borderLeft: `3px solid ${selected ? theme.colors.primary : "transparent"}`,
+                      background: selected ? (`${P}15`) : "transparent",
+                      borderLeft: `3px solid ${selected ? P : "transparent"}`,
                     }}
-                    onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLTableRowElement).style.background = isDark ? "#1a1a2e" : "#fafafa"; }}
+                    onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLTableRowElement).style.background = bg; }}
                     onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLTableRowElement).style.background = "transparent"; }}
                   >
                     <td style={{ padding: "11px 14px", maxWidth: 200 }}>
@@ -777,7 +759,7 @@ function FlowsTab({
                       <span style={{ fontSize: 12, color: text }}>{flow.nodeCount}</span>
                     </td>
                     <td style={{ padding: "11px 14px" }}>
-                      <span style={{ fontSize: 11, color: flow.linkedRequirements.length ? theme.colors.primary : textLight }}>{flow.linkedRequirements.length || "—"}</span>
+                      <span style={{ fontSize: 11, color: flow.linkedRequirements.length ? P : textLight }}>{flow.linkedRequirements.length || "—"}</span>
                     </td>
                     <td style={{ padding: "11px 14px" }}>
                       <span style={{ fontSize: 11, color: flow.linkedTests.length ? "#42A5F5" : textLight }}>{flow.linkedTests.length || "—"}</span>
@@ -829,11 +811,7 @@ function EndpointsTab({
   const [riskFilter, setRiskFilter] = useState<"all" | "high">("all");
   const [search, setSearch] = useState("");
 
-  const isDark = theme.mode === "dark";
-  const surface = isDark ? theme.colors.darkSurface : theme.colors.background;
-  const border = isDark ? theme.colors.darkBorder : theme.colors.border;
-  const text = isDark ? theme.colors.darkText : theme.colors.textDark;
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const methods = Array.from(new Set(endpoints.map(e => e.method)));
 
@@ -855,21 +833,21 @@ function EndpointsTab({
       {/* Toolbar */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
         <input placeholder="Search path or summary…" value={search} onChange={e => setSearch(e.target.value)}
-          style={{ flex: "1 1 160px", padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: isDark ? surface : "#fff", color: text, fontSize: 12, outline: "none" }} />
+          style={{ flex: "1 1 160px", padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: dark ? surface : "#fff", color: text, fontSize: 12, outline: "none" }} />
         <select value={methodFilter} onChange={e => setMethodFilter(e.target.value)}
-          style={{ padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: isDark ? surface : "#fff", color: text, fontSize: 12 }}>
+          style={{ padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: dark ? surface : "#fff", color: text, fontSize: 12 }}>
           <option value="all">All Methods</option>
           {methods.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
         <select value={coverageFilter} onChange={e => setCoverageFilter(e.target.value as any)}
-          style={{ padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: isDark ? surface : "#fff", color: text, fontSize: 12 }}>
+          style={{ padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: dark ? surface : "#fff", color: text, fontSize: 12 }}>
           <option value="all">All Coverage</option>
           <option value="covered">Covered</option>
           <option value="uncovered">Uncovered</option>
           <option value="unused">Unused</option>
         </select>
         <select value={riskFilter} onChange={e => setRiskFilter(e.target.value as any)}
-          style={{ padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: isDark ? surface : "#fff", color: text, fontSize: 12 }}>
+          style={{ padding: "7px 12px", borderRadius: 8, border: `1px solid ${border}`, background: dark ? surface : "#fff", color: text, fontSize: 12 }}>
           <option value="all">All Risk</option>
           <option value="high">High Risk</option>
         </select>
@@ -900,15 +878,15 @@ function EndpointsTab({
                   <tr key={ep.id} onClick={() => onSelect(ep)}
                     style={{
                       cursor: "pointer",
-                      background: selected ? (isDark ? "#1e1230" : "#f0eaff") : "transparent",
-                      borderLeft: `3px solid ${selected ? theme.colors.primary : "transparent"}`,
+                      background: selected ? (`${P}15`) : "transparent",
+                      borderLeft: `3px solid ${selected ? P : "transparent"}`,
                     }}
-                    onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLTableRowElement).style.background = isDark ? "#1a1a2e" : "#fafafa"; }}
+                    onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLTableRowElement).style.background = bg; }}
                     onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLTableRowElement).style.background = "transparent"; }}
                   >
                     <td style={{ padding: "10px 14px" }}><MethodBadge method={ep.method} /></td>
                     <td style={{ padding: "10px 14px", maxWidth: 220 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: theme.colors.primary, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: P, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {ep.path}
                       </div>
                       {ep.unused && <Badge label="unused" color="#FFA726" small />}
@@ -923,7 +901,7 @@ function EndpointsTab({
                       </div>
                     </td>
                     <td style={{ padding: "10px 14px" }}>
-                      <span style={{ fontSize: 11, color: ep.linkedRequirements.length ? theme.colors.primary : textLight }}>{ep.linkedRequirements.length || "—"}</span>
+                      <span style={{ fontSize: 11, color: ep.linkedRequirements.length ? P : textLight }}>{ep.linkedRequirements.length || "—"}</span>
                     </td>
                     <td style={{ padding: "10px 14px" }}>
                       <span style={{ fontSize: 11, color: ep.linkedTests.length ? "#42A5F5" : textLight }}>{ep.linkedTests.length || "—"}</span>
@@ -964,8 +942,7 @@ function EndpointsTab({
 // ── Main SystemMap component ──────────────────────────────────────────────────
 
 export default function SystemMap({ projectId, projectType }: { projectId: string; projectType?: string }) {
-  const isDark = theme.mode === "dark";
-  const textLight = isDark ? theme.colors.darkTextLight : theme.colors.textLight;
+  const { CARD: surface, BDR: border, TXT: text, TXT2: textLight, P, BG: bg, dark } = useColors();
 
   const [summary, setSummary] = useState<SystemMapSummary | null>(null);
   const [flows, setFlows] = useState<EnrichedFlow[]>([]);
@@ -1033,7 +1010,7 @@ export default function SystemMap({ projectId, projectType }: { projectId: strin
     <div style={{ width: "100%", minWidth: 0 }}>
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
-        <h2 style={{ margin: 0, color: theme.colors.primary, fontSize: 20, fontWeight: 800 }}>
+        <h2 style={{ margin: 0, color: P, fontSize: 20, fontWeight: 800 }}>
           Flows / Endpoints
         </h2>
         <p style={{ margin: "4px 0 0", fontSize: 13, color: textLight }}>
@@ -1048,15 +1025,15 @@ export default function SystemMap({ projectId, projectType }: { projectId: strin
 
       {/* Tab bar */}
       {showFlowsTab && showEndpointsTab && (
-        <div style={{ display: "flex", marginBottom: 16, borderBottom: `1px solid ${isDark ? theme.colors.darkBorder : theme.colors.border}` }}>
+        <div style={{ display: "flex", marginBottom: 16, borderBottom: `1px solid ${dark ? theme.colors.darkBorder : theme.colors.border}` }}>
           {(showFlowsTab ? [{ id: "flows", label: "🌐 Flows", count: flows.length }] : [])
             .concat(showEndpointsTab ? [{ id: "endpoints", label: "🔌 Endpoints", count: endpoints.length }] : [])
             .map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} style={{
                 padding: "10px 20px", border: "none",
-                borderBottom: `2px solid ${activeTab === tab.id ? theme.colors.primary : "transparent"}`,
+                borderBottom: `2px solid ${activeTab === tab.id ? P : "transparent"}`,
                 background: "transparent",
-                color: activeTab === tab.id ? theme.colors.primary : textLight,
+                color: activeTab === tab.id ? P : textLight,
                 fontWeight: activeTab === tab.id ? 700 : 500, fontSize: 13,
                 cursor: "pointer",
               }}>

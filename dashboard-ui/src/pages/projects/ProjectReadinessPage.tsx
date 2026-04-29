@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { theme } from "@/theme";
+import { useColors } from "@/hooks/useColors";
 import type { TabId } from "@/dashboard/pages/projects/layout/ProjectSidebar";
 
 const API = "http://localhost:3000";
@@ -63,17 +63,6 @@ const PRIORITY_DOT: Record<string, string> = {
 const ENV_OPTIONS = ["staging", "production", "qa", "dev"];
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
-
-function useC() {
-  return {
-    P:    theme.colors.primary,
-    CARD: theme.colors.background,
-    BDR:  theme.colors.border,
-    TXT:  theme.colors.textDark,
-    TXT2: theme.colors.textLight,
-    BG:   theme.colors.appBackground,
-  };
-}
 
 // ─── Score Ring ───────────────────────────────────────────────────────────────
 
@@ -164,6 +153,7 @@ function GateRow({ gate, onNavigate, CARD, BDR, TXT, TXT2 }: {
   gate: Gate; onNavigate?: (tab: TabId) => void;
   CARD: string; BDR: string; TXT: string; TXT2: string;
 }) {
+  const { P } = useColors();
   const statusColor = gate.passed ? "#4CAF50" : gate.critical ? "#EF5350" : "#FF9800";
 
   return (
@@ -215,7 +205,7 @@ function GateRow({ gate, onNavigate, CARD, BDR, TXT, TXT2 }: {
             border: `1px solid ${BDR}`, background: "transparent",
             color: TXT2, cursor: "pointer",
           }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = theme.colors.primary; e.currentTarget.style.color = theme.colors.primary; }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = P; e.currentTarget.style.color = P; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = BDR; e.currentTarget.style.color = TXT2; }}
         >
           View →
@@ -263,11 +253,12 @@ function RecItem({ rec, onNavigate, BDR, TXT, TXT2 }: {
 // ─── Coverage bar ─────────────────────────────────────────────────────────────
 
 function CovBar({ label, pct, P }: { label: string; pct: number | null; P: string }) {
+  const { TXT2 } = useColors();
   const barColor = pct === null ? "#ccc" : pct >= 70 ? "#4CAF50" : pct >= 40 ? "#FF9800" : "#EF5350";
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 12 }}>
-        <span style={{ color: theme.colors.textLight }}>{label}</span>
+        <span style={{ color: TXT2 }}>{label}</span>
         <strong style={{ color: barColor }}>{pct !== null ? `${pct}%` : "—"}</strong>
       </div>
       <div style={{ height: 5, borderRadius: 3, background: `${P}18` }}>
@@ -287,7 +278,7 @@ interface Props {
 }
 
 export default function ProjectReadinessPage({ projectId, onNavigate }: Props) {
-  const { P, CARD, BDR, TXT, TXT2, BG } = useC();
+  const { P, CARD, BDR, TXT, TXT2, BG } = useColors();
 
   const [data, setData]       = useState<ReadinessAssessment | null>(null);
   const [loading, setLoading] = useState(true);
