@@ -15,6 +15,8 @@ import { UiModule } from './projects/ui/ui.module';
 
 import { UIScanModule } from './ui-scan/ui-scan.module';
 
+import { FrameworkModule } from './framework/framework.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,6 +29,7 @@ import { UIScanModule } from './ui-scan/ui-scan.module';
     DashboardModule,
     ExecutionModule,
     TestsModule,
+    FrameworkModule,
 
     ProjectModule,
     UiModule,

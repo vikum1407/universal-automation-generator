@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{PROJECT_NAME}}-tests
+  namespace: {{K8S_NAMESPACE}}
+  labels:
+    app.kubernetes.io/managed-by: qlitz
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: {{PROJECT_NAME}}-tests
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: test-runner
+          image: {{K8S_IMAGE_NAME}}:{{K8S_IMAGE_TAG}}
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: {{PROJECT_NAME}}-config
+          env:
+            - name: GRID_URL
+              value: "http://{{GRID_SERVICE_NAME}}.{{K8S_NAMESPACE}}.svc.cluster.local:4444"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          volumeMounts:
+            - name: results
+              mountPath: /app/allure-results
+      volumes:
+        - name: results
+          emptyDir: {}

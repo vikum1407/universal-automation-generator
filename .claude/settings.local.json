@@ -4,7 +4,10 @@
       "Bash(npx tsc *)",
       "Bash(netstat -ano)",
       "Bash(findstr \":3000\")",
-      "Bash(findstr \"LISTENING\")"
+      "Bash(findstr \"LISTENING\")",
+      "Bash(node -e ' *)",
+      "Bash(npm install *)",
+      "Bash(npx vite *)"
     ]
   }
 }

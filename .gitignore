@@ -47,3 +47,4 @@ backend-ts/playwright.config.ts
 
 backend-ts/history-data/
 backend-ts/history-data/run_*.json
+backend-ts/tmp/

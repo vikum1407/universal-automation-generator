@@ -132,6 +132,46 @@ function IconReadiness() {
   </Icon>;
 }
 
+function IconRelease() {
+  return <Icon>
+    <path d="M8 2L2 5.5v5L8 14l6-3.5v-5L8 2z"
+      stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinejoin="round"/>
+    <circle cx="8" cy="8" r="2" fill="currentColor" opacity=".85"/>
+  </Icon>;
+}
+
+function IconIntelligence() {
+  return <Icon>
+    <circle cx="5" cy="5" r="2.2" stroke="currentColor" strokeWidth="1.3"/>
+    <circle cx="11" cy="5" r="2.2" stroke="currentColor" strokeWidth="1.3"/>
+    <circle cx="8" cy="12" r="2.2" stroke="currentColor" strokeWidth="1.3"/>
+    <path d="M7.1 5h1.8M6.1 6.8l1.4 3.4M9.9 6.8l-1.4 3.4"
+      stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" opacity=".6"/>
+  </Icon>;
+}
+
+function IconFramework() {
+  return <Icon>
+    <rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.3" fill="none"/>
+    <rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.3" fill="none"/>
+    <rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.3" fill="none"/>
+    <path d="M9 12h6M12 9v6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M4 7v2M7 4H9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity=".5"/>
+  </Icon>;
+}
+
+function IconDevWorkflow() {
+  return <Icon>
+    <circle cx="4" cy="4" r="1.8" stroke="currentColor" strokeWidth="1.3"/>
+    <circle cx="4" cy="12" r="1.8" stroke="currentColor" strokeWidth="1.3"/>
+    <circle cx="12" cy="4" r="1.8" stroke="currentColor" strokeWidth="1.3"/>
+    <path d="M4 5.8v4.4M5.8 4h1.7a2.5 2.5 0 012.5 2.5V12"
+      stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+    <circle cx="12" cy="11" r="1.4" fill="currentColor" opacity=".7"/>
+    <path d="M10.8 11h-1.3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+  </Icon>;
+}
+
 function IconSearch() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -443,11 +483,14 @@ export default function Sidebar({ open, setOpen }: { open: boolean; setOpen: (v:
   }, []);
 
   const localCommands: Command[] = useMemo(() => [
-    { label: "All Projects",             action: () => navigate("/projects"),           hint: "Workspace" },
-    { label: "Execution Timeline",       action: () => navigate("/execution"),          hint: "Execution" },
-    { label: "Trends",                   action: () => navigate("/execution/trends"),   hint: "Execution" },
-    { label: "Insights",                 action: () => navigate("/execution/insights"), hint: "Execution" },
-    { label: "Release Readiness Center", action: () => navigate("/release"),            hint: "Release"   },
+    { label: "All Projects",             action: () => navigate("/projects"),           hint: "Workspace"     },
+    { label: "Execution Timeline",       action: () => navigate("/execution"),          hint: "Execution"     },
+    { label: "Trends",                   action: () => navigate("/execution/trends"),   hint: "Execution"     },
+    { label: "Insights",                 action: () => navigate("/execution/insights"), hint: "Execution"     },
+    { label: "Release Readiness Center", action: () => navigate("/release"),            hint: "Release"       },
+    { label: "Cross-Project Intelligence", action: () => navigate("/intelligence"),      hint: "Intelligence"  },
+    { label: "Developer Workflow",         action: () => navigate("/workflow"),          hint: "Intelligence"  },
+    { label: "Framework Generator",        action: () => navigate("/framework/start"),  hint: "Build"         },
   ], [navigate]);
 
   const W = open ? 224 : 60;
@@ -528,9 +571,23 @@ export default function Sidebar({ open, setOpen }: { open: boolean; setOpen: (v:
           </div>
 
           {/* RELEASE */}
-          <div>
+          <div style={{ marginBottom: 2 }}>
             <SectionLabel label="Release" collapsed={!open} S={S} />
             <NavItem to="/release" label="Readiness Center" icon={<IconReadiness />} collapsed={!open} exact S={S} />
+            <NavItem to="/releases" label="Release Management" icon={<IconRelease />} collapsed={!open} S={S} />
+          </div>
+
+          {/* INTELLIGENCE */}
+          <div style={{ marginBottom: 2 }}>
+            <SectionLabel label="Intelligence" collapsed={!open} S={S} />
+            <NavItem to="/intelligence" label="Cross-Project" icon={<IconIntelligence />} collapsed={!open} S={S} />
+            <NavItem to="/workflow"     label="Dev Workflow"  icon={<IconDevWorkflow />}  collapsed={!open} S={S} />
+          </div>
+
+          {/* BUILD */}
+          <div style={{ marginBottom: 2 }}>
+            <SectionLabel label="Build" collapsed={!open} S={S} />
+            <NavItem to="/framework/start" label="Framework Generator" icon={<IconFramework />} collapsed={!open} S={S} />
           </div>
 
         </nav>

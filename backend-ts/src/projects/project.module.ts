@@ -45,6 +45,13 @@ import { OverviewController } from './overview/overview.controller';
 import { ReadinessController, OrgReadinessController } from './readiness/readiness.controller';
 import { HeatMapController } from './heatmap/heatmap.controller';
 import { StoryController } from './story/story.controller';
+import { ReleaseManagementController } from './release-management/release-management.controller';
+import { ForecastController } from './forecast/forecast.controller';
+import { BudgetController } from './budgets/budget.controller';
+import { OrgIntelligenceController } from '../org/org-intelligence.controller';
+import { TestDataController } from './test-data/test-data.controller';
+import { WorkflowController, OrgWorkflowController } from './developer-workflow/developer-workflow.controller';
+import { GraphController } from './graph/graph.controller';
 
 @Module({
   imports: [
@@ -80,6 +87,14 @@ import { StoryController } from './story/story.controller';
     OrgReadinessController,
     HeatMapController,
     StoryController,
+    ReleaseManagementController,
+    ForecastController,
+    BudgetController,
+    OrgIntelligenceController,
+    TestDataController,
+    WorkflowController,
+    OrgWorkflowController,
+    GraphController,
   ],
   providers: [
     ProjectService,

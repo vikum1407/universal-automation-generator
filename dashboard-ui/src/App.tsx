@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import DashboardLayout from "./layouts/DashboardLayout";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -12,6 +12,9 @@ import ExecutionInsightsPanel from "./pages/ExecutionTimeline/ExecutionInsightsP
 import ExecutionComparePanel from "./pages/ExecutionTimeline/ExecutionComparePanel";
 
 import OrgReadinessCenter from "./pages/Release/OrgReadinessCenter";
+import OrgIntelligencePage from "./pages/OrgIntelligencePage";
+import DevWorkflowPage from "./pages/DevWorkflowPage";
+import OrgReleasesHub from "./pages/ReleaseManagement/OrgReleasesHub";
 import ReleaseHeatmap from "./pages/Release/ReleaseHeatmap";
 import ReleaseStory from "./pages/Release/ReleaseStory";
 
@@ -34,6 +37,12 @@ import InitializingProject from "./pages/projects/InitializingProject";
 
 import ProjectDetails from "@/dashboard/pages/projects/ProjectDetails";
 import ProjectsList from "./pages/projects/ProjectsList";
+
+import { FrameworkProvider } from "./framework/context/FrameworkContext";
+import { BuilderProvider } from "./framework/builder/useBuilderState";
+import FrameworkStart from "./framework/pages/FrameworkStart";
+import FrameworkBuilder from "./framework/pages/FrameworkBuilder";
+import FrameworkReview from "./framework/pages/FrameworkReview";
 
 import { Toaster } from "react-hot-toast";
 
@@ -70,6 +79,13 @@ export default function App() {
             <Route path="/execution/insights" element={<ExecutionInsightsPanel />} />
             <Route path="/execution/compare" element={<ExecutionComparePanel />} />
 
+            {/* INTELLIGENCE */}
+            <Route path="/intelligence" element={<OrgIntelligencePage />} />
+            <Route path="/workflow"     element={<DevWorkflowPage />} />
+
+            {/* RELEASE MANAGEMENT */}
+            <Route path="/releases" element={<OrgReleasesHub />} />
+
             {/* RELEASE */}
             <Route path="/release" element={<OrgReadinessCenter />} />
             <Route path="/release/heatmap" element={<ReleaseHeatmap />} />
@@ -92,6 +108,13 @@ export default function App() {
               path="/release/:project/self-healing/:suggestionId"
               element={<ReleaseSelfHealingDetails />}
             />
+
+            {/* FRAMEWORK GENERATOR — context-scoped under FrameworkProvider */}
+            <Route element={<FrameworkProvider><BuilderProvider><Outlet /></BuilderProvider></FrameworkProvider>}>
+              <Route path="/framework/start"   element={<FrameworkStart />} />
+              <Route path="/framework/builder" element={<FrameworkBuilder />} />
+              <Route path="/framework/review"  element={<FrameworkReview />} />
+            </Route>
 
             {/* TEST INTELLIGENCE */}
             <Route path="/release/test/:testId" element={<TestPage />} />

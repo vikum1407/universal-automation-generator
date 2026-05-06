@@ -16,6 +16,12 @@ import ReplayViewer from "@/pages/projects/ReplayViewer";
 import ProjectReadinessPage from "@/pages/projects/ProjectReadinessPage";
 import HeatMapPage from "@/pages/projects/HeatMapPage";
 import StoryPage from "@/pages/projects/StoryPage";
+import ReleasesPage from "@/pages/projects/releases/ReleasesPage";
+import ForecastPage from "@/pages/projects/ForecastPage";
+import BudgetsPage from "@/pages/projects/BudgetsPage";
+import TestDataPage from "@/pages/projects/TestDataPage";
+import WorkflowTab from "@/pages/projects/WorkflowTab";
+import GraphPage from "@/pages/projects/GraphPage";
 
 import type { TabId } from "@/dashboard/pages/projects/layout/ProjectSidebar";
 
@@ -94,6 +100,13 @@ export default function ProjectTabs({ project, activeTab, setActiveTab }: Projec
         </div>
       );
 
+    case "test-data":
+      return (
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 120px)", overflowY: "auto" }}>
+          <TestDataPage projectId={project.id} />
+        </div>
+      );
+
     case "autoheal":
       return (
         <div style={{ marginTop: theme.spacing.lg }}>
@@ -115,10 +128,45 @@ export default function ProjectTabs({ project, activeTab, setActiveTab }: Projec
         </div>
       );
 
+    case "workflow":
+      return (
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 120px)", overflowY: "auto" }}>
+          <WorkflowTab projectId={project.id} />
+        </div>
+      );
+
     case "story":
       return (
         <div style={{ marginTop: theme.spacing.lg }}>
           <StoryPage projectId={project.id} />
+        </div>
+      );
+
+    case "forecast":
+      return (
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 120px)", overflowY: "auto" }}>
+          <ForecastPage projectId={project.id} />
+        </div>
+      );
+
+    case "releases":
+      return (
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 120px)" }}>
+          <ReleasesPage projectId={project.id} />
+        </div>
+      );
+
+    case "budgets":
+      return (
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 120px)", overflowY: "auto" }}>
+          <BudgetsPage projectId={project.id} />
+        </div>
+      );
+
+    case "graph":
+      return (
+        <div style={{ marginTop: 0, height: "calc(100vh - 64px)" }}>
+          <GraphPage projectId={project.id} />
         </div>
       );
 

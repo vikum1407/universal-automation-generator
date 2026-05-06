@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{GRID_SERVICE_NAME}}
+  namespace: {{K8S_NAMESPACE}}
+  labels:
+    app: {{GRID_SERVICE_NAME}}
+    app.kubernetes.io/managed-by: qlitz
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{GRID_SERVICE_NAME}}
+  template:
+    metadata:
+      labels:
+        app: {{GRID_SERVICE_NAME}}
+    spec:
+      containers:
+        - name: selenium-hub
+          image: selenium/hub:4.18.1-20240402
+          ports:
+            - containerPort: 4444
+            - containerPort: 4442
+            - containerPort: 4443
+          env:
+            - name: SE_NODE_MAX_SESSIONS
+              value: "10"
+            - name: SE_SESSION_QUEUE_CAPACITY
+              value: "20"
+          livenessProbe:
+            httpGet:
+              path: /wd/hub/status
+              port: 4444
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /wd/hub/status
+              port: 4444
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"

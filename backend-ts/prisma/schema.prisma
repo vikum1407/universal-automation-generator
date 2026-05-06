@@ -39,6 +39,17 @@ enum SuggestionStatus {
   rejected
 }
 
+enum ReleaseStatus {
+  planned
+  in_progress
+  ready_for_validation
+  validating
+  ready_to_ship
+  shipped
+  rolled_back
+  cancelled
+}
+
 // ------------------------------------------------------
 //  PROJECTS
 // ------------------------------------------------------
@@ -216,18 +227,44 @@ model Suggestion {
 }
 
 // ------------------------------------------------------
-//  RELEASE INTELLIGENCE
+//  RELEASE MANAGEMENT
 // ------------------------------------------------------
 model Release {
-  id        String   @id @default(uuid())
-  projectId String
-  version   String
-  notes     String?
-  createdAt DateTime @default(now())
+  id           String        @id @default(uuid())
+  projectId    String
+  name         String?
+  version      String?
+  environment  String        @default("staging")
+  status       ReleaseStatus @default(planned)
+  description  String?
+  createdBy    String?
+  notes        String?
+  plannedStart DateTime?
+  plannedEnd   DateTime?
+  actualStart  DateTime?
+  actualEnd    DateTime?
+  metadata     Json?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
-  project Project @relation(fields: [projectId], references: [id])
+  project Project       @relation(fields: [projectId], references: [id])
+  links   ReleaseLink[]
 
   @@index([projectId])
+  @@index([status])
+}
+
+model ReleaseLink {
+  id        String   @id @default(uuid())
+  releaseId String
+  type      String
+  targetId  String
+  createdAt DateTime @default(now())
+
+  release Release @relation(fields: [releaseId], references: [id])
+
+  @@index([releaseId])
+  @@index([type])
 }
 
 // ------------------------------------------------------
@@ -285,4 +322,72 @@ model CloudSync {
   bucketPath   String?
 
   project Project @relation(fields: [projectId], references: [id])
+}
+
+// ------------------------------------------------------
+//  QUALITY BUDGETS
+// ------------------------------------------------------
+enum BudgetScope {
+  org
+  project
+  release
+}
+
+enum BudgetMetric {
+  coverageOverall
+  coverageCritical
+  highRiskUncovered
+  failureRate
+  flakinessCount
+  unstableCriticalFlows
+  unstableCriticalEndpoints
+  incidentCount
+  openCriticalInsights
+  unresolvedAISuggestions
+}
+
+enum BudgetSeverity {
+  soft
+  hard
+}
+
+model QualityBudget {
+  id          String         @id @default(uuid())
+  scope       BudgetScope
+  scopeId     String
+  environment String?
+  metric      BudgetMetric
+  target      Float?
+  limit       Float
+  severity    BudgetSeverity
+  period      String?
+  enabled     Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  violations  BudgetViolation[]
+
+  @@index([scope, scopeId])
+  @@index([metric])
+}
+
+model BudgetViolation {
+  id               String         @id @default(uuid())
+  budgetId         String
+  scope            BudgetScope
+  scopeId          String
+  environment      String?
+  metric           BudgetMetric
+  value            Float
+  limit            Float
+  severity         BudgetSeverity
+  occurredAt       DateTime       @default(now())
+  resolvedAt       DateTime?
+  linkedInsightId  String?
+
+  budget  QualityBudget @relation(fields: [budgetId], references: [id])
+
+  @@index([budgetId])
+  @@index([scope, scopeId])
+  @@index([occurredAt])
 }

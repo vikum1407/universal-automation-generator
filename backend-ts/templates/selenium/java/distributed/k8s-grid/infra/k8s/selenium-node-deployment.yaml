@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{GRID_SERVICE_NAME}}-chrome
+  namespace: {{K8S_NAMESPACE}}
+  labels:
+    app: {{GRID_SERVICE_NAME}}-chrome
+    app.kubernetes.io/managed-by: qlitz
+spec:
+  replicas: {{K8S_NODE_REPLICAS}}
+  selector:
+    matchLabels:
+      app: {{GRID_SERVICE_NAME}}-chrome
+  template:
+    metadata:
+      labels:
+        app: {{GRID_SERVICE_NAME}}-chrome
+    spec:
+      containers:
+        - name: chrome-node
+          image: selenium/node-chrome:4.18.1-20240402
+          ports:
+            - containerPort: 5555
+          env:
+            - name: SE_EVENT_BUS_HOST
+              value: {{GRID_SERVICE_NAME}}
+            - name: SE_EVENT_BUS_PUBLISH_PORT
+              value: "4442"
+            - name: SE_EVENT_BUS_SUBSCRIBE_PORT
+              value: "4443"
+            - name: SE_NODE_MAX_SESSIONS
+              value: "3"
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi

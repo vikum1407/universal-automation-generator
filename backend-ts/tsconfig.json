@@ -20,7 +20,11 @@
   },
   "exclude": [
     "node_modules",
+    "dist",
+    "templates",
+    "tmp",
     "temp-project",
-    "temp.zip"
+    "temp.zip",
+    "qlitz-output"
   ]
 }

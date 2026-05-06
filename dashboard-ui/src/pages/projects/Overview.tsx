@@ -170,6 +170,8 @@ export default function Overview({ project, onNavigate }: OverviewProps) {
 
   const [data, setData]       = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [fcst, setFcst]       = useState<any>(null);
+  const [budgets, setBudgets] = useState<any>(null);
 
   const [progress, setProgress] = useState({ open: false, percent: 0, step: "Starting…" });
 
@@ -200,6 +202,22 @@ export default function Overview({ project, onNavigate }: OverviewProps) {
       .then(setData)
       .catch(() => setData(null))
       .finally(() => setLoading(false));
+  }, [project.id]);
+
+  // Load forecast overview (non-blocking, best-effort)
+  useEffect(() => {
+    fetch(`${API}/projects/${project.id}/forecast/overview?horizon=14&historyDays=14`)
+      .then(r => r.ok ? r.json() : null)
+      .then(setFcst)
+      .catch(() => {});
+  }, [project.id]);
+
+  // Load budget evaluation (non-blocking, best-effort)
+  useEffect(() => {
+    fetch(`${API}/projects/${project.id}/budgets?withEval=true`)
+      .then(r => r.ok ? r.json() : null)
+      .then(setBudgets)
+      .catch(() => {});
   }, [project.id]);
 
   const recrawl = async () => {
@@ -319,8 +337,8 @@ export default function Overview({ project, onNavigate }: OverviewProps) {
         </div>
       </div>
 
-      {/* ── ROW 1: Health · Coverage · Stability ───────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+      {/* ── ROW 1: Health · Coverage · Stability · Quality Budgets ────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
 
         {/* Health card */}
         <Card title="Project Health">
@@ -389,6 +407,70 @@ export default function Overview({ project, onNavigate }: OverviewProps) {
           )}
         </Card>
 
+        {/* Quality Budgets card */}
+        <Card title="Quality Budgets" action={() => nav("budgets")} actionLabel="Manage →">
+          {!budgets ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <Skeleton h={40} /><Skeleton h={14} /><Skeleton h={14} /><Skeleton h={14} />
+            </div>
+          ) : (() => {
+            const BSTATUS_COLOR: Record<string, string> = {
+              "within-budget":    "#22c55e",
+              "approaching-budget": "#f59e0b",
+              "exceeded":         "#ef4444",
+            };
+            const all = (budgets.budgets ?? []) as any[];
+            const exceeded    = all.filter((b: any) => b.evaluation?.status === "exceeded");
+            const approaching = all.filter((b: any) => b.evaluation?.status === "approaching-budget");
+            const within      = all.filter((b: any) => b.evaluation?.status === "within-budget");
+            const hardViol    = exceeded.filter((b: any) => b.severity === "hard");
+            const overallOk   = hardViol.length === 0 && exceeded.length === 0 && approaching.length === 0;
+
+            return (
+              <>
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  padding: "10px 12px", borderRadius: 9,
+                  background: hardViol.length > 0 ? "#ef444410" : exceeded.length > 0 ? "#ef444410" : approaching.length > 0 ? "#f59e0b10" : "#4CAF5010",
+                  border: `1px solid ${hardViol.length > 0 ? "#ef444425" : exceeded.length > 0 ? "#ef444425" : approaching.length > 0 ? "#f59e0b25" : "#4CAF5025"}`,
+                  marginBottom: 4,
+                }}>
+                  <span style={{ fontSize: 20 }}>{overallOk ? "✅" : hardViol.length > 0 ? "🚨" : "⚠️"}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: hardViol.length > 0 ? "#ef4444" : approaching.length > 0 ? "#f59e0b" : "#4CAF50" }}>
+                      {hardViol.length > 0 ? `${hardViol.length} hard limit exceeded` : overallOk ? "All limits respected" : `${approaching.length} approaching limit`}
+                    </div>
+                    <div style={{ fontSize: 11, color: TXT2, marginTop: 1 }}>
+                      {within.length} within · {approaching.length} approaching · {exceeded.length} exceeded
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                  {exceeded.slice(0, 3).map((b: any) => (
+                    <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ width: 7, height: 7, borderRadius: "50%", background: BSTATUS_COLOR[b.evaluation.status], flexShrink: 0 }} />
+                      <span style={{ fontSize: 11, color: TXT, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.evaluation.label}</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "#ef4444" }}>{b.evaluation.currentValue}{b.evaluation.unit}</span>
+                    </div>
+                  ))}
+                  {approaching.slice(0, exceeded.length > 0 ? 1 : 3).map((b: any) => (
+                    <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ width: 7, height: 7, borderRadius: "50%", background: BSTATUS_COLOR[b.evaluation.status], flexShrink: 0 }} />
+                      <span style={{ fontSize: 11, color: TXT, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.evaluation.label}</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b" }}>{b.evaluation.currentValue}{b.evaluation.unit}</span>
+                    </div>
+                  ))}
+                  {overallOk && (
+                    <div style={{ fontSize: 11, color: TXT2, textAlign: "center", padding: "4px 0" }}>
+                      {all.length} budget{all.length !== 1 ? "s" : ""} monitored
+                    </div>
+                  )}
+                </div>
+              </>
+            );
+          })()}
+        </Card>
+
         {/* Stability card */}
         <Card title="Stability" action={() => nav("tests")} actionLabel="Tests →">
           {loading ? (
@@ -447,8 +529,8 @@ export default function Overview({ project, onNavigate }: OverviewProps) {
         </Card>
       </div>
 
-      {/* ── ROW 2: Top Insights · AI & Automation ──────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      {/* ── ROW 2: Top Insights · AI & Automation · Forecast ──────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
 
         {/* Top Insights */}
         <Card title="Top Insights" action={() => nav("insights")} actionLabel="All insights →">
@@ -559,6 +641,59 @@ export default function Overview({ project, onNavigate }: OverviewProps) {
               </div>
             </>
           )}
+        </Card>
+
+        {/* Predictive Forecast */}
+        <Card title="Forecast" action={() => nav("forecast")} actionLabel="View forecast →">
+          {!fcst ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <Skeleton h={40} /><Skeleton h={14} /><Skeleton h={14} /><Skeleton h={14} />
+            </div>
+          ) : (() => {
+            const RISK_COLOR: Record<string, string> = {
+              low: "#22c55e", medium: "#f59e0b", high: "#ef4444", critical: "#dc2626",
+            };
+            const RISK_ICON: Record<string, string> = {
+              low: "✅", medium: "⚠️", high: "🔴", critical: "🚨",
+            };
+            const rc = RISK_COLOR[fcst.overallRisk] ?? "#6b7280";
+            const DIR_COLOR = (m: any) =>
+              m.improving ? "#22c55e" : m.direction === "steady" ? "#6b7280" : "#ef4444";
+            const DIR_ARROW = (m: any) =>
+              m.direction === "increasing" ? "↑" : m.direction === "decreasing" ? "↓" : "→";
+            return (
+              <>
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  padding: "10px 12px", borderRadius: 9,
+                  background: `${rc}10`, border: `1px solid ${rc}25`, marginBottom: 4,
+                }}>
+                  <span style={{ fontSize: 20 }}>{RISK_ICON[fcst.overallRisk] ?? "⚠️"}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: rc }}>
+                      {fcst.overallRisk.charAt(0).toUpperCase() + fcst.overallRisk.slice(1)} Risk · 14d
+                    </div>
+                    <div style={{ fontSize: 11, color: TXT2, marginTop: 1, lineHeight: 1.4,
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {fcst.headline}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                  {(fcst.metrics as any[]).slice(0, 4).map((m: any) => (
+                    <div key={m.metric} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 11, color: TXT2, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {m.label}
+                      </span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: DIR_COLOR(m) }}>
+                        {DIR_ARROW(m)} {m.current}{m.unit}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            );
+          })()}
         </Card>
       </div>
 

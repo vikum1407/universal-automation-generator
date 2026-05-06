@@ -1,0 +1,10 @@
+target/
+allure-results/
+test-output/
+screenshots/
+tmp/
+.git/
+.idea/
+*.iml
+*.md
+.DS_Store

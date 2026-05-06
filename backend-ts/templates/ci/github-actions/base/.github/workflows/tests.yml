@@ -1,0 +1,86 @@
+name: {{PROJECT_NAME}} — Test Suite
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * *'   # nightly run at 02:00 UTC
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up environment
+        run: |
+          echo "Framework: {{FRAMEWORK}}"
+          echo "Language:  {{LANGUAGE}}"
+
+      # ── Java / Maven ──────────────────────────────────────────────────────────
+      - name: Set up JDK 17
+        if: ${{ '{{LANGUAGE}}' == 'java' }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Maven tests
+        if: ${{ '{{LANGUAGE}}' == 'java' }}
+        run: mvn test -B
+        env:
+          BASE_URL: ${{ secrets.BASE_URL || '{{BASE_URL}}' }}
+
+      # ── Node / TypeScript ─────────────────────────────────────────────────────
+      - name: Set up Node.js 20
+        if: ${{ '{{LANGUAGE}}' == 'typescript' || '{{LANGUAGE}}' == 'javascript' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        if: ${{ '{{LANGUAGE}}' == 'typescript' || '{{LANGUAGE}}' == 'javascript' }}
+        run: npm ci
+
+      - name: Run tests
+        if: ${{ '{{LANGUAGE}}' == 'typescript' || '{{LANGUAGE}}' == 'javascript' }}
+        run: npm test
+        env:
+          BASE_URL: ${{ secrets.BASE_URL || '{{BASE_URL}}' }}
+
+      # ── Python ────────────────────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        if: ${{ '{{LANGUAGE}}' == 'python' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        if: ${{ '{{LANGUAGE}}' == 'python' }}
+        run: pip install -r requirements.txt
+
+      - name: Run pytest
+        if: ${{ '{{LANGUAGE}}' == 'python' }}
+        run: pytest --tb=short -v
+        env:
+          BASE_URL: ${{ secrets.BASE_URL || '{{BASE_URL}}' }}
+
+      # ── Artifacts ─────────────────────────────────────────────────────────────
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_id }}
+          path: |
+            target/surefire-reports/**
+            playwright-report/**
+            allure-results/**
+            reports/**
+          if-no-files-found: ignore

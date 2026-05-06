@@ -12,12 +12,18 @@ export type TabId =
   | "insights"
   | "readiness"
   | "heatmap"
+  | "forecast"
   | "suggestions"
   | "tests"
+  | "test-data"
   | "autoheal"
   | "replay"
   | "history"
   | "story"
+  | "releases"
+  | "budgets"
+  | "workflow"
+  | "graph"
   | "settings";
 
 // ─── Tab groups ───────────────────────────────────────────────────────────────
@@ -35,6 +41,7 @@ const GROUPS: { label: string; tabs: TabDef[] }[] = [
       { id: "insights",     label: "Insights",         icon: <IconInsight /> },
       { id: "readiness",    label: "Readiness",        icon: <IconReadiness /> },
       { id: "heatmap",      label: "HeatMap",          icon: <IconHeatMap /> },
+      { id: "graph",        label: "Knowledge Graph",  icon: <IconGraph /> },
     ],
   },
   {
@@ -42,6 +49,7 @@ const GROUPS: { label: string; tabs: TabDef[] }[] = [
     tabs: [
       { id: "suggestions",  label: "Suggestions",      icon: <IconBulb /> },
       { id: "tests",        label: "Tests",            icon: <IconPlay /> },
+      { id: "test-data",    label: "Test Data",        icon: <IconTestData /> },
       { id: "autoheal",     label: "Auto‑Heal",        icon: <IconHeal /> },
       { id: "replay",       label: "Replay",           icon: <IconReplay /> },
     ],
@@ -51,11 +59,25 @@ const GROUPS: { label: string; tabs: TabDef[] }[] = [
     tabs: [
       { id: "history",      label: "History",          icon: <IconHistory /> },
       { id: "story",        label: "Story",            icon: <IconStory /> },
+      { id: "workflow",     label: "Dev Workflow",     icon: <IconWorkflow /> },
+    ],
+  },
+  {
+    label: "Predict",
+    tabs: [
+      { id: "forecast",     label: "Forecast",         icon: <IconTrend /> },
+    ],
+  },
+  {
+    label: "Release",
+    tabs: [
+      { id: "releases",     label: "Releases",         icon: <IconRelease /> },
     ],
   },
   {
     label: "Configure",
     tabs: [
+      { id: "budgets",      label: "Quality Budgets",  icon: <IconBudget /> },
       { id: "settings",     label: "Settings",         icon: <IconSettings /> },
     ],
   },
@@ -70,6 +92,10 @@ function Svg({ children, size = 16 }: { children: React.ReactNode; size?: number
       {children}
     </svg>
   );
+}
+
+function IconGraph() {
+  return <Svg><circle cx="8" cy="2.5" r="1.8" stroke="currentColor" strokeWidth="1.3" fill="none"/><circle cx="2.5" cy="13" r="1.8" stroke="currentColor" strokeWidth="1.3" fill="none"/><circle cx="13.5" cy="13" r="1.8" stroke="currentColor" strokeWidth="1.3" fill="none"/><circle cx="8" cy="8" r="1.8" stroke="currentColor" strokeWidth="1.3" fill="none"/><path d="M8 4.3V6.2M6.5 9.2l-2.6 2.1M9.5 9.2l2.6 2.1M4.3 8H6.2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></Svg>;
 }
 
 function IconHeatMap() {
@@ -116,6 +142,14 @@ function IconReplay() {
   return <Svg><path d="M3.5 8A4.5 4.5 0 108 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M8 1.5L5.5 4 8 6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></Svg>;
 }
 
+function IconWorkflow() {
+  return <Svg><circle cx="4" cy="4" r="1.8" stroke="currentColor" strokeWidth="1.3"/><circle cx="4" cy="12" r="1.8" stroke="currentColor" strokeWidth="1.3"/><circle cx="12" cy="4" r="1.8" stroke="currentColor" strokeWidth="1.3"/><path d="M4 5.8v4.4M5.8 4h1.7a2.5 2.5 0 012.5 2.5V12" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></Svg>;
+}
+
+function IconTestData() {
+  return <Svg><ellipse cx="8" cy="4" rx="5" ry="1.8" stroke="currentColor" strokeWidth="1.3" fill="none"/><path d="M3 4v3c0 1 2.2 1.8 5 1.8s5-.8 5-1.8V4" stroke="currentColor" strokeWidth="1.3"/><path d="M3 7v3c0 1 2.2 1.8 5 1.8s5-.8 5-1.8V7" stroke="currentColor" strokeWidth="1.3"/><path d="M10.5 13.5l1.5-1.5-1.5-1.5M12 12H9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></Svg>;
+}
+
 function IconHistory() {
   return <Svg><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4"/><path d="M8 5v3.5l2.5 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></Svg>;
 }
@@ -128,8 +162,16 @@ function IconTrend() {
   return <Svg><polyline points="2,12 5,8 8,10 11,5 14,7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none"/><circle cx="14" cy="7" r="1.5" fill="currentColor"/></Svg>;
 }
 
+function IconRelease() {
+  return <Svg><path d="M8 2L2 5.5v5L8 14l6-3.5v-5L8 2z" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinejoin="round"/><circle cx="8" cy="8" r="2" fill="currentColor" opacity=".85"/></Svg>;
+}
+
 function IconSettings() {
   return <Svg><circle cx="8" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.4"/><path d="M8 1.5v1.2M8 13.3v1.2M1.5 8h1.2M13.3 8h1.2M3.3 3.3l.85.85M11.85 11.85l.85.85M3.3 12.7l.85-.85M11.85 4.15l.85-.85" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></Svg>;
+}
+
+function IconBudget() {
+  return <Svg><rect x="1" y="10" width="14" height="4" rx="1" stroke="currentColor" strokeWidth="1.3" fill="none"/><rect x="1" y="6" width="9" height="3" rx="1" stroke="currentColor" strokeWidth="1.3" fill="none"/><rect x="1" y="2" width="6" height="3" rx="1" stroke="currentColor" strokeWidth="1.3" fill="none"/><line x1="12" y1="3.5" x2="12" y2="8.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><line x1="10" y1="5.5" x2="14" y2="5.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></Svg>;
 }
 
 function IconChevronLeft() {
