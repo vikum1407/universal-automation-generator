@@ -11,8 +11,13 @@ import RTMDeepView from "./RTMDeepView";
 import RTMInsights from "./RTMInsights";
 import RTMRegenerateModal from "./RTMRegenerateModal";
 import Loader from "../../components/Loader";
+import { RTMDomainView } from "./RTMDomainView";
+import { RTMCoverageView } from "./RTMCoverageView";
+import { RTMGapsPanel }    from "./RTMGapsPanel";
+import { RTMClosurePanel } from "./RTMClosurePanel";
 
 type ViewMode = "matrix" | "insights";
+type TopTab = "domain" | "coverage" | "gaps" | "closure" | "generated";
 
 // ─────────────────────────────────────────────────────────────
 // Filter toolbar
@@ -186,6 +191,8 @@ function Toolbar({
 // Main RTMTable component
 // ─────────────────────────────────────────────────────────────
 export default function RTMTable({ projectId }: { projectId: string }) {
+  const [topTab, setTopTab] = useState<TopTab>("domain");
+
   const [data, setData] = useState<RTMEnterpriseResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -251,20 +258,62 @@ export default function RTMTable({ projectId }: { projectId: string }) {
     load();
   };
 
-  if (loading) return <div style={{ marginTop: 32 }}><Loader /></div>;
-
-  if (error || !data) {
-    return (
-      <div style={{ marginTop: 32, textAlign: "center", color: textLight, padding: "48px 0" }}>
-        <div style={{ fontSize: 36, marginBottom: 12 }}>📋</div>
-        <div style={{ fontSize: 15, fontWeight: 600, color: text, marginBottom: 6 }}>No RTM data yet</div>
-        <div style={{ fontSize: 13 }}>Generate a project to build the Requirements Traceability Matrix.</div>
-      </div>
-    );
-  }
+  const tabStyle = (active: boolean) => ({
+    padding: "8px 18px", borderRadius: 8, fontSize: 13, fontWeight: active ? 700 : 500,
+    border: `1px solid ${active ? P : border}`,
+    background: active ? `${P}1A` : "transparent",
+    color: active ? P : textLight,
+    cursor: "pointer", transition: "all 0.12s",
+  });
 
   return (
     <div style={{ marginTop: 24, width: "100%", minWidth: 0 }}>
+
+      {/* ── Top-level tab switcher ── */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+        <button onClick={() => setTopTab("domain")} style={tabStyle(topTab === "domain")}>
+          Domain RTM
+        </button>
+        <button onClick={() => setTopTab("coverage")} style={tabStyle(topTab === "coverage")}>
+          Coverage
+        </button>
+        <button onClick={() => setTopTab("gaps")} style={tabStyle(topTab === "gaps")}>
+          Gap Analysis
+        </button>
+        <button onClick={() => setTopTab("closure")} style={tabStyle(topTab === "closure")}>
+          Closure Loop
+        </button>
+        <button onClick={() => setTopTab("generated")} style={tabStyle(topTab === "generated")}>
+          Generated RTM
+        </button>
+      </div>
+
+      {/* ── Domain RTM (DB-backed, versioned) ── */}
+      {topTab === "domain" && <RTMDomainView projectId={projectId} />}
+
+      {/* ── Coverage Engine (Phase 3) ── */}
+      {topTab === "coverage" && <RTMCoverageView projectId={projectId} />}
+
+      {/* ── Gap Analysis (Phase 5) ── */}
+      {topTab === "gaps" && <RTMGapsPanel projectId={projectId} />}
+
+      {/* ── Coverage Closure Loop (Phase 6) ── */}
+      {topTab === "closure" && <RTMClosurePanel projectId={projectId} />}
+
+      {/* ── Generated RTM (file-based enterprise view) ── */}
+      {topTab === "generated" && <>
+
+      {loading && <div style={{ marginTop: 32 }}><Loader /></div>}
+
+      {!loading && (error || !data) && (
+        <div style={{ marginTop: 32, textAlign: "center", color: textLight, padding: "48px 0" }}>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>📋</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: text, marginBottom: 6 }}>No RTM data yet</div>
+          <div style={{ fontSize: 13 }}>Generate a project to build the Requirements Traceability Matrix.</div>
+        </div>
+      )}
+
+      {!loading && data && <>
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: 20 }}>
@@ -382,6 +431,9 @@ export default function RTMTable({ projectId }: { projectId: string }) {
         onRegenerate={doRegen}
         requirement={regenTarget}
       />
+
+      </>}
+      </>}
     </div>
   );
 }

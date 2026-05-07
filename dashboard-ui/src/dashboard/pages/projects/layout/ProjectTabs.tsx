@@ -22,6 +22,12 @@ import BudgetsPage from "@/pages/projects/BudgetsPage";
 import TestDataPage from "@/pages/projects/TestDataPage";
 import WorkflowTab from "@/pages/projects/WorkflowTab";
 import GraphPage from "@/pages/projects/GraphPage";
+import { RTMRequirementsPage } from "@/features/rtm/pages/RTMRequirementsPage";
+import { RTMJourneysPage }     from "@/features/rtm/pages/RTMJourneysPage";
+import { RTMEndpointsPage }    from "@/features/rtm/pages/RTMEndpointsPage";
+import { RTMCoveragePage }     from "@/features/rtm/pages/RTMCoveragePage";
+import { RTMGapsPage }         from "@/features/rtm/pages/RTMGapsPage";
+import { RTMClosureJobsPage }  from "@/features/rtm/pages/RTMClosureJobsPage";
 
 import type { TabId } from "@/dashboard/pages/projects/layout/ProjectSidebar";
 
@@ -52,9 +58,45 @@ export default function ProjectTabs({ project, activeTab, setActiveTab }: Projec
       );
 
     case "rtm":
+    case "rtm-requirements":
       return (
-        <div style={{ marginTop: theme.spacing.lg }}>
-          <RTMTable projectId={project.id} />
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 80px)", overflowY: "auto" }}>
+          <RTMRequirementsPage projectId={project.id} />
+        </div>
+      );
+
+    case "rtm-journeys":
+      return (
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 80px)", overflowY: "auto" }}>
+          <RTMJourneysPage projectId={project.id} />
+        </div>
+      );
+
+    case "rtm-endpoints":
+      return (
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 80px)", overflowY: "auto" }}>
+          <RTMEndpointsPage projectId={project.id} />
+        </div>
+      );
+
+    case "rtm-coverage":
+      return (
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 80px)", overflowY: "auto" }}>
+          <RTMCoveragePage projectId={project.id} />
+        </div>
+      );
+
+    case "rtm-gaps":
+      return (
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 80px)", overflowY: "auto" }}>
+          <RTMGapsPage projectId={project.id} />
+        </div>
+      );
+
+    case "rtm-closure":
+      return (
+        <div style={{ marginTop: theme.spacing.lg, height: "calc(100vh - 80px)", overflowY: "auto" }}>
+          <RTMClosureJobsPage projectId={project.id} />
         </div>
       );
 

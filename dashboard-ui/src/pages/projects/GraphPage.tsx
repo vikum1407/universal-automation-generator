@@ -37,11 +37,13 @@ interface KnowledgeGraph {
 }
 
 interface QueryResult {
-  queryType: string;
-  nodeId?: string;
-  results: string[];
-  paths?: string[][];
-  message?: string;
+  queryType:     string;
+  rootNode:      GraphNode | null;
+  affectedNodes: GraphNode[];
+  affectedEdges: GraphEdge[];
+  depths:        Record<string, number>;
+  riskScore:     number;
+  summary:       string;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -125,6 +127,8 @@ function computeLayout(nodes: GraphNode[], width: number, height: number): Layou
   return result;
 }
 
+const API_BASE = "http://localhost:3000";
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface GraphPageProps {
@@ -160,7 +164,7 @@ export default function GraphPage({ projectId }: GraphPageProps) {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/projects/${projectId}/graph`)
+    fetch(`${API_BASE}/projects/${projectId}/graph`)
       .then(r => r.json())
       .then(data => { setGraph(data); setLoading(false); })
       .catch(() => { setError("Failed to load knowledge graph"); setLoading(false); });
@@ -247,15 +251,15 @@ export default function GraphPage({ projectId }: GraphPageProps) {
     setQuerying(true);
     try {
       const r = await fetch(
-        `/projects/${projectId}/graph/query?type=${queryType}&nodeId=${selectedNode.id}&depth=3`
+        `${API_BASE}/projects/${projectId}/graph/query?type=${queryType}&nodeId=${selectedNode.id}&depth=3`
       );
       const data: QueryResult = await r.json();
       setQueryResult(data);
-      if (data.results?.length) {
-        setHighlightedIds(new Set([selectedNode.id, ...data.results]));
+      if (data.affectedNodes?.length) {
+        setHighlightedIds(new Set([selectedNode.id, ...data.affectedNodes.map(n => n.id)]));
       }
     } catch {
-      setQueryResult({ queryType, message: "Query failed", results: [] });
+      setQueryResult({ queryType, rootNode: null, affectedNodes: [], affectedEdges: [], depths: {}, riskScore: 0, summary: "Query failed" });
     } finally {
       setQuerying(false);
     }
@@ -271,8 +275,8 @@ export default function GraphPage({ projectId }: GraphPageProps) {
 
   const handleRebuild = async () => {
     setLoading(true);
-    await fetch(`/projects/${projectId}/graph/rebuild`, { method: "POST" });
-    const r = await fetch(`/projects/${projectId}/graph`);
+    await fetch(`${API_BASE}/projects/${projectId}/graph/rebuild`, { method: "POST" });
+    const r = await fetch(`${API_BASE}/projects/${projectId}/graph`);
     const data = await r.json();
     setGraph(data);
     setLoading(false);
@@ -692,18 +696,22 @@ export default function GraphPage({ projectId }: GraphPageProps) {
               {queryResult && (
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 600, color: TXT, marginBottom: 6 }}>
-                    {queryResult.message || `${queryResult.results.length} nodes found`}
+                    {queryResult.summary || `${queryResult.affectedNodes.length} nodes found`}
                   </div>
-                  {queryResult.results.slice(0, 12).map(nodeId => {
-                    const n = nodeMap.get(nodeId);
-                    if (!n) return null;
+                  {queryResult.riskScore > 0 && (
+                    <div style={{ fontSize: 10, color: queryResult.riskScore >= 70 ? "#EF4444" : "#FFA726", marginBottom: 8, fontWeight: 600 }}>
+                      Risk score: {queryResult.riskScore}/100
+                    </div>
+                  )}
+                  {queryResult.affectedNodes.slice(0, 12).map(n => {
+                    const layoutNode = nodeMap.get(n.id);
                     return (
                       <div
-                        key={nodeId}
-                        onClick={() => handleNodeClick(n)}
+                        key={n.id}
+                        onClick={() => layoutNode && handleNodeClick(layoutNode)}
                         style={{
                           display: "flex", alignItems: "center", gap: 6, marginBottom: 5,
-                          padding: "5px 8px", borderRadius: 6, cursor: "pointer",
+                          padding: "5px 8px", borderRadius: 6, cursor: layoutNode ? "pointer" : "default",
                           background: `${NODE_COLORS[n.type]}10`,
                           border: `1px solid ${NODE_COLORS[n.type]}30`,
                         }}

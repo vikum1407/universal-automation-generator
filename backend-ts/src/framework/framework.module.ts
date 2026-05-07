@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
-import { FrameworkController }      from './framework.controller';
-import { FrameworkService }         from './framework.service';
+import { FrameworkController }         from './framework.controller';
+import { FrameworkService }            from './framework.service';
+import { FrameworkRegistryController } from './registry/framework-registry.controller';
+import { FrameworkRegistryService }    from './registry/framework-registry.service';
+import { PrismaService }               from '../../prisma/prisma.service';
 import { NodeLibraryService }       from './nodes/node-library.service';
 import { NodeFilterService }        from './filter/node-filter.service';
 import { BlueprintValidator }       from './blueprint/blueprint-validator';
@@ -19,9 +22,11 @@ import { AIExplainService }         from './ai/ai-explain.service';
 import { SampleTestsService }       from './samples/sample-tests.service';
 
 @Module({
-  controllers: [FrameworkController],
+  controllers: [FrameworkController, FrameworkRegistryController],
   providers: [
     FrameworkService,
+    FrameworkRegistryService,
+    PrismaService,
     NodeLibraryService,
     NodeFilterService,
     BlueprintValidator,

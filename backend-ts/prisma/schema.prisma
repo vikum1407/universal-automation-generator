@@ -18,6 +18,41 @@ enum ProjectType {
   api
 }
 
+// RTM domain enums
+enum RtmRequirementType {
+  functional
+  nonFunctional
+  technical
+  regression
+}
+
+enum RtmPriority {
+  P0
+  P1
+  P2
+  P3
+}
+
+enum RtmRisk {
+  high
+  medium
+  low
+}
+
+enum RtmRequirementStatus {
+  draft
+  approved
+  deprecated
+}
+
+enum RtmEndpointMethod {
+  GET
+  POST
+  PUT
+  DELETE
+  PATCH
+}
+
 enum RunStatus {
   pending
   running
@@ -69,6 +104,8 @@ model Project {
   authToken       String?
   createdAt       DateTime    @default(now())
 
+  defaultFrameworkId String?
+
   flows        Flow[]
   endpoints    Endpoint[]
   testRuns     TestRun[]
@@ -79,6 +116,8 @@ model Project {
   analytics    Analytics?
   stability    Stability?
   cloudSync    CloudSync?
+  rtmRoot      RtmRoot?
+  frameworks   Framework[]
 
   // NEW RELATIONS FOR FLOW ENGINE
   pages       Page[]
@@ -325,6 +364,27 @@ model CloudSync {
 }
 
 // ------------------------------------------------------
+//  FRAMEWORK REGISTRY
+// ------------------------------------------------------
+
+model Framework {
+  id               String   @id @default(uuid())
+  projectId        String
+  name             String
+  frameworkType    String
+  language         String
+  blueprintId      String?
+  artifactLocation String?
+  isRTMEnabled     Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  createdBy        String?
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+// ------------------------------------------------------
 //  QUALITY BUDGETS
 // ------------------------------------------------------
 enum BudgetScope {
@@ -390,4 +450,388 @@ model BudgetViolation {
   @@index([budgetId])
   @@index([scope, scopeId])
   @@index([occurredAt])
+}
+
+// ------------------------------------------------------
+//  RTM MAPPING ENUMS
+// ------------------------------------------------------
+
+enum RtmMappingStrength {
+  primary
+  secondary
+}
+
+// ------------------------------------------------------
+//  RTM DOMAIN MODEL
+// ------------------------------------------------------
+
+model RtmRoot {
+  id               String      @id @default(uuid())
+  projectId        String      @unique
+  currentVersionId String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  project        Project      @relation(fields: [projectId], references: [id])
+  versions       RtmVersion[] @relation("RootVersions")
+  currentVersion RtmVersion?  @relation("CurrentVersion", fields: [currentVersionId], references: [id])
+
+  @@index([projectId])
+}
+
+model RtmVersion {
+  id            String    @id @default(uuid())
+  rtmRootId     String
+  versionNumber Int
+  label         String?
+  createdAt     DateTime  @default(now())
+  createdBy     String?
+
+  root         RtmRoot          @relation("RootVersions", fields: [rtmRootId], references: [id])
+  currentFor   RtmRoot[]        @relation("CurrentVersion")
+  requirements RtmRequirement[]
+  journeys     RtmJourney[]
+  endpoints    RtmEndpoint[]
+
+  @@unique([rtmRootId, versionNumber])
+  @@index([rtmRootId])
+}
+
+model RtmRequirement {
+  id           String               @id @default(uuid())
+  rtmVersionId String
+  key          String
+  title        String
+  description  String               @default("")
+  type         RtmRequirementType   @default(functional)
+  priority     RtmPriority          @default(P2)
+  risk         RtmRisk              @default(medium)
+  status       RtmRequirementStatus @default(draft)
+  tags         String[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  version RtmVersion @relation(fields: [rtmVersionId], references: [id])
+
+  @@index([rtmVersionId])
+  @@index([key])
+}
+
+model RtmJourney {
+  id             String   @id @default(uuid())
+  rtmVersionId   String
+  key            String
+  name           String
+  description    String   @default("")
+  requirementIds String[]
+  createdAt      DateTime @default(now())
+
+  version RtmVersion @relation(fields: [rtmVersionId], references: [id])
+
+  @@index([rtmVersionId])
+}
+
+model RtmEndpoint {
+  id             String            @id @default(uuid())
+  rtmVersionId   String
+  key            String
+  method         RtmEndpointMethod @default(GET)
+  path           String
+  serviceName    String?
+  description    String            @default("")
+  requirementIds String[]
+  createdAt      DateTime          @default(now())
+
+  version RtmVersion @relation(fields: [rtmVersionId], references: [id])
+
+  @@index([rtmVersionId])
+}
+
+// ------------------------------------------------------
+//  RTM MAPPING TABLES (Phase 2)
+// ------------------------------------------------------
+
+// Requirement ↔ UI Flow (Flow in Prisma = discovered UI flow)
+model RtmReqFlowMapping {
+  id           String             @id @default(uuid())
+  projectId    String
+  rtmVersionId String
+  requirementId String
+  flowId       String
+  strength     RtmMappingStrength @default(primary)
+  createdAt    DateTime           @default(now())
+
+  @@unique([requirementId, flowId])
+  @@index([requirementId])
+  @@index([flowId])
+  @@index([rtmVersionId])
+}
+
+// Requirement ↔ API Endpoint (Endpoint in Prisma = discovered API endpoint)
+model RtmReqEndpointMapping {
+  id                   String             @id @default(uuid())
+  projectId            String
+  rtmVersionId         String
+  requirementId        String
+  discoveredEndpointId String
+  strength             RtmMappingStrength @default(primary)
+  createdAt            DateTime           @default(now())
+
+  @@unique([requirementId, discoveredEndpointId])
+  @@index([requirementId])
+  @@index([discoveredEndpointId])
+  @@index([rtmVersionId])
+}
+
+// Journey ↔ UI Flow
+model RtmJourneyFlowMapping {
+  id           String   @id @default(uuid())
+  projectId    String
+  rtmVersionId String
+  journeyId    String
+  flowId       String
+  createdAt    DateTime @default(now())
+
+  @@unique([journeyId, flowId])
+  @@index([journeyId])
+  @@index([flowId])
+  @@index([rtmVersionId])
+}
+
+// Journey ↔ API Endpoint
+model RtmJourneyEndpointMapping {
+  id                   String   @id @default(uuid())
+  projectId            String
+  rtmVersionId         String
+  journeyId            String
+  discoveredEndpointId String
+  createdAt            DateTime @default(now())
+
+  @@unique([journeyId, discoveredEndpointId])
+  @@index([journeyId])
+  @@index([discoveredEndpointId])
+  @@index([rtmVersionId])
+}
+
+// ------------------------------------------------------
+//  RTM COVERAGE (Phase 3)
+// ------------------------------------------------------
+
+// Tagging table — associates test file/run IDs with RTM entities.
+// tagType: 'requirement' | 'uiflow' | 'endpoint' | 'journey'
+// tagValue: the RTM entity ID or key
+model RtmTestTag {
+  id        String   @id @default(uuid())
+  projectId String
+  testId    String
+  tagType   String
+  tagValue  String
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, testId, tagType, tagValue])
+  @@index([projectId])
+  @@index([testId])
+  @@index([tagType, tagValue])
+}
+
+// Materialised per-requirement coverage snapshot
+model RtmRequirementCoverage {
+  id                String   @id @default(uuid())
+  projectId         String
+  rtmVersionId      String
+  requirementId     String
+  frameworkId       String?
+  hasTests          Boolean  @default(false)
+  totalTests        Int      @default(0)
+  passedTests       Int      @default(0)
+  failedTests       Int      @default(0)
+  skippedTests      Int      @default(0)
+  uiFlowsTotal      Int      @default(0)
+  uiFlowsCovered    Int      @default(0)
+  endpointsTotal    Int      @default(0)
+  endpointsCovered  Int      @default(0)
+  journeysTotal     Int      @default(0)
+  journeysCovered   Int      @default(0)
+  coverageScore     Float    @default(0)
+  riskWeightedScore Float    @default(0)
+  lastComputedAt    DateTime @default(now())
+
+  @@unique([rtmVersionId, requirementId])
+  @@index([rtmVersionId])
+  @@index([requirementId])
+}
+
+// Materialised per-RTM-endpoint coverage snapshot
+model RtmEndpointCoverage {
+  id             String   @id @default(uuid())
+  projectId      String
+  rtmVersionId   String
+  endpointId     String
+  frameworkId    String?
+  totalTests     Int      @default(0)
+  passedTests    Int      @default(0)
+  failedTests    Int      @default(0)
+  coverageScore  Float    @default(0)
+  lastComputedAt DateTime @default(now())
+
+  @@unique([rtmVersionId, endpointId])
+  @@index([rtmVersionId])
+}
+
+// Materialised per-journey coverage snapshot
+model RtmJourneyCoverage {
+  id             String   @id @default(uuid())
+  projectId      String
+  rtmVersionId   String
+  journeyId      String
+  frameworkId    String?
+  totalTests     Int      @default(0)
+  passedTests    Int      @default(0)
+  failedTests    Int      @default(0)
+  coverageScore  Float    @default(0)
+  lastComputedAt DateTime @default(now())
+
+  @@unique([rtmVersionId, journeyId])
+  @@index([rtmVersionId])
+}
+
+// ------------------------------------------------------
+//  RTM GAPS (Phase 5)
+// ------------------------------------------------------
+
+model RequirementGap {
+  id                     String   @id @default(uuid())
+  projectId              String
+  rtmVersionId           String
+  requirementId          String
+  frameworkId            String?
+
+  hasNoTests             Boolean  @default(false)
+  hasInsufficientTests   Boolean  @default(false)
+
+  missingUITests         Boolean  @default(false)
+  missingAPITests        Boolean  @default(false)
+  missingHybridTests     Boolean  @default(false)
+
+  missingNegativeTests   Boolean  @default(false)
+  missingBoundaryTests   Boolean  @default(false)
+  missingRegressionDepth Boolean  @default(false)
+
+  risk                   String   @default("medium")
+  priority               String   @default("P2")
+
+  coverageScore          Float    @default(0)
+  riskWeightedScore      Float    @default(0)
+
+  suggestedUITests       Int      @default(0)
+  suggestedAPITests      Int      @default(0)
+  suggestedHybridTests   Int      @default(0)
+
+  lastComputedAt         DateTime @default(now())
+
+  @@unique([rtmVersionId, requirementId])
+  @@index([projectId])
+  @@index([rtmVersionId])
+}
+
+model EndpointGap {
+  id                   String   @id @default(uuid())
+  projectId            String
+  rtmVersionId         String
+  endpointId           String
+  frameworkId          String?
+
+  hasNoTests           Boolean  @default(false)
+  hasInsufficientTests Boolean  @default(false)
+
+  missingPositiveTests Boolean  @default(false)
+  missingNegativeTests Boolean  @default(false)
+  missingBoundaryTests Boolean  @default(false)
+
+  coverageScore        Float    @default(0)
+  lastComputedAt       DateTime @default(now())
+
+  @@unique([rtmVersionId, endpointId])
+  @@index([projectId])
+  @@index([rtmVersionId])
+}
+
+model JourneyGap {
+  id                      String   @id @default(uuid())
+  projectId               String
+  rtmVersionId            String
+  journeyId               String
+  frameworkId             String?
+
+  hasNoTests              Boolean  @default(false)
+  hasInsufficientTests    Boolean  @default(false)
+
+  missingEndToEndFlow     Boolean  @default(false)
+  missingAlternativePaths Boolean  @default(false)
+
+  coverageScore           Float    @default(0)
+  lastComputedAt          DateTime @default(now())
+
+  @@unique([rtmVersionId, journeyId])
+  @@index([projectId])
+  @@index([rtmVersionId])
+}
+
+// ------------------------------------------------------
+//  CLOSURE LOOP (Phase 6)
+// ------------------------------------------------------
+
+model ClosureJob {
+  id                        String             @id @default(uuid())
+  projectId                 String
+  rtmVersionId              String
+  frameworkId               String?
+  framework                 String             @default("playwright")
+  language                  String             @default("typescript")
+  baseUrl                   String             @default("http://localhost:3000")
+
+  targetRequirementCoverage Float              @default(0.8)
+  targetEndpointCoverage    Float?
+  targetJourneyCoverage     Float?
+  maxIterations             Int                @default(5)
+  maxTestsPerIteration      Int                @default(20)
+  prioritizeHighRisk        Boolean            @default(true)
+  dryRun                    Boolean            @default(false)
+
+  status                    String             @default("pending")
+  currentIteration          Int                @default(0)
+  testsGeneratedTotal       Int                @default(0)
+
+  createdAt                 DateTime           @default(now())
+  completedAt               DateTime?
+  failureReason             String?
+
+  iterations                ClosureIteration[]
+
+  @@index([projectId])
+  @@index([rtmVersionId])
+  @@index([status])
+}
+
+model ClosureIteration {
+  id              String    @id @default(uuid())
+  closureJobId    String
+  iterationNumber Int
+
+  coverageBefore  Json
+  coverageAfter   Json?
+  generationPlan  Json?
+
+  testsGenerated  Int       @default(0)
+  testsExecuted   Int       @default(0)
+
+  status          String    @default("pending")
+  startedAt       DateTime?
+  completedAt     DateTime?
+  failureReason   String?
+
+  job             ClosureJob @relation(fields: [closureJobId], references: [id], onDelete: Cascade)
+
+  @@unique([closureJobId, iterationNumber])
+  @@index([closureJobId])
 }

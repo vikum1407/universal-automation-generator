@@ -8,6 +8,12 @@ export type TabId =
   | "overview"
   | "flows"
   | "rtm"
+  | "rtm-requirements"
+  | "rtm-journeys"
+  | "rtm-endpoints"
+  | "rtm-coverage"
+  | "rtm-gaps"
+  | "rtm-closure"
   | "coverage"
   | "insights"
   | "readiness"
@@ -36,7 +42,7 @@ const GROUPS: { label: string; tabs: TabDef[] }[] = [
     tabs: [
       { id: "overview",     label: "Overview",         icon: <IconGrid /> },
       { id: "flows",        label: "Flows & Endpoints", icon: <IconNetwork /> },
-      { id: "rtm",          label: "RTM",              icon: <IconList /> },
+      // RTM sub-tabs rendered separately (see RTM_GROUP below)
       { id: "coverage",     label: "Coverage",         icon: <IconCoverage /> },
       { id: "insights",     label: "Insights",         icon: <IconInsight /> },
       { id: "readiness",    label: "Readiness",        icon: <IconReadiness /> },
@@ -182,6 +188,37 @@ function IconChevronRight() {
   return <Svg size={14}><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/></Svg>;
 }
 
+function IconJourney() {
+  return <Svg><path d="M2 8h3l2-4 2 8 2-4h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></Svg>;
+}
+
+function IconEndpoint() {
+  return <Svg><rect x="1" y="4" width="14" height="8" rx="2" stroke="currentColor" strokeWidth="1.3" fill="none"/><path d="M5 8h6M9 6l2 2-2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></Svg>;
+}
+
+function IconGap() {
+  return <Svg><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4" fill="none"/><path d="M8 5v3.5l2 2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><circle cx="8" cy="8" r="1" fill="currentColor" opacity=".4"/></Svg>;
+}
+
+function IconClosure() {
+  return <Svg><path d="M3.5 8A4.5 4.5 0 008 12.5 4.5 4.5 0 0012.5 8 4.5 4.5 0 008 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/><path d="M5.5 6L8 3.5 10.5 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/><path d="M6 8.5l1.5 1.5L11 6.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></Svg>;
+}
+
+// ─── RTM sub-group ────────────────────────────────────────────────────────────
+
+const RTM_GROUP: TabDef[] = [
+  { id: "rtm-requirements", label: "Requirements", icon: <IconList /> },
+  { id: "rtm-journeys",     label: "Journeys",     icon: <IconJourney /> },
+  { id: "rtm-endpoints",    label: "Endpoints",    icon: <IconEndpoint /> },
+  { id: "rtm-coverage",     label: "Coverage",     icon: <IconCoverage /> },
+  { id: "rtm-gaps",         label: "Gaps",         icon: <IconGap /> },
+  { id: "rtm-closure",      label: "Closure Jobs", icon: <IconClosure /> },
+];
+
+function isRtmTab(id: TabId): boolean {
+  return id === "rtm" || id.startsWith("rtm-");
+}
+
 // ─── Tooltip (collapsed mode) ─────────────────────────────────────────────────
 
 function Tip({ label, children }: { label: string; children: React.ReactNode }) {
@@ -237,6 +274,8 @@ export default function ProjectSidebar({
 }) {
   const { P, BDR, CARD: BG, TXT, TXT2 } = useColors();
   const APP_BG = BG;
+  const rtmActive = isRtmTab(activeTab);
+  const [rtmOpen, setRtmOpen] = useState(rtmActive);
 
   const projectName: string = project.name || project.title || (
     project.type === "ui" ? "UI Project" : "API Project"
@@ -323,8 +362,7 @@ export default function ProjectSidebar({
               <div style={{
                 fontSize: 10, fontWeight: 700, color: TXT2,
                 textTransform: "uppercase", letterSpacing: "0.1em",
-                padding: "4px 8px 6px",
-                opacity: 0.7,
+                padding: "4px 8px 6px", opacity: 0.7,
               }}>
                 {group.label}
               </div>
@@ -334,7 +372,7 @@ export default function ProjectSidebar({
             )}
 
             {/* Tab buttons */}
-            {group.tabs.map(tab => {
+            {group.tabs.filter(t => t.id !== "rtm").map(tab => {
               const active = tab.id === activeTab;
               const btn = (
                 <button
@@ -342,69 +380,138 @@ export default function ProjectSidebar({
                   onClick={() => setActiveTab(tab.id)}
                   title={collapsed ? tab.label : undefined}
                   style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
+                    width: "100%", display: "flex", alignItems: "center",
                     gap: collapsed ? 0 : 10,
                     justifyContent: collapsed ? "center" : "flex-start",
                     padding: collapsed ? "9px 0" : "9px 10px",
-                    borderRadius: 8,
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: 13,
-                    fontWeight: active ? 600 : 400,
+                    borderRadius: 8, border: "none", cursor: "pointer",
+                    fontSize: 13, fontWeight: active ? 600 : 400,
                     transition: "background 0.15s, color 0.15s",
-                    background: active
-                      ? `${P}14`
-                      : "transparent",
+                    background: active ? `${P}14` : "transparent",
                     color: active ? P : TXT2,
-                    position: "relative",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textAlign: "left",
+                    position: "relative", whiteSpace: "nowrap",
+                    overflow: "hidden", textAlign: "left",
                   }}
-                  onMouseEnter={e => {
-                    if (!active) (e.currentTarget as HTMLElement).style.background = `${P}09`;
-                  }}
-                  onMouseLeave={e => {
-                    if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
-                  }}
+                  onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = `${P}09`; }}
+                  onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                 >
-                  {/* Active indicator bar */}
                   {active && (
-                    <div style={{
-                      position: "absolute", left: 0, top: "20%", bottom: "20%",
-                      width: 3, borderRadius: "0 3px 3px 0",
-                      background: P,
-                    }} />
+                    <div style={{ position: "absolute", left: 0, top: "20%", bottom: "20%", width: 3, borderRadius: "0 3px 3px 0", background: P }} />
                   )}
-
-                  {/* Icon */}
-                  <span style={{
-                    color: active ? P : TXT2,
-                    display: "flex", alignItems: "center",
-                    transition: "color 0.15s",
-                    marginLeft: active && !collapsed ? 0 : 0,
-                  }}>
+                  <span style={{ color: active ? P : TXT2, display: "flex", alignItems: "center", transition: "color 0.15s" }}>
                     {tab.icon}
                   </span>
-
-                  {/* Label */}
                   {!collapsed && (
-                    <span style={{
-                      overflow: "hidden", textOverflow: "ellipsis",
-                      whiteSpace: "nowrap", lineHeight: 1.2,
-                    }}>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.2 }}>
                       {tab.label}
                     </span>
                   )}
                 </button>
               );
-
-              return collapsed
-                ? <Tip key={tab.id} label={tab.label}>{btn}</Tip>
-                : btn;
+              return collapsed ? <Tip key={tab.id} label={tab.label}>{btn}</Tip> : btn;
             })}
+
+            {/* ── RTM expandable section (injected into Analyze group) ── */}
+            {group.label === "Analyze" && (() => {
+              const showSubs = rtmOpen || rtmActive;
+              const parentBtn = (
+                <button
+                  onClick={() => {
+                    if (rtmActive) {
+                      setRtmOpen(v => !v);
+                    } else {
+                      setRtmOpen(true);
+                      setActiveTab("rtm-requirements");
+                    }
+                  }}
+                  title={collapsed ? "RTM" : undefined}
+                  style={{
+                    width: "100%", display: "flex", alignItems: "center",
+                    gap: collapsed ? 0 : 10,
+                    justifyContent: collapsed ? "center" : "flex-start",
+                    padding: collapsed ? "9px 0" : "9px 10px",
+                    borderRadius: 8, border: "none", cursor: "pointer",
+                    fontSize: 13, fontWeight: rtmActive ? 600 : 400,
+                    background: rtmActive ? `${P}14` : "transparent",
+                    color: rtmActive ? P : TXT2,
+                    position: "relative", whiteSpace: "nowrap", overflow: "hidden", textAlign: "left",
+                  }}
+                  onMouseEnter={e => { if (!rtmActive) (e.currentTarget as HTMLElement).style.background = `${P}09`; }}
+                  onMouseLeave={e => { if (!rtmActive) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+                >
+                  {rtmActive && (
+                    <div style={{ position: "absolute", left: 0, top: "20%", bottom: "20%", width: 3, borderRadius: "0 3px 3px 0", background: P }} />
+                  )}
+                  <span style={{ color: rtmActive ? P : TXT2, display: "flex", alignItems: "center" }}>
+                    <IconList />
+                  </span>
+                  {!collapsed && (
+                    <>
+                      <span style={{ flex: 1 }}>RTM</span>
+                      <span style={{ fontSize: 9, opacity: 0.6 }}>{showSubs ? "▾" : "▸"}</span>
+                    </>
+                  )}
+                </button>
+              );
+
+              return (
+                <div key="rtm-section">
+                  {collapsed ? <Tip label="RTM">{parentBtn}</Tip> : parentBtn}
+
+                  {/* Sub-tabs — expanded sidebar */}
+                  {showSubs && !collapsed && (
+                    <div style={{ paddingLeft: 10, display: "flex", flexDirection: "column", gap: 1, marginTop: 1 }}>
+                      {RTM_GROUP.map(tab => {
+                        const active = tab.id === activeTab;
+                        return (
+                          <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            style={{
+                              width: "100%", display: "flex", alignItems: "center", gap: 8,
+                              padding: "7px 10px", borderRadius: 7, border: "none", cursor: "pointer",
+                              fontSize: 12, fontWeight: active ? 600 : 400,
+                              background: active ? `${P}14` : "transparent",
+                              color: active ? P : TXT2, position: "relative",
+                            }}
+                            onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = `${P}09`; }}
+                            onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+                          >
+                            {active && <div style={{ position: "absolute", left: 0, top: "20%", bottom: "20%", width: 2, borderRadius: "0 2px 2px 0", background: P }} />}
+                            <span style={{ color: active ? P : TXT2, display: "flex", alignItems: "center" }}>{tab.icon}</span>
+                            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tab.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Sub-tabs — collapsed sidebar (icons only) */}
+                  {showSubs && collapsed && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 1, marginTop: 1 }}>
+                      {RTM_GROUP.map(tab => {
+                        const active = tab.id === activeTab;
+                        return (
+                          <Tip key={tab.id} label={tab.label}>
+                            <button
+                              onClick={() => setActiveTab(tab.id)}
+                              style={{
+                                width: "100%", display: "flex", alignItems: "center", justifyContent: "center",
+                                padding: "7px 0", borderRadius: 7, border: "none", cursor: "pointer",
+                                background: active ? `${P}14` : "transparent",
+                                color: active ? P : TXT2,
+                              }}
+                            >
+                              <span style={{ color: active ? P : TXT2, display: "flex" }}>{tab.icon}</span>
+                            </button>
+                          </Tip>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         ))}
       </nav>

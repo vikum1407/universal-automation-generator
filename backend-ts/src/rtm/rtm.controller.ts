@@ -1,15 +1,20 @@
 import {
-  Controller, Get, Post, Patch, Param, Body, Res,
+  Controller, Get, Post, Patch, Delete, Param, Body, Res,
   HttpException, HttpStatus
 } from "@nestjs/common";
 import * as fs from "fs";
 import * as path from "path";
 import type { Response } from "express";
+import { RTMDomainService } from "./rtm-domain.service";
+import type { ImportRtmDto }        from "./dto/import-rtm.dto";
+import type { CreateRequirementDto } from "./dto/create-rtm.dto";
+import type { UpdateRequirementDto } from "./dto/update-requirement.dto";
 
 const OUTPUT_BASE = "./qlitz-output";
 
 @Controller("projects/:projectId/rtm")
 export class RTMController {
+  constructor(private readonly domain: RTMDomainService) {}
 
   // ─────────────────────────────────────────────────────────────
   // HELPERS
@@ -297,5 +302,89 @@ export class RTMController {
       `attachment; filename="rtm-${projectId.slice(0, 8)}.json"`,
     );
     res.send(JSON.stringify(data, null, 2));
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // DOMAIN MODEL ENDPOINTS  (database-backed, versioned)
+  // ═══════════════════════════════════════════════════════════════
+
+  // POST /projects/:id/rtm/initialize
+  @Post("initialize")
+  async initializeRTM(
+    @Param("projectId") projectId: string,
+    @Body() body: { label?: string; createdBy?: string },
+  ) {
+    return this.domain.initialize(projectId, body?.label, body?.createdBy);
+  }
+
+  // GET /projects/:id/rtm/snapshot  —  current domain-model snapshot
+  @Get("snapshot")
+  async getSnapshot(@Param("projectId") projectId: string) {
+    const snapshot = await this.domain.getSnapshot(projectId);
+    if (!snapshot) throw new HttpException("RTM not initialised — POST /initialize first", HttpStatus.NOT_FOUND);
+    return snapshot;
+  }
+
+  // POST /projects/:id/rtm/import
+  @Post("import")
+  async importRTM(
+    @Param("projectId") projectId: string,
+    @Body() body: Omit<ImportRtmDto, "projectId">,
+  ) {
+    return this.domain.import({ projectId, ...body });
+  }
+
+  // GET /projects/:id/rtm/versions
+  @Get("versions")
+  async listVersions(@Param("projectId") projectId: string) {
+    return this.domain.listVersions(projectId);
+  }
+
+  // GET /projects/:id/rtm/versions/:versionId
+  @Get("versions/:versionId")
+  async getVersion(
+    @Param("projectId") projectId: string,
+    @Param("versionId") versionId: string,
+  ) {
+    return this.domain.getVersionSnapshot(projectId, versionId);
+  }
+
+  // PATCH /projects/:id/rtm/versions/:versionId/activate
+  @Patch("versions/:versionId/activate")
+  async activateVersion(
+    @Param("projectId") projectId: string,
+    @Param("versionId") versionId: string,
+  ) {
+    await this.domain.activateVersion(projectId, versionId);
+    return { ok: true };
+  }
+
+  // POST /projects/:id/rtm/requirements
+  @Post("requirements")
+  async createRequirement(
+    @Param("projectId") projectId: string,
+    @Body() dto: CreateRequirementDto,
+  ) {
+    return this.domain.createRequirement(projectId, dto);
+  }
+
+  // PATCH /projects/:id/rtm/requirements/:reqId
+  @Patch("requirements/:reqId")
+  async updateRequirement(
+    @Param("projectId") projectId: string,
+    @Param("reqId") reqId: string,
+    @Body() dto: UpdateRequirementDto,
+  ) {
+    return this.domain.updateRequirement(projectId, reqId, dto);
+  }
+
+  // DELETE /projects/:id/rtm/requirements/:reqId
+  @Delete("requirements/:reqId")
+  async deleteRequirement(
+    @Param("projectId") projectId: string,
+    @Param("reqId") reqId: string,
+  ) {
+    await this.domain.deleteRequirement(projectId, reqId);
+    return { ok: true };
   }
 }

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useFramework } from "../context/FrameworkContext";
 import { useBuilderState } from "../builder/useBuilderState";
 import { useBlueprint } from "../blueprint/useBlueprint";
-import { generateFramework, getDownloadUrl } from "../api/framework";
+import { generateFramework, getDownloadUrl, registerFramework, type RegisteredFramework } from "../api/framework";
 import { DARK_TOKENS, LIGHT_TOKENS, CATEGORY_META } from "../nodes/types";
 import { AISafeModeToggle }    from "../ai/AISafeModeToggle";
 import { AIExplainPanel }      from "../ai/AIExplainPanel";
@@ -65,6 +65,11 @@ export default function FrameworkReview() {
   const [status,  setStatus]  = useState<GenerateStatus>("idle");
   const [result2, setResult2] = useState<GenerateResult | null>(null);
   const [error,   setError]   = useState<string | null>(null);
+
+  // Framework Registry integration
+  const [registering,        setRegistering]        = useState(false);
+  const [registeredFramework, setRegisteredFramework] = useState<RegisteredFramework | null>(null);
+  const [enableRTM,          setEnableRTM]          = useState(false);
 
   // AI generation config
   const [aiEnabled,  setAiEnabled]  = useState<boolean>(true);
@@ -162,6 +167,29 @@ export default function FrameworkReview() {
     } catch (err: any) {
       setStatus("error");
       setError(err?.message ?? "Unexpected error during generation.");
+    }
+  };
+
+  // Extract projectId from URL search params (passed when navigating from a project)
+  const projectId = new URLSearchParams(window.location.search).get("projectId") ?? "";
+
+  const handleRegister = async () => {
+    if (!result2 || !projectId) return;
+    setRegistering(true);
+    try {
+      const fw = await registerFramework({
+        projectId,
+        name:          result2.projectName,
+        frameworkType: selection!.framework,
+        language:      selection!.language,
+        blueprintId:   result2.jobId,
+        isRTMEnabled:  enableRTM,
+      });
+      setRegisteredFramework(fw);
+    } catch {
+      // silently ignored — non-blocking
+    } finally {
+      setRegistering(false);
     }
   };
 
@@ -509,6 +537,67 @@ export default function FrameworkReview() {
                     </div>
                   ))}
                 </div>
+
+                {/* ── Registry + RTM integration ─────────────────────────── */}
+                {projectId && !registeredFramework && (
+                  <div style={{
+                    padding: "16px 18px", borderRadius: 10,
+                    background: `${S.accent}0a`, border: `1px solid ${S.accent}30`,
+                    display: "flex", flexDirection: "column", gap: 12,
+                  }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: S.text }}>
+                      Save to Framework Registry
+                    </div>
+                    <div style={{ fontSize: 11, color: S.textMuted, lineHeight: 1.6 }}>
+                      Register this framework so it can be selected when generating RTM tests.
+                    </div>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={enableRTM}
+                        onChange={e => setEnableRTM(e.target.checked)}
+                        style={{ accentColor: S.accent, cursor: "pointer" }}
+                      />
+                      <span style={{ fontSize: 12, color: S.text, fontWeight: 600 }}>
+                        Enable RTM integration (use this framework for test generation)
+                      </span>
+                    </label>
+                    <button
+                      onClick={handleRegister}
+                      disabled={registering}
+                      style={{
+                        alignSelf: "flex-start", padding: "8px 18px", borderRadius: 8,
+                        background: S.accent, color: "#fff", border: "none",
+                        fontSize: 12, fontWeight: 700,
+                        cursor: registering ? "wait" : "pointer", opacity: registering ? 0.7 : 1,
+                      }}
+                    >
+                      {registering ? "Registering…" : "Register Framework"}
+                    </button>
+                  </div>
+                )}
+
+                {registeredFramework && (
+                  <div style={{
+                    padding: "14px 18px", borderRadius: 10,
+                    background: "#10B98112", border: "1px solid #10B98140",
+                    display: "flex", flexDirection: "column", gap: 10,
+                  }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#10B981" }}>
+                      ✓ Registered: {registeredFramework.name}
+                    </div>
+                    {registeredFramework.isRTMEnabled && (
+                      <div style={{ fontSize: 11, color: S.textMuted }}>
+                        RTM integration enabled — open a project and go to{" "}
+                        <span style={{ fontWeight: 700, color: S.text }}>RTM › Coverage</span>{" "}
+                        to generate tests using this framework.
+                      </div>
+                    )}
+                    <div style={{ fontSize: 10, color: S.textDim, fontFamily: "monospace" }}>
+                      ID: {registeredFramework.id}
+                    </div>
+                  </div>
+                )}
               </div>
             </Section>
           )}
