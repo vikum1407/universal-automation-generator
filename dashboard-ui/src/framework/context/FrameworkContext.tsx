@@ -6,6 +6,14 @@ import type { ReactNode } from "react";
 export interface FrameworkSelection {
   framework: string;
   language: string;
+  // API generation fields (REST Assured + Playwright API/Hybrid)
+  swaggerUrl?:       string;
+  swaggerFile?:      string;
+  coverageLevel?:    'smoke' | 'functional';
+  testDataStrategy?: 'faker' | 'custom' | 'csv' | 'json';
+  // Playwright-specific
+  playwrightMode?:   'ui' | 'api' | 'hybrid';
+  websiteUrl?:       string;
 }
 
 export interface CombinationValidation {

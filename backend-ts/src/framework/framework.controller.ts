@@ -1,13 +1,17 @@
 import { Controller, Get, Post, Query, Body, Param, Res, NotFoundException } from '@nestjs/common';
 import type { Response } from 'express';
-import { FrameworkService } from './framework.service';
+import { FrameworkService }         from './framework.service';
+import { SwaggerValidatorService }  from './swagger/swagger-validator.service';
 
 // All endpoints are under /framework.
 // Controllers are intentionally thin — all logic is in FrameworkService.
 
 @Controller('framework')
 export class FrameworkController {
-  constructor(private readonly service: FrameworkService) {}
+  constructor(
+    private readonly service:    FrameworkService,
+    private readonly validator:  SwaggerValidatorService,
+  ) {}
 
   // ── Framework + language discovery ─────────────────────────────────────────
 
@@ -71,6 +75,15 @@ export class FrameworkController {
   @Post('blueprint/validate')
   validateBlueprint(@Body() blueprint: any) {
     return this.service.validateBlueprint(blueprint);
+  }
+
+  // ── Swagger spec validation ─────────────────────────────────────────────────
+
+  @Post('swagger/validate')
+  async validateSwagger(@Body() body: { url?: string; content?: string }) {
+    if (body.content) return this.validator.validateFromContent(body.content);
+    if (body.url)     return this.validator.validateFromUrl(body.url);
+    return { valid: false, canGenerate: false, errors: [{ code: 'NO_INPUT', message: 'Provide either url or content.' }] };
   }
 
   // ── Assembly ─────────────────────────────────────────────────────────────────

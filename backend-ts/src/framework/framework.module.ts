@@ -20,6 +20,12 @@ import { AIDocGenerator }           from './ai/ai-doc-generator';
 import { AIFileHeaderGenerator }    from './ai/ai-file-header-generator';
 import { AIExplainService }         from './ai/ai-explain.service';
 import { SampleTestsService }       from './samples/sample-tests.service';
+import { SwaggerParserService }              from './swagger/swagger-parser.service';
+import { SwaggerValidatorService }           from './swagger/swagger-validator.service';
+import { ApiTestGeneratorService }           from './api/api-test-generator.service';
+import { PlaywrightCrawlerService }          from './crawler/playwright-crawler.service';
+import { PlaywrightApiTestGeneratorService } from './playwright/playwright-api-test-generator.service';
+import { PlaywrightUiTestGeneratorService }  from './playwright/playwright-ui-test-generator.service';
 
 @Module({
   controllers: [FrameworkController, FrameworkRegistryController],
@@ -42,6 +48,12 @@ import { SampleTestsService }       from './samples/sample-tests.service';
     AIFileHeaderGenerator,
     AIExplainService,
     SampleTestsService,
+    SwaggerParserService,
+    SwaggerValidatorService,
+    ApiTestGeneratorService,
+    PlaywrightCrawlerService,
+    PlaywrightApiTestGeneratorService,
+    PlaywrightUiTestGeneratorService,
     AssemblyOrchestrator,
   ],
 })

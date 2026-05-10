@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+
+    <Properties>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} — %msg%n</Property>
+        <Property name="LOG_DIR">target/logs</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console output — shown during `mvn test` -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- Rolling file — keeps last 10 × 10 MB log files -->
+        <RollingFile name="File"
+                     fileName="${LOG_DIR}/api-tests.log"
+                     filePattern="${LOG_DIR}/api-tests-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Silence noisy HTTP client libraries at INFO level -->
+        <Logger name="org.apache.http"                level="WARN" additivity="false"><AppenderRef ref="File"/></Logger>
+        <Logger name="io.restassured"                 level="WARN" additivity="false"><AppenderRef ref="Console"/></Logger>
+        <Logger name="org.testng"                     level="INFO" additivity="false"><AppenderRef ref="Console"/></Logger>
+
+        <!-- Project logger — full DEBUG to file, INFO to console -->
+        <Logger name="{{BASE_PACKAGE}}" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console" level="INFO"/>
+            <AppenderRef ref="File"    level="DEBUG"/>
+        </Logger>
+
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

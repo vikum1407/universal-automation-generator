@@ -288,4 +288,59 @@ export const TEST_RUNNER_NODES: FrameworkNode[] = [
     capabilities: { canBeRoot: false, supportsParallel: true, supportsDistributed: false, hasAIIntegration: false, hasReporting: false, hasRetry: false },
   }),
 
+  // ─── REST Assured test runners ───────────────────────────────────────────────
+
+  defineNode({
+    id: 'restassured-java-testng',
+    label: 'TestNG',
+    category: 'testRunner',
+    compatibleFrameworks: ['restassured'],
+    compatibleLanguages: ['java'],
+    templates: [],
+    metadata: {
+      description: 'TestNG test runner for REST Assured + Java. Parallel execution, data providers, grouping, and retry — the standard choice for API test suites.',
+      version: '7.x',
+      tags: ['testng', 'parallel', 'data-provider', 'groups', 'restassured'],
+      docs: 'https://testng.org/doc/',
+      since: '1.0.0',
+    },
+    constraints: {
+      required: false,
+      maxInstances: 1,
+      requires: [],
+      conflicts: ['restassured-java-junit5'],
+      recommendedWith: ['restassured-java-allure'],
+    },
+    capabilities: { canBeRoot: false, supportsParallel: true, supportsDistributed: false, hasAIIntegration: false, hasReporting: false, hasRetry: true },
+    configSchema: {
+      parallel:    { type: 'enum',   label: 'Parallel mode',  default: 'methods', options: ['methods', 'classes', 'tests', 'none'] },
+      threadCount: { type: 'number', label: 'Thread count',   default: 4 },
+      retryCount:  { type: 'number', label: 'Retry count',    default: 1 },
+    },
+  }),
+
+  defineNode({
+    id: 'restassured-java-junit5',
+    label: 'JUnit 5',
+    category: 'testRunner',
+    compatibleFrameworks: ['restassured'],
+    compatibleLanguages: ['java'],
+    templates: [],
+    metadata: {
+      description: 'JUnit 5 test runner for REST Assured + Java. Modern annotation model, parameterized tests, and @BeforeAll/@AfterAll lifecycle.',
+      version: '5.x',
+      tags: ['junit5', 'jupiter', 'parameterized', 'restassured'],
+      docs: 'https://junit.org/junit5/',
+      since: '1.0.0',
+    },
+    constraints: {
+      required: false,
+      maxInstances: 1,
+      requires: [],
+      conflicts: ['restassured-java-testng'],
+      recommendedWith: ['restassured-java-allure'],
+    },
+    capabilities: { canBeRoot: false, supportsParallel: true, supportsDistributed: false, hasAIIntegration: false, hasReporting: false, hasRetry: false },
+  }),
+
 ];

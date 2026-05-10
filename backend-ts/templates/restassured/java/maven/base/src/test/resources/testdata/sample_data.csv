@@ -1,0 +1,6 @@
+name,email,phone,address,city,country,notes
+John Smith,john.smith@example.com,+1-555-100-0001,123 Main St,New York,US,positive case
+Jane Doe,jane.doe@example.com,+1-555-100-0002,456 Oak Ave,Los Angeles,US,positive case
+Invalid User,,+1-555-100-0003,789 Pine Rd,Chicago,US,missing email — negative case
+,valid.email@example.com,+1-555-100-0004,321 Elm St,Houston,US,missing name — negative case
+Test User,not-an-email,+1-555-100-0005,654 Maple Dr,Phoenix,US,invalid email — negative case

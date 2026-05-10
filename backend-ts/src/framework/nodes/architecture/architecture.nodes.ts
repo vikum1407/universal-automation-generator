@@ -3,6 +3,33 @@ import { FrameworkNode, defineNode } from '../node.model';
 export const ARCHITECTURE_NODES: FrameworkNode[] = [
 
   defineNode({
+    id: 'restassured-java-maven',
+    label: 'Maven Project',
+    category: 'architecture',
+    compatibleFrameworks: ['restassured'],
+    compatibleLanguages: ['java'],
+    templates: ['restassured/java/maven/base'],
+    metadata: {
+      description: 'Maven project scaffold for REST Assured API testing. Swagger-driven — generates one test class per resource tag. Add test runner, reporting, and data nodes to complete the stack.',
+      version: '5.x',
+      tags: ['restassured', 'api', 'java', 'maven'],
+      docs: 'https://rest-assured.io/',
+      since: '1.0.0',
+    },
+    constraints: {
+      required: true,
+      maxInstances: 1,
+      requires: [],
+      conflicts: [],
+      recommendedWith: [],
+    },
+    capabilities: { canBeRoot: true, supportsParallel: true, supportsDistributed: false, hasAIIntegration: false, hasReporting: true, hasRetry: true },
+    configSchema: {
+      basePackage: { type: 'string', label: 'Base package', default: 'com.qlitz.api', required: true },
+    },
+  }),
+
+  defineNode({
     id: 'selenium-java-pom',
     label: 'Page Object Model',
     category: 'architecture',
@@ -72,20 +99,68 @@ export const ARCHITECTURE_NODES: FrameworkNode[] = [
 
   defineNode({
     id: 'playwright-ts-pom',
-    label: 'Page Object Model',
+    label: 'UI Automation (Page Object Model)',
     category: 'architecture',
     compatibleFrameworks: ['playwright'],
-    compatibleLanguages: ['typescript'],
+    compatibleLanguages: ['typescript', 'javascript'],
     templates: ['playwright/ts/pom/base'],
     metadata: {
-      description: 'Page Object Model for Playwright + TypeScript. Pages extend base Page class, fixtures inject them.',
+      description: 'Playwright UI automation using Page Object Model. Crawls your website URL to generate Page classes, fixtures, and 100% functional test coverage. Supports TypeScript and JavaScript.',
       version: '1.x',
-      tags: ['pom', 'playwright', 'typescript', 'fixtures'],
+      tags: ['pom', 'playwright', 'typescript', 'javascript', 'ui', 'crawler'],
       docs: 'https://playwright.dev/docs/pom',
       since: '1.0.0',
     },
-    constraints: { required: true, maxInstances: 1, requires: [], conflicts: [], recommendedWith: ['playwright-ts-runner', 'playwright-ts-allure'] },
+    constraints: { required: true, maxInstances: 1, requires: [], conflicts: ['playwright-ts-api'], recommendedWith: ['playwright-ts-runner', 'playwright-ts-allure'] },
     capabilities: { canBeRoot: true, supportsParallel: true, supportsDistributed: true, hasAIIntegration: false, hasReporting: false, hasRetry: false },
+    configSchema: {
+      websiteUrl: { type: 'string', label: 'Website URL to crawl', default: 'https://example.com', required: true },
+    },
+  }),
+
+  defineNode({
+    id: 'playwright-ts-api',
+    label: 'API Automation (Swagger-driven)',
+    category: 'architecture',
+    compatibleFrameworks: ['playwright'],
+    compatibleLanguages: ['typescript', 'javascript'],
+    templates: ['playwright/ts/api/base'],
+    metadata: {
+      description: 'Playwright API automation using APIRequestContext. Swagger/OpenAPI-driven — generates one test file per resource tag with 100% positive and negative functional coverage. Supports TypeScript and JavaScript.',
+      version: '1.x',
+      tags: ['api', 'playwright', 'typescript', 'javascript', 'swagger', 'openapi'],
+      docs: 'https://playwright.dev/docs/api-testing',
+      since: '1.0.0',
+    },
+    constraints: { required: true, maxInstances: 1, requires: [], conflicts: ['playwright-ts-pom', 'playwright-ts-hybrid'], recommendedWith: ['playwright-ts-runner', 'playwright-ts-allure'] },
+    capabilities: { canBeRoot: true, supportsParallel: true, supportsDistributed: false, hasAIIntegration: false, hasReporting: true, hasRetry: true },
+    configSchema: {
+      coverageLevel: { type: 'enum', label: 'Coverage level', default: 'functional', options: ['smoke', 'functional'] },
+      testDataStrategy: { type: 'enum', label: 'Test data strategy', default: 'faker', options: ['faker', 'csv', 'json'] },
+    },
+  }),
+
+  defineNode({
+    id: 'playwright-ts-hybrid',
+    label: 'Hybrid (UI + API)',
+    category: 'architecture',
+    compatibleFrameworks: ['playwright'],
+    compatibleLanguages: ['typescript', 'javascript'],
+    templates: ['playwright/ts/hybrid/base'],
+    metadata: {
+      description: 'Playwright hybrid project combining UI (POM + crawler) and API (Swagger-driven) automation in one codebase. Shared auth fixture, single playwright.config.ts with separate UI and API projects.',
+      version: '1.x',
+      tags: ['hybrid', 'playwright', 'typescript', 'javascript', 'ui', 'api'],
+      docs: 'https://playwright.dev/docs/api-testing',
+      since: '1.0.0',
+    },
+    constraints: { required: true, maxInstances: 1, requires: [], conflicts: ['playwright-ts-pom', 'playwright-ts-api'], recommendedWith: ['playwright-ts-runner', 'playwright-ts-allure'] },
+    capabilities: { canBeRoot: true, supportsParallel: true, supportsDistributed: true, hasAIIntegration: false, hasReporting: true, hasRetry: true },
+    configSchema: {
+      websiteUrl:       { type: 'string', label: 'Website URL to crawl', default: 'https://example.com', required: true },
+      coverageLevel:    { type: 'enum',   label: 'Coverage level',       default: 'functional', options: ['smoke', 'functional'] },
+      testDataStrategy: { type: 'enum',   label: 'Test data strategy',   default: 'faker',      options: ['faker', 'csv', 'json'] },
+    },
   }),
 
   defineNode({

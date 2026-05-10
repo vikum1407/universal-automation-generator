@@ -18,7 +18,8 @@ export type SupportedFramework =
   | 'cypress'
   | 'playwright'
   | 'webdriverio'
-  | 'appium';
+  | 'appium'
+  | 'restassured';
 
 export type SupportedLanguage =
   | 'java'

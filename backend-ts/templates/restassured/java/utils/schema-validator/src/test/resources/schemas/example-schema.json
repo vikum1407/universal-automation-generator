@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExampleResponse",
+  "description": "Replace this with your actual API response schema. Place one file per response type in this directory.",
+  "type": "object",
+  "required": ["id"],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Unique resource identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Resource name"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"]
+    }
+  }
+}

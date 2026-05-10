@@ -1,0 +1,60 @@
+pipeline {
+    agent {
+        docker {
+            image 'maven:3.9-eclipse-temurin-17'
+            args  '-v $HOME/.m2:/root/.m2'
+        }
+    }
+
+    environment {
+        API_BASE_URL   = credentials('API_BASE_URL')
+        API_AUTH_TOKEN = credentials('API_AUTH_TOKEN')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+
+        stage('Run API Tests') {
+            steps {
+                sh """
+                    mvn clean test \\
+                        -Dapi.base.url=${API_BASE_URL} \\
+                        -Dapi.auth.token=${API_AUTH_TOKEN} \\
+                        -Dcoverage.level={{COVERAGE_LEVEL}} \\
+                        --no-transfer-progress
+                """
+            }
+        }
+
+        stage('Generate Allure Report') {
+            steps {
+                sh 'mvn allure:report --no-transfer-progress'
+            }
+            post {
+                always {
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        results: [[path: 'target/allure-results']]
+                    ])
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit 'target/surefire-reports/**/*.xml'
+            archiveArtifacts artifacts: 'target/allure-report/**', allowEmptyArchive: true
+        }
+        failure {
+            emailext(
+                subject: "FAILED: {{PROJECT_NAME}} API Tests — Build ${env.BUILD_NUMBER}",
+                body: "Build failed. Check Allure report: ${env.BUILD_URL}allure",
+                to: '{{AUTHOR}}'
+            )
+        }
+    }
+}

@@ -7,7 +7,13 @@ import { ZipGenerator } from './zip-generator';
 import { AIFileHeaderGenerator } from '../ai/ai-file-header-generator';
 import { AIDocGenerator } from '../ai/ai-doc-generator';
 import { SampleTestsService } from '../samples/sample-tests.service';
+import { SwaggerParserService } from '../swagger/swagger-parser.service';
+import { ApiTestGeneratorService } from '../api/api-test-generator.service';
+import { PlaywrightCrawlerService } from '../crawler/playwright-crawler.service';
+import { PlaywrightApiTestGeneratorService } from '../playwright/playwright-api-test-generator.service';
+import { PlaywrightUiTestGeneratorService } from '../playwright/playwright-ui-test-generator.service';
 import type { FrameworkBlueprint } from '../blueprint/blueprint.model';
+import type { SwaggerSummary } from '../swagger/swagger.types';
 
 export interface AssemblyResult {
   jobId: string;
@@ -25,13 +31,18 @@ export class AssemblyOrchestrator {
   private readonly logger = new Logger(AssemblyOrchestrator.name);
 
   constructor(
-    private readonly engine:         TemplateEngine,
-    private readonly folder:         FolderBuilder,
-    private readonly writer:         FileWriter,
-    private readonly zipper:         ZipGenerator,
-    private readonly headerGen:      AIFileHeaderGenerator,
-    private readonly docGen:         AIDocGenerator,
-    private readonly sampleSvc:      SampleTestsService,
+    private readonly engine:           TemplateEngine,
+    private readonly folder:           FolderBuilder,
+    private readonly writer:           FileWriter,
+    private readonly zipper:           ZipGenerator,
+    private readonly headerGen:        AIFileHeaderGenerator,
+    private readonly docGen:           AIDocGenerator,
+    private readonly sampleSvc:        SampleTestsService,
+    private readonly swaggerParser:    SwaggerParserService,
+    private readonly apiTestGen:       ApiTestGeneratorService,
+    private readonly pwCrawler:        PlaywrightCrawlerService,
+    private readonly pwApiGen:         PlaywrightApiTestGeneratorService,
+    private readonly pwUiGen:          PlaywrightUiTestGeneratorService,
   ) {}
 
   async assembleFramework(blueprint: FrameworkBlueprint): Promise<AssemblyResult> {
@@ -45,14 +56,29 @@ export class AssemblyOrchestrator {
     const aiDocs     = aiEnabled && (aiCfg?.docs    ?? true);
     const safeMode   = aiCfg?.safeMode ?? true;
 
-    // Step 1 — generate template files
-    let files = this.engine.generate(blueprint);
+    // Pre-step — parse Swagger first so parsedApiBaseUrl is available to templates
+    let swaggerSummary: SwaggerSummary | null = null;
+    let effectiveBlueprint = blueprint;
+    if (blueprint.swaggerUrl || blueprint.swaggerFile) {
+      try {
+        swaggerSummary = blueprint.swaggerUrl
+          ? await this.swaggerParser.parseFromUrl(blueprint.swaggerUrl)
+          : this.swaggerParser.parseFromContent(blueprint.swaggerFile!);
+        effectiveBlueprint = { ...blueprint, parsedApiBaseUrl: swaggerSummary.baseUrl };
+        this.logger.log(`Swagger parsed: ${swaggerSummary.endpoints.length} endpoints, base URL: ${swaggerSummary.baseUrl}`);
+      } catch (err: any) {
+        this.logger.warn(`Swagger pre-parse failed: ${err?.message}`);
+      }
+    }
+
+    // Step 1 — generate template files (uses enriched blueprint with parsedApiBaseUrl)
+    let files = this.engine.generate(effectiveBlueprint);
 
     // Step 2 — optionally inject AI file headers (modifies in-memory file content)
     let headersApplied = false;
     if (aiHeaders) {
       try {
-        files = await this.headerGen.applyHeaders(files, blueprint, safeMode);
+        files = await this.headerGen.applyHeaders(files, effectiveBlueprint, safeMode);
         headersApplied = true;
       } catch (err: any) {
         this.logger.warn(`AI header step failed: ${err?.message}`);
@@ -66,7 +92,7 @@ export class AssemblyOrchestrator {
     let docsApplied = false;
     if (aiDocs) {
       try {
-        const docs = await this.docGen.generateDocs(blueprint, safeMode);
+        const docs = await this.docGen.generateDocs(effectiveBlueprint, safeMode);
         this.docGen.writeDocs(projectRoot, docs);
         docsApplied = docs.length > 0;
       } catch (err: any) {
@@ -76,11 +102,57 @@ export class AssemblyOrchestrator {
 
     // Step 5 — optionally seed sample tests
     let seedResult = { uiTests: [] as string[], apiTests: [] as string[], hybridTests: [] as string[] };
-    if (blueprint.samples && Object.values(blueprint.samples).some(Boolean)) {
+    if (effectiveBlueprint.samples && Object.values(effectiveBlueprint.samples).some(Boolean)) {
       try {
-        seedResult = await this.sampleSvc.seedSamples(blueprint, projectRoot);
+        seedResult = await this.sampleSvc.seedSamples(effectiveBlueprint, projectRoot);
       } catch (err: any) {
         this.logger.warn(`Sample seeding failed: ${err?.message}`);
+      }
+    }
+
+    // Step 5b — REST Assured Swagger-driven API test generation
+    if (swaggerSummary && effectiveBlueprint.framework === 'restassured') {
+      try {
+        const tagCount = Object.keys(
+          swaggerSummary.endpoints.reduce((a: Record<string,boolean>, e) => ({ ...a, [e.tag]: true }), {}),
+        ).length;
+        this.logger.log(`Generating REST Assured tests: ${swaggerSummary.endpoints.length} endpoints across ${tagCount} tags`);
+        const apiFiles = this.apiTestGen.generate(swaggerSummary, effectiveBlueprint);
+        files.push(...apiFiles);
+        this.writer.writeAll(projectRoot, apiFiles);
+      } catch (err: any) {
+        this.logger.warn(`REST Assured test generation failed: ${err?.message}`);
+      }
+    }
+
+    // Step 5c — Playwright generation (UI / API / Hybrid)
+    if (effectiveBlueprint.framework === 'playwright') {
+      const mode = effectiveBlueprint.playwrightMode ?? this.detectPlaywrightMode(effectiveBlueprint);
+
+      // API mode — Swagger-driven
+      if ((mode === 'api' || mode === 'hybrid') && swaggerSummary) {
+        try {
+          this.logger.log(`Generating Playwright API tests: ${swaggerSummary.endpoints.length} endpoints`);
+          const pwApiFiles = this.pwApiGen.generate(swaggerSummary, effectiveBlueprint);
+          files.push(...pwApiFiles);
+          this.writer.writeAll(projectRoot, pwApiFiles);
+        } catch (err: any) {
+          this.logger.warn(`Playwright API generation failed: ${err?.message}`);
+        }
+      }
+
+      // UI mode — crawler-driven
+      if ((mode === 'ui' || mode === 'hybrid') && effectiveBlueprint.websiteUrl) {
+        try {
+          this.logger.log(`Crawling website: ${effectiveBlueprint.websiteUrl}`);
+          const pageMap    = await this.pwCrawler.crawl(effectiveBlueprint.websiteUrl);
+          this.logger.log(`Crawl complete: ${pageMap.pages.length} pages discovered`);
+          const pwUiFiles  = this.pwUiGen.generate(pageMap, effectiveBlueprint);
+          files.push(...pwUiFiles);
+          this.writer.writeAll(projectRoot, pwUiFiles);
+        } catch (err: any) {
+          this.logger.warn(`Playwright UI generation failed: ${err?.message}`);
+        }
       }
     }
 
@@ -97,5 +169,12 @@ export class AssemblyOrchestrator {
       aiHeaders:        headersApplied,
       samples:          seedResult,
     };
+  }
+
+  private detectPlaywrightMode(blueprint: FrameworkBlueprint): 'ui' | 'api' | 'hybrid' {
+    const ids = (blueprint.nodes ?? []).map(n => n.nodeId);
+    if (ids.includes('playwright-ts-hybrid')) return 'hybrid';
+    if (ids.includes('playwright-ts-api'))    return 'api';
+    return 'ui';
   }
 }

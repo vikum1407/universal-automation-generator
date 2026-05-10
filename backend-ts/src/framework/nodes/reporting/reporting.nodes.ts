@@ -229,4 +229,54 @@ export const REPORTING_NODES: FrameworkNode[] = [
     capabilities: { canBeRoot: false, supportsParallel: false, supportsDistributed: false, hasAIIntegration: false, hasReporting: true, hasRetry: false },
   }),
 
+  // ─── REST Assured reporting ──────────────────────────────────────────────────
+
+  defineNode({
+    id: 'restassured-java-allure',
+    label: 'Allure Report',
+    category: 'reporting',
+    compatibleFrameworks: ['restassured'],
+    compatibleLanguages: ['java'],
+    templates: [],
+    metadata: {
+      description: 'Allure 2 reporting for REST Assured + Java. Rich HTML reports with full request/response attachments, epic/feature/story hierarchy, and trend charts. Uses allure-rest-assured filter for automatic HTTP logging.',
+      version: '2.x',
+      tags: ['allure', 'html-report', 'restassured', 'filter'],
+      docs: 'https://allurereport.org/docs/restassured/',
+      since: '1.0.0',
+    },
+    constraints: {
+      required: false,
+      maxInstances: 1,
+      requires: [],
+      conflicts: ['restassured-java-extent'],
+      recommendedWith: ['restassured-java-testng'],
+    },
+    capabilities: { canBeRoot: false, supportsParallel: false, supportsDistributed: false, hasAIIntegration: false, hasReporting: true, hasRetry: false },
+  }),
+
+  defineNode({
+    id: 'restassured-java-extent',
+    label: 'Extent Reports',
+    category: 'reporting',
+    compatibleFrameworks: ['restassured'],
+    compatibleLanguages: ['java'],
+    templates: [],  // listener generated programmatically in ApiTestGeneratorService (runner-aware)
+    metadata: {
+      description: 'Extent Reports 5 for REST Assured + Java. Fluent API for rich HTML reports with category tagging, step logs, and screenshots.',
+      version: '5.x',
+      tags: ['extent', 'html-report', 'restassured'],
+      docs: 'https://www.extentreports.com/docs/versions/5/java/index.html',
+      since: '1.0.0',
+    },
+    constraints: {
+      required: false,
+      maxInstances: 1,
+      requires: [],
+      conflicts: ['restassured-java-allure'],
+      recommendedWith: ['restassured-java-testng'],
+    },
+    capabilities: { canBeRoot: false, supportsParallel: false, supportsDistributed: false, hasAIIntegration: false, hasReporting: true, hasRetry: false },
+  }),
+
 ];

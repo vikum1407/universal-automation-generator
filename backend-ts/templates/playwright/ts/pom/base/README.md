@@ -4,8 +4,8 @@
 
 ## Stack
 
-| Component   | Version  |
-|-------------|----------|
+| Component   | Version        |
+|-------------|----------------|
 | Framework   | Playwright 1.x |
 | Language    | TypeScript 5.x |
 | Reporting   | {{REPORTING_TOOL}} |
@@ -13,20 +13,31 @@
 ## Quick Start
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Install browsers
-npx playwright install
+# 2. Install Playwright browsers
+npm run install:browsers
 
-# Run all tests
+# 3. Run all tests
 npm test
 
-# Run headed
+# Run headed (visible browser)
 npm run test:headed
 
-# Open report
+# Debug mode
+npm run test:debug
+
+# Open HTML report
 npm run report
+```
+
+## Environment Variables
+
+```bash
+BASE_URL=https://your-app.com npm test
+TEST_USER=admin@example.com npm test
+TEST_PASS=secret npm test
 ```
 
 ## Project Structure
@@ -34,21 +45,26 @@ npm run report
 ```
 src/
 ├── pages/
-│   └── BasePage.ts        ← Abstract page base class
+│   ├── BasePage.ts              ← Abstract base class
+│   └── <Page>.ts                ← One class per discovered page
 ├── fixtures/
-│   └── index.ts           ← Custom test fixtures
-└── tests/
-    └── example.spec.ts    ← Starter test
-playwright.config.ts       ← Playwright configuration
+│   ├── auth.fixture.ts          ← Authenticated page fixture
+│   └── index.ts                 ← Fixture re-exports
+└── helpers/
+    ├── faker-ui-helper.ts       ← Faker-based test data generators
+    └── data-loader.ts           ← CSV / JSON test data loader
+tests/
+└── ui/
+    └── <Page>.spec.ts           ← One spec per page (positive + negative)
+testdata/
+└── ui_data.csv                  ← Sample test data rows
+playwright.config.ts             ← Playwright configuration
+tsconfig.json                    ← TypeScript configuration
 ```
 
 ## Configuration
 
-Edit `playwright.config.ts` or set environment variables:
-
-```bash
-BASE_URL={{BASE_URL}} npm test
-```
+Edit `playwright.config.ts` to change browsers, parallelism, retries, or base URL.
 
 ---
 _Generated {{YEAR}} · {{AUTHOR}}_

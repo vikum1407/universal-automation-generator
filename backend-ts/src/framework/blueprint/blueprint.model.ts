@@ -56,6 +56,12 @@ export interface BlueprintSamples {
   hybridFlows?: boolean;  // seed tests/hybrid/ with sample hybrid flows
 }
 
+// ─── API generation config (Phase 10) ─────────────────────────────────────────
+
+export type CoverageLevel    = 'smoke' | 'functional';
+export type TestDataStrategy = 'faker' | 'custom' | 'csv' | 'json';
+export type PlaywrightMode   = 'ui' | 'api' | 'hybrid';
+
 // ─── Primary blueprint contract ───────────────────────────────────────────────
 // This is the canonical input to the template engine (Phase 3+).
 // It is language-agnostic and framework-agnostic at the structural level.
@@ -71,6 +77,15 @@ export interface FrameworkBlueprint {
   aiConfig: BlueprintAIConfig;
   ai?: BlueprintAIGeneration;   // Phase 6 AI doc / header generation
   samples?: BlueprintSamples;   // Phase 7 sample test seeding
+  // Phase 10 — Swagger-driven API test generation (REST Assured + Playwright API)
+  swaggerUrl?:       string;
+  swaggerFile?:      string;           // raw OpenAPI JSON/YAML content
+  coverageLevel?:    CoverageLevel;    // 'smoke' | 'functional'
+  testDataStrategy?: TestDataStrategy; // 'faker' | 'custom' | 'csv' | 'json'
+  parsedApiBaseUrl?: string;           // extracted from spec at generation time
+  // Playwright-specific
+  websiteUrl?:       string;           // UI crawl target URL
+  playwrightMode?:   PlaywrightMode;   // 'ui' | 'api' | 'hybrid'
   components: Record<string, any>; // free-form extensions + legacy compat
 }
 

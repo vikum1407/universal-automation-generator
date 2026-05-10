@@ -1,0 +1,30 @@
+version: "3.8"
+
+# Qlitz API Test Suite — Docker Compose
+#
+# Quick start:
+#   docker-compose run --rm api-tests
+#
+# Override at runtime:
+#   API_BASE_URL=https://staging.api.com API_AUTH_TOKEN=my-token docker-compose run --rm api-tests
+
+services:
+  api-tests:
+    image: maven:3.9-eclipse-temurin-17
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - maven-cache:/root/.m2
+    environment:
+      - api.base.url=${API_BASE_URL:-{{API_BASE_URL}}}
+      - api.auth.token=${API_AUTH_TOKEN:-}
+      - coverage.level=${COVERAGE_LEVEL:-{{COVERAGE_LEVEL}}}
+    command: >
+      mvn clean test
+        -Dapi.base.url=$${api.base.url}
+        -Dapi.auth.token=$${api.auth.token}
+        -Dcoverage.level=$${coverage.level}
+        --no-transfer-progress
+
+volumes:
+  maven-cache:

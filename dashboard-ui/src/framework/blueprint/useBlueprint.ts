@@ -9,6 +9,14 @@ export interface DerivedBlueprint {
   framework: string;
   language: string;
   architecture: string;
+  // API generation (REST Assured + Playwright API/Hybrid)
+  swaggerUrl?:       string;
+  swaggerFile?:      string;
+  coverageLevel?:    'smoke' | 'functional';
+  testDataStrategy?: 'faker' | 'custom' | 'csv' | 'json';
+  // Playwright-specific
+  playwrightMode?:   'ui' | 'api' | 'hybrid';
+  websiteUrl?:       string;
   metadata: {
     name: string;
     description: string;
@@ -92,6 +100,12 @@ export function useBlueprint(): DerivedBlueprint | null {
         visualTesting: hasVisual,
       },
       components: componentsMap,
+      swaggerUrl:       selection.swaggerUrl,
+      swaggerFile:      selection.swaggerFile,
+      coverageLevel:    selection.coverageLevel,
+      testDataStrategy: selection.testDataStrategy,
+      playwrightMode:   selection.playwrightMode,
+      websiteUrl:       selection.websiteUrl,
     };
   }, [selection, architecture, components, getAllInstances]);
 }

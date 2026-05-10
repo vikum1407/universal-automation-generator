@@ -13,7 +13,8 @@ export abstract class BasePage {
   }
 
   async waitForLoad() {
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(1500);
   }
 
   async getTitle(): Promise<string> {

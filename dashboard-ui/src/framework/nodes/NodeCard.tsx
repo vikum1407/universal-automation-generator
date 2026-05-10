@@ -48,32 +48,33 @@ export function NodeCard({ node, S }: NodeCardProps) {
         position: "relative",
       }}
     >
-      {/* Required badge */}
+      {/* Label row */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 7, marginBottom: 4, paddingRight: node.constraints.required ? 54 : 0 }}>
+        {isPlaced
+          ? <span style={{ fontSize: 10, color, flexShrink: 0 }}>✓</span>
+          : <div style={{ width: 7, height: 7, borderRadius: "50%", background: color, flexShrink: 0, marginTop: 3 }} />
+        }
+        <span style={{
+          fontSize: 12.5, fontWeight: isPlaced ? 700 : 600,
+          color: isPlaced ? color : S.text,
+          lineHeight: 1.3,
+        }}>
+          {node.label}
+        </span>
+      </div>
+
+      {/* Required badge — positioned after label to avoid overlap */}
       {node.constraints.required && (
         <div style={{
           position: "absolute", top: 7, right: 7,
           fontSize: 8, fontWeight: 800, textTransform: "uppercase",
           letterSpacing: "0.06em", color: "#F97316",
           background: "#F9731618", borderRadius: 3, padding: "1px 5px",
+          whiteSpace: "nowrap",
         }}>
           Required
         </div>
       )}
-
-      {/* Label row */}
-      <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
-        {isPlaced
-          ? <span style={{ fontSize: 10, color }}>✓</span>
-          : <div style={{ width: 7, height: 7, borderRadius: "50%", background: color, flexShrink: 0 }} />
-        }
-        <span style={{
-          fontSize: 12.5, fontWeight: isPlaced ? 700 : 600,
-          color: isPlaced ? color : S.text,
-          lineHeight: 1.2,
-        }}>
-          {node.label}
-        </span>
-      </div>
 
       {/* Description */}
       {node.metadata.description && (

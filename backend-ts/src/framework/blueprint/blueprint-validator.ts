@@ -8,7 +8,7 @@ import { NodeFilterService } from '../filter/node-filter.service';
 
 // ─── Known values ─────────────────────────────────────────────────────────────
 
-const SUPPORTED_FRAMEWORKS = ['selenium', 'cypress', 'playwright', 'webdriverio', 'appium'];
+const SUPPORTED_FRAMEWORKS = ['selenium', 'cypress', 'playwright', 'webdriverio', 'appium', 'restassured'];
 const SUPPORTED_LANGUAGES  = ['java', 'typescript', 'javascript', 'python', 'csharp'];
 
 // ─── Validator ────────────────────────────────────────────────────────────────

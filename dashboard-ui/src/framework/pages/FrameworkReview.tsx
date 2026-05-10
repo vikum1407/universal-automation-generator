@@ -87,6 +87,8 @@ export default function FrameworkReview() {
   useEffect(() => {
     if (!blueprint) return;
     setProjectName(blueprint.metadata.name);
+    // Pre-fill base URL from websiteUrl (Playwright UI/Hybrid) or leave default
+    if (selection?.websiteUrl) setBaseUrl(selection.websiteUrl);
     // Pre-populate distributed fields from placed node configs
     const distNodes = components.filter(c => c.category === "distributed");
     const dockerNode = distNodes.find(n =>
@@ -126,36 +128,66 @@ export default function FrameworkReview() {
     groupedNodes[c.category].push(c);
   }
 
+  const isApiFramework = selection?.framework === "restassured";
+
   const handleGenerate = async () => {
     setStatus("generating");
     setError(null);
     try {
-      const payload = {
+      const payload: Record<string, any> = {
         ...blueprint,
         metadata: { ...blueprint.metadata, name: projectName },
-        executionConfig: {
-          ...blueprint.executionConfig,
-          baseUrl,
-          browser,
-          headless,
-          // distributed overrides fed into placeholder engine via executionConfig
-          dockerImageName: dockerImage || projectName.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
-          dockerImageTag:  dockerTag,
-          gridHubUrl,
-          k8sNamespace,
-        },
         ai: {
           enabled:  aiEnabled,
           docs:     aiEnabled,
           headers:  aiEnabled,
           safeMode: aiSafeMode,
         },
-        samples: {
+      };
+
+      const isPlaywrightFramework = selection?.framework === "playwright";
+      const pwMode = selection?.playwrightMode ?? "ui";
+
+      if (isApiFramework) {
+        // REST Assured — pass API-specific fields; no browser/baseUrl needed
+        payload.swaggerUrl       = selection!.swaggerUrl;
+        payload.swaggerFile      = selection!.swaggerFile;
+        payload.coverageLevel    = selection!.coverageLevel    ?? "functional";
+        payload.testDataStrategy = selection!.testDataStrategy ?? "faker";
+      } else if (isPlaywrightFramework) {
+        // Playwright — mode-aware payload
+        payload.playwrightMode   = pwMode;
+        payload.websiteUrl       = selection!.websiteUrl;
+        payload.swaggerUrl       = selection!.swaggerUrl;
+        payload.swaggerFile      = selection!.swaggerFile;
+        payload.coverageLevel    = selection!.coverageLevel    ?? "functional";
+        payload.testDataStrategy = selection!.testDataStrategy ?? "faker";
+        // UI + Hybrid still need browser config for the UI project
+        if (pwMode !== "api") {
+          payload.executionConfig = {
+            ...blueprint!.executionConfig,
+            baseUrl:  selection!.websiteUrl ?? baseUrl,
+            browser,
+            headless,
+          };
+        }
+      } else {
+        payload.executionConfig = {
+          ...blueprint!.executionConfig,
+          baseUrl,
+          browser,
+          headless,
+          dockerImageName: dockerImage || projectName.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
+          dockerImageTag:  dockerTag,
+          gridHubUrl,
+          k8sNamespace,
+        };
+        payload.samples = {
           uiTests:     sampleUI,
           apiTests:    sampleAPI,
           hybridFlows: sampleHybrid,
-        },
-      };
+        };
+      }
       const res = await generateFramework(payload);
       if (!res.success) {
         setStatus("error");
@@ -199,6 +231,7 @@ export default function FrameworkReview() {
       height: "100vh", overflow: "hidden",
       background: S.bg,
     }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       {/* ── Top bar ─────────────────────────────────────────────────────── */}
       <div style={{
@@ -207,14 +240,14 @@ export default function FrameworkReview() {
         background: S.card, borderBottom: `1px solid ${S.border}`, zIndex: 10,
       }}>
         <button
-          onClick={() => navigate("/framework/builder")}
+          onClick={() => navigate(isApiFramework ? "/framework/start" : "/framework/builder")}
           style={{
             display: "flex", alignItems: "center", gap: 5,
             background: "none", border: "none", cursor: "pointer",
             color: S.textMuted, fontSize: 13, fontWeight: 500, padding: 0,
           }}
         >
-          ← Builder
+          {isApiFramework ? "← Start" : "← Builder"}
         </button>
 
         <div style={{ width: 1, height: 18, background: S.border }} />
@@ -251,13 +284,28 @@ export default function FrameworkReview() {
             transition: "all 0.15s",
           }}
         >
-          {status === "generating" ? "Generating…" : status === "done" ? "✓ Generated" : "⚡ Generate Framework"}
+          {status === "generating"
+            ? (selection?.framework === "playwright" && selection?.playwrightMode !== "api" ? "Crawling & Generating…" : "Generating…")
+            : status === "done" ? "✓ Generated" : "⚡ Generate Framework"}
         </button>
       </div>
 
       {/* ── Body ────────────────────────────────────────────────────────── */}
       <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
+
+          {/* ── Playwright crawl progress banner ─────────────────────── */}
+          {status === "generating" && selection?.framework === "playwright" && selection?.playwrightMode !== "api" && (
+            <div style={{ padding: "14px 18px", borderRadius: 12, background: "#7B5FFF0d", border: "1.5px solid #7B5FFF40", display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ width: 18, height: 18, border: "2.5px solid #7B5FFF", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#7B5FFF" }}>Crawling {selection.websiteUrl ?? "your website"}…</div>
+                <div style={{ fontSize: 11, color: S.textMuted, marginTop: 3 }}>
+                  Playwright is launching a headless browser, discovering pages (up to 10), and generating Page Objects + tests. This takes ~30–60 s.
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ── AI Explain ────────────────────────────────────────────── */}
           {aiEnabled && (
@@ -266,42 +314,96 @@ export default function FrameworkReview() {
 
           {/* ── Section: Finalize settings ─────────────────────────────── */}
           <Section title="Finalize Settings" S={S}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <Field label="Project Name" S={S}>
-                <input
-                  value={projectName}
-                  onChange={e => setProjectName(e.target.value)}
-                  style={inputStyle(S)}
-                />
-              </Field>
-              <Field label="Base URL" S={S}>
-                <input
-                  value={baseUrl}
-                  onChange={e => setBaseUrl(e.target.value)}
-                  style={inputStyle(S)}
-                  placeholder="https://example.com"
-                />
-              </Field>
-              <Field label="Browser" S={S}>
-                <select value={browser} onChange={e => setBrowser(e.target.value)} style={inputStyle(S)}>
-                  <option value="chrome">Chrome</option>
-                  <option value="firefox">Firefox</option>
-                  <option value="edge">Edge</option>
-                  <option value="safari">Safari</option>
-                </select>
-              </Field>
-              <Field label="Run Headless" S={S}>
-                <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                  <input
-                    type="checkbox"
-                    checked={headless}
-                    onChange={e => setHeadless(e.target.checked)}
-                    style={{ width: 14, height: 14, accentColor: S.accent, cursor: "pointer" }}
-                  />
-                  <span style={{ fontSize: 12, color: S.textMuted }}>Headless mode</span>
-                </label>
-              </Field>
-            </div>
+            {isApiFramework ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <Field label="Project Name" S={S}>
+                  <input value={projectName} onChange={e => setProjectName(e.target.value)} style={inputStyle(S)} />
+                </Field>
+                {/* API config summary — read-only, set on Start page */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                  <div style={{ padding: "10px 14px", borderRadius: 8, background: "#10B98108", border: "1px solid #10B98130" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#10B981", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Swagger URL</div>
+                    <div style={{ fontSize: 11, color: S.text, wordBreak: "break-all" }}>{selection!.swaggerUrl || "—"}</div>
+                  </div>
+                  <div style={{ padding: "10px 14px", borderRadius: 8, background: "#10B98108", border: "1px solid #10B98130" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#10B981", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Coverage Level</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: S.text, textTransform: "capitalize" }}>{selection!.coverageLevel ?? "smoke"}</div>
+                  </div>
+                  <div style={{ padding: "10px 14px", borderRadius: 8, background: "#10B98108", border: "1px solid #10B98130" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#10B981", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Test Data</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: S.text, textTransform: "capitalize" }}>{selection!.testDataStrategy ?? "faker"}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 11, color: S.textMuted, padding: "8px 12px", borderRadius: 7, background: `${S.accent}06`, border: `1px solid ${S.border}` }}>
+                  Set <code style={{ fontSize: 10 }}>api.auth.token</code> in <code style={{ fontSize: 10 }}>src/test/resources/config.properties</code> after downloading, or pass <code style={{ fontSize: 10 }}>-Dapi.auth.token=...</code> as a JVM flag. All other settings are injectable via the Qlitz dashboard.
+                </div>
+              </div>
+            ) : selection?.framework === "playwright" ? (
+              /* ── Playwright-specific Finalize Settings ── */
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <Field label="Project Name" S={S}>
+                    <input value={projectName} onChange={e => setProjectName(e.target.value)} style={inputStyle(S)} />
+                  </Field>
+                  <Field label="Browser" S={S}>
+                    <select value={browser} onChange={e => setBrowser(e.target.value)} style={inputStyle(S)}>
+                      <option value="chromium">Chromium</option>
+                      <option value="firefox">Firefox</option>
+                      <option value="webkit">WebKit (Safari)</option>
+                    </select>
+                  </Field>
+                  <Field label="Run Headless" S={S}>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                      <input type="checkbox" checked={headless} onChange={e => setHeadless(e.target.checked)} style={{ width: 14, height: 14, accentColor: S.accent, cursor: "pointer" }} />
+                      <span style={{ fontSize: 12, color: S.textMuted }}>Headless mode</span>
+                    </label>
+                  </Field>
+                </div>
+                {/* Playwright config summary — read-only, set on Start page */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                  <div style={{ padding: "10px 14px", borderRadius: 8, background: "#7B5FFF08", border: "1px solid #7B5FFF30" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#7B5FFF", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Mode</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: S.text, textTransform: "capitalize" }}>{selection.playwrightMode ?? "ui"}</div>
+                  </div>
+                  {selection.websiteUrl && (
+                    <div style={{ padding: "10px 14px", borderRadius: 8, background: "#7B5FFF08", border: "1px solid #7B5FFF30" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "#7B5FFF", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Website URL</div>
+                      <div style={{ fontSize: 11, color: S.text, wordBreak: "break-all" }}>{selection.websiteUrl}</div>
+                    </div>
+                  )}
+                  <div style={{ padding: "10px 14px", borderRadius: 8, background: "#7B5FFF08", border: "1px solid #7B5FFF30" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#7B5FFF", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Coverage</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: S.text, textTransform: "capitalize" }}>{selection.coverageLevel ?? "functional"}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 11, color: S.textMuted, padding: "8px 12px", borderRadius: 7, background: "#7B5FFF06", border: `1px solid ${S.border}` }}>
+                  Qlitz will crawl <strong>{selection.websiteUrl ?? "your website"}</strong> (up to 10 pages), generate Page Object classes, and produce smoke + functional test coverage for every discovered page. Generation takes ~30–60 s.
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <Field label="Project Name" S={S}>
+                  <input value={projectName} onChange={e => setProjectName(e.target.value)} style={inputStyle(S)} />
+                </Field>
+                <Field label="Base URL" S={S}>
+                  <input value={baseUrl} onChange={e => setBaseUrl(e.target.value)} style={inputStyle(S)} placeholder="https://example.com" />
+                </Field>
+                <Field label="Browser" S={S}>
+                  <select value={browser} onChange={e => setBrowser(e.target.value)} style={inputStyle(S)}>
+                    <option value="chrome">Chrome</option>
+                    <option value="firefox">Firefox</option>
+                    <option value="edge">Edge</option>
+                    <option value="safari">Safari</option>
+                  </select>
+                </Field>
+                <Field label="Run Headless" S={S}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                    <input type="checkbox" checked={headless} onChange={e => setHeadless(e.target.checked)} style={{ width: 14, height: 14, accentColor: S.accent, cursor: "pointer" }} />
+                    <span style={{ fontSize: 12, color: S.textMuted }}>Headless mode</span>
+                  </label>
+                </Field>
+              </div>
+            )}
           </Section>
 
           {/* ── Section: Distributed config (conditional) ─────────────── */}
@@ -364,8 +466,8 @@ export default function FrameworkReview() {
             </Section>
           )}
 
-          {/* ── Section: Sample tests ─────────────────────────────────── */}
-          <Section title="Seed Sample Tests" S={S}>
+          {/* ── Section: Sample tests (hidden for REST Assured + Playwright — both generate real tests) */}
+          {!isApiFramework && selection?.framework !== "playwright" && <Section title="Seed Sample Tests" S={S}>
             <p style={{ fontSize: 11, color: S.textMuted, marginBottom: 14, lineHeight: 1.6 }}>
               Optionally seed the generated project with working sample tests.
               These are ready-to-run examples that demonstrate the framework patterns.
@@ -396,7 +498,7 @@ export default function FrameworkReview() {
                 </label>
               ))}
             </div>
-          </Section>
+          </Section>}
 
           {/* ── Section: Architecture summary ──────────────────────────── */}
           <Section title="Architecture Summary" S={S}>

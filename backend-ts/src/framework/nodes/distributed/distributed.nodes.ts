@@ -1,4 +1,6 @@
-import { FrameworkNode, defineNode } from '../node.model';
+import { FrameworkNode, FrameworkRef, defineNode } from '../node.model';
+
+const UI_FRAMEWORKS: FrameworkRef[] = ['selenium', 'cypress', 'playwright', 'webdriverio', 'appium'];
 
 export const DISTRIBUTED_NODES: FrameworkNode[] = [
 
@@ -109,7 +111,7 @@ export const DISTRIBUTED_NODES: FrameworkNode[] = [
     id: 'all-lambdatest',
     label: 'LambdaTest',
     category: 'distributed',
-    compatibleFrameworks: ['*'],
+    compatibleFrameworks: UI_FRAMEWORKS,
     compatibleLanguages: ['*'],
     templates: ['distributed/lambdatest/base'],
     metadata: {
@@ -133,7 +135,7 @@ export const DISTRIBUTED_NODES: FrameworkNode[] = [
     id: 'all-saucelabs',
     label: 'Sauce Labs',
     category: 'distributed',
-    compatibleFrameworks: ['*'],
+    compatibleFrameworks: UI_FRAMEWORKS,
     compatibleLanguages: ['*'],
     templates: ['distributed/saucelabs/base'],
     metadata: {
@@ -277,7 +279,7 @@ export const DISTRIBUTED_NODES: FrameworkNode[] = [
     id: 'distributed-browserstack',
     label: 'BrowserStack',
     category: 'distributed',
-    compatibleFrameworks: ['*'],
+    compatibleFrameworks: UI_FRAMEWORKS,
     compatibleLanguages: ['*'],
     templates: ['distributed/browserstack/base'],
     metadata: {
@@ -327,6 +329,52 @@ export const DISTRIBUTED_NODES: FrameworkNode[] = [
       imageName: { type: 'string', label: 'Docker image name', default: 'qlitz-cypress', required: true },
       imageTag:  { type: 'string', label: 'Image tag',         default: 'latest' },
     },
+  }),
+
+  // ─── REST Assured distributed ────────────────────────────────────────────────
+
+  defineNode({
+    id: 'restassured-java-k8s',
+    label: 'Kubernetes Job',
+    category: 'distributed',
+    compatibleFrameworks: ['restassured'],
+    compatibleLanguages: ['java'],
+    templates: ['restassured/java/k8s'],
+    metadata: {
+      description: 'Kubernetes batch Job manifest for REST Assured + Java. Runs mvn clean test in a Maven container — credentials injected via K8s Secrets. No Grid needed: API tests are stateless.',
+      version: 'latest',
+      tags: ['kubernetes', 'k8s', 'job', 'restassured', 'maven'],
+      docs: 'https://kubernetes.io/docs/concepts/workloads/controllers/job/',
+      since: '1.0.0',
+    },
+    constraints: {
+      required: false, maxInstances: 1, requires: [],
+      conflicts: ['restassured-java-docker'],
+      recommendedWith: ['restassured-java-github-actions', 'restassured-java-gitlab'],
+    },
+    capabilities: { canBeRoot: false, supportsParallel: true, supportsDistributed: true, hasAIIntegration: false, hasReporting: false, hasRetry: false },
+    configSchema: {
+      namespace:   { type: 'string', label: 'K8s namespace',     default: 'qa-automation', required: true },
+      imageName:   { type: 'string', label: 'Maven image',        default: 'maven:3.9-eclipse-temurin-17' },
+    },
+  }),
+
+  defineNode({
+    id: 'restassured-java-docker',
+    label: 'Docker Compose',
+    category: 'distributed',
+    compatibleFrameworks: ['restassured'],
+    compatibleLanguages: ['java'],
+    templates: ['restassured/java/docker'],
+    metadata: {
+      description: 'Docker Compose setup for REST Assured + Java. Runs the full Maven test suite inside a container — auth token and base URL injected as environment variables. One command: docker-compose run --rm api-tests.',
+      version: '3.x',
+      tags: ['docker', 'compose', 'container', 'restassured', 'maven'],
+      docs: 'https://docs.docker.com/compose/',
+      since: '1.0.0',
+    },
+    constraints: { required: false, maxInstances: 1, requires: [], conflicts: [], recommendedWith: [] },
+    capabilities: { canBeRoot: false, supportsParallel: false, supportsDistributed: true, hasAIIntegration: false, hasReporting: false, hasRetry: false },
   }),
 
 ];

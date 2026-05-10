@@ -1,0 +1,84 @@
+# {{PROJECT_NAME}} — Kubernetes Batch Job
+# Runs the full REST Assured test suite as a one-shot K8s Job.
+# No Grid needed: API tests are stateless and run in a single Maven container.
+#
+# Prerequisites:
+#   1. Create the Secret (see api-test-secrets.yaml below)
+#   2. Optionally create a PVC for Maven cache (speeds up repeated runs)
+#
+# Usage:
+#   kubectl apply -f k8s/api-test-secrets.yaml
+#   kubectl apply -f k8s/api-tests-job.yaml
+#   kubectl logs -l app=api-tests -f
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{PROJECT_NAME}}-api-tests
+  namespace: {{K8S_NAMESPACE}}
+  labels:
+    app: api-tests
+    project: {{PROJECT_NAME}}
+spec:
+  ttlSecondsAfterFinished: 3600   # auto-clean Job after 1 hour
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: api-tests
+        project: {{PROJECT_NAME}}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: api-tests
+          image: maven:3.9-eclipse-temurin-17
+          workingDir: /workspace
+          command:
+            - mvn
+            - clean
+            - test
+            - --no-transfer-progress
+          args:
+            - -Dapi.base.url=$(API_BASE_URL)
+            - -Dapi.auth.token=$(API_AUTH_TOKEN)
+            - -Dcoverage.level=$(COVERAGE_LEVEL)
+          env:
+            - name: API_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: api-test-secrets
+                  key: api-base-url
+            - name: API_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: api-test-secrets
+                  key: api-auth-token
+                  optional: true
+            - name: COVERAGE_LEVEL
+              value: "{{COVERAGE_LEVEL}}"
+            - name: MAVEN_OPTS
+              value: "-Xmx1g -Dmaven.repo.local=/root/.m2/repository"
+          volumeMounts:
+            - name: source
+              mountPath: /workspace
+            - name: maven-cache
+              mountPath: /root/.m2
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+      initContainers:
+        - name: copy-source
+          image: busybox
+          command: [sh, -c, "cp -r /src/. /workspace/"]
+          volumeMounts:
+            - name: source
+              mountPath: /workspace
+      volumes:
+        - name: source
+          emptyDir: {}
+        - name: maven-cache
+          emptyDir: {}   # replace with PVC for persistent cache

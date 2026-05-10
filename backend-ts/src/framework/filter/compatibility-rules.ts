@@ -52,6 +52,13 @@ export const COMPATIBILITY_MATRIX: FrameworkLanguageMatrix = {
     typescript: 'supported',
     javascript: 'partial',
   },
+  restassured: {
+    java:       'supported',
+    python:     'unsupported',
+    csharp:     'unsupported',
+    typescript: 'unsupported',
+    javascript: 'unsupported',
+  },
 };
 
 // ─── Explicit violation rules (for descriptive error messages) ────────────────
