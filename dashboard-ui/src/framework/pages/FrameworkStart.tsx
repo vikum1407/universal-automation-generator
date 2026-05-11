@@ -20,7 +20,7 @@ function useDarkMode() {
 
 const FRAMEWORKS = [
   { id: "selenium",    label: "Selenium",     tagline: "Cross-browser UI automation",   color: "#E25C1D", langs: ["Java", "Python", "TypeScript", "C#"], apiOnly: false },
-  { id: "playwright",  label: "Playwright",   tagline: "Modern web testing",             color: "#7B5FFF", langs: ["TypeScript", "Python", "Java", "C#"], apiOnly: false },
+  { id: "playwright",  label: "Playwright",   tagline: "Modern web testing",             color: "#7B5FFF", langs: ["TypeScript", "JavaScript", "Python", "Java", "C#"], apiOnly: false },
   { id: "cypress",     label: "Cypress",      tagline: "Fast component & E2E tests",     color: "#17B26A", langs: ["TypeScript", "JavaScript"],           apiOnly: false },
   { id: "webdriverio", label: "WebdriverIO",  tagline: "Flexible WDIO automation",       color: "#E8A000", langs: ["TypeScript", "JavaScript"],           apiOnly: false },
   { id: "appium",      label: "Appium",       tagline: "Mobile & cross-platform",        color: "#2563EB", langs: ["Java", "Python", "TypeScript", "C#"], apiOnly: false },
@@ -393,7 +393,7 @@ export default function FrameworkStart() {
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {LANGUAGES.map(lang => {
                   const selected   = selectedLang === lang.id;
-                  const pwOnly     = isPlaywrightFramework && !["typescript", "javascript"].includes(lang.id);
+                  const pwOnly     = isPlaywrightFramework && !["typescript", "javascript", "java", "python"].includes(lang.id);
                   const compatible = !fwDef || fwDef.langs.some(l => l.toLowerCase() === lang.label.toLowerCase());
                   const dimmed     = !!selectedFw && (!compatible || pwOnly);
                   return (
@@ -408,7 +408,7 @@ export default function FrameworkStart() {
                 })}
               </div>
               {isPlaywrightFramework && (
-                <div style={{ fontSize: 11, color: S.textMuted, marginTop: 6 }}>Playwright supports TypeScript and JavaScript only.</div>
+                <div style={{ fontSize: 11, color: S.textMuted, marginTop: 6 }}>Playwright supports TypeScript, JavaScript, Java, and Python.</div>
               )}
             </div>
           )}

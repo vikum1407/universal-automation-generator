@@ -58,7 +58,7 @@ export interface BlueprintSamples {
 
 // ─── API generation config (Phase 10) ─────────────────────────────────────────
 
-export type CoverageLevel    = 'smoke' | 'functional';
+export type CoverageLevel    = 'smoke' | 'functional' | 'regression';
 export type TestDataStrategy = 'faker' | 'custom' | 'csv' | 'json';
 export type PlaywrightMode   = 'ui' | 'api' | 'hybrid';
 
@@ -80,12 +80,13 @@ export interface FrameworkBlueprint {
   // Phase 10 — Swagger-driven API test generation (REST Assured + Playwright API)
   swaggerUrl?:       string;
   swaggerFile?:      string;           // raw OpenAPI JSON/YAML content
-  coverageLevel?:    CoverageLevel;    // 'smoke' | 'functional'
+  coverageLevel?:    CoverageLevel;    // 'smoke' | 'functional' | 'regression'
   testDataStrategy?: TestDataStrategy; // 'faker' | 'custom' | 'csv' | 'json'
   parsedApiBaseUrl?: string;           // extracted from spec at generation time
   // Playwright-specific
   websiteUrl?:       string;           // UI crawl target URL
   playwrightMode?:   PlaywrightMode;   // 'ui' | 'api' | 'hybrid'
+  codegenScript?:    string;           // raw Playwright codegen .ts script (alternative to crawling)
   components: Record<string, any>; // free-form extensions + legacy compat
 }
 

@@ -1,6 +1,7 @@
 import type { StyleTokens } from "../nodes/types";
 import { CATEGORY_META } from "../nodes/types";
 import { useBuilderState } from "./useBuilderState";
+import { useFramework } from "../context/FrameworkContext";
 
 interface NodeConfigPanelProps {
   S: StyleTokens;
@@ -8,7 +9,12 @@ interface NodeConfigPanelProps {
 
 export function NodeConfigPanel({ S }: NodeConfigPanelProps) {
   const { getSelectedInstance, updateConfig } = useBuilderState();
+  const { result } = useFramework();
   const instance = getSelectedInstance();
+
+  const nodeLabelMap = new Map<string, string>(
+    (result?.nodes ?? []).map(n => [n.id, n.label])
+  );
 
   if (!instance) {
     return (
@@ -142,7 +148,9 @@ export function NodeConfigPanel({ S }: NodeConfigPanelProps) {
               Conflicts with
             </div>
             {instance.conflicts.map(c => (
-              <div key={c} style={{ fontSize: 10, color: "#EF4444", opacity: 0.8 }}>• {c}</div>
+              <div key={c} style={{ fontSize: 10, color: "#EF4444", opacity: 0.8 }}>
+                • {nodeLabelMap.get(c) ?? c}
+              </div>
             ))}
           </div>
         )}

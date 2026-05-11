@@ -9,7 +9,7 @@ export interface FrameworkSelection {
   // API generation fields (REST Assured + Playwright API/Hybrid)
   swaggerUrl?:       string;
   swaggerFile?:      string;
-  coverageLevel?:    'smoke' | 'functional';
+  coverageLevel?:    'smoke' | 'functional' | 'regression';
   testDataStrategy?: 'faker' | 'custom' | 'csv' | 'json';
   // Playwright-specific
   playwrightMode?:   'ui' | 'api' | 'hybrid';

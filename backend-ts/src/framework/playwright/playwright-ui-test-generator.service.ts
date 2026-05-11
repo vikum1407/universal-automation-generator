@@ -12,11 +12,16 @@ export class PlaywrightUiTestGeneratorService {
     const level   = blueprint.coverageLevel ?? 'functional';
     const files:  GeneratedFile[] = [];
 
+    const wantSmoke      = level === 'smoke'      || level === 'regression';
+    const wantFunctional = level === 'functional' || level === 'regression';
+
     for (const page of pageMap.pages) {
-      // Page Object class
       files.push(this.buildPageObject(page, ext, lang));
-      // Test spec
-      files.push(this.buildTestSpec(page, level, ext, pageMap.baseUrl));
+      if (wantSmoke) files.push(this.buildSmokeSpec(page, ext, pageMap.baseUrl));
+      if (wantFunctional) {
+        const funcFile = this.buildFunctionalSpec(page, ext, pageMap.baseUrl);
+        if (funcFile) files.push(funcFile);
+      }
     }
 
     // Shared fixtures
@@ -26,6 +31,7 @@ export class PlaywrightUiTestGeneratorService {
 
     // Sample test data
     files.push(this.buildSampleData(pageMap));
+    files.push(this.buildReadme(pageMap));
 
     return files;
   }
@@ -57,7 +63,10 @@ ${methods}
   private toSafeIdentifier(str: string): string {
     const cleaned = str.replace(/[^a-zA-Z0-9\-_\s]/g, '').trim();
     if (!cleaned) return '';
-    return this.toCamelCase(cleaned);
+    // TypeScript identifiers cannot start with a digit — strip any leading digits + whitespace
+    const safe = cleaned.replace(/^\d+[\s\-_]*/g, '').trim();
+    if (!safe) return '';
+    return this.toCamelCase(safe);
   }
 
   private buildLocatorFields(page: PageInfo, isTs: boolean): string {
@@ -92,6 +101,18 @@ ${methods}
     return lines.length ? '\n' + lines.join('\n') + '\n' : '';
   }
 
+  /** Deduplicate form fields by safe identifier — prevents duplicate params when the same
+   *  input is recorded more than once (e.g. user typed, cleared, retyped). */
+  private uniqueFields(fields: FieldInfo[]): FieldInfo[] {
+    const seen = new Set<string>();
+    return fields.filter(f => {
+      const id = this.toSafeIdentifier(f.name);
+      if (!id || seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+  }
+
   private buildPageMethods(page: PageInfo, isTs: boolean): string {
     const lines:      string[] = [];
     const asyncRet    = isTs ? ': Promise<void>' : '';
@@ -110,7 +131,9 @@ ${methods}
       if (usedMethods.has(fillMethod)) continue;
       usedMethods.add(fillMethod);
 
-      const validFields = form.fields.filter(f => !['hidden'].includes(f.type) && this.toSafeIdentifier(f.name));
+      const validFields = this.uniqueFields(
+        form.fields.filter(f => !['hidden'].includes(f.type))
+      );
       const params = validFields.map(f =>
         isTs ? `${this.toSafeIdentifier(f.name)}: string` : this.toSafeIdentifier(f.name)
       ).join(', ');
@@ -141,25 +164,13 @@ ${fills}
     return str.split('\n').map(line => prefix + line).join('\n');
   }
 
-  private buildTestSpec(page: PageInfo, level: string, ext: string, baseUrl: string): GeneratedFile {
-    const smokeTests      = this.buildSmokeTests(page);
-    const functionalTests = level === 'functional' ? this.buildFunctionalTests(page) : [];
-
-    // Each test is 0-indented; we add 4 spaces when placing inside test.describe
-    const smokeInner      = smokeTests.map(t => this.pad(t, 4)).join('\n\n');
-    const functionalInner = functionalTests.map(t => this.pad(t, 4)).join('\n\n');
-
-    const smokeBlock = `  test.describe('Smoke', () => {\n${smokeInner}\n  });`;
-    const functionalBlock = functionalTests.length > 0
-      ? `\n\n  test.describe('Functional', () => {\n${functionalInner}\n  });`
-      : '';
-
+  private buildSmokeSpec(page: PageInfo, ext: string, baseUrl: string): GeneratedFile {
+    const tests = this.buildSmokeTests(page).map(t => this.pad(t, 2)).join('\n\n');
     const content = `import { test, expect } from '@playwright/test';
 import { ${page.className} } from '@pages/${page.className}';
-import { faker } from '@faker-js/faker';
 
-// Auto-generated — ${page.title} | ${page.url} | Coverage: ${level}
-test.describe('${page.title}', () => {
+// Auto-generated — ${page.title} | ${page.url} | Smoke
+test.describe('${page.title} — Smoke', () => {
   let pageObj: ${page.className};
 
   test.beforeEach(async ({ page }) => {
@@ -167,10 +178,33 @@ test.describe('${page.title}', () => {
     await pageObj.goto();
   });
 
-${smokeBlock}${functionalBlock}
+${tests}
 });
 `;
-    return { path: `tests/ui/${page.className}.spec.${ext}`, content };
+    return { path: `tests/ui/smoke/${page.className}.smoke.spec.${ext}`, content };
+  }
+
+  private buildFunctionalSpec(page: PageInfo, ext: string, baseUrl: string): GeneratedFile | null {
+    const tests = this.buildFunctionalTests(page);
+    if (!tests.length) return null;
+    const inner = tests.map(t => this.pad(t, 2)).join('\n\n');
+    const content = `import { test, expect } from '@playwright/test';
+import { ${page.className} } from '@pages/${page.className}';
+import { faker } from '@faker-js/faker';
+
+// Auto-generated — ${page.title} | ${page.url} | Functional
+test.describe('${page.title} — Functional', () => {
+  let pageObj: ${page.className};
+
+  test.beforeEach(async ({ page }) => {
+    pageObj = new ${page.className}(page);
+    await pageObj.goto();
+  });
+
+${inner}
+});
+`;
+    return { path: `tests/ui/functional/${page.className}.functional.spec.${ext}`, content };
   }
 
   private buildSmokeTests(page: PageInfo): string[] {
@@ -281,8 +315,9 @@ ${smokeBlock}${functionalBlock}
   }
 
   private buildFormHappyPathTest(page: PageInfo, form: FormInfo): string {
-    const validFields = form.fields
-      .filter(f => !['hidden'].includes(f.type) && this.toSafeIdentifier(f.name));
+    const validFields = this.uniqueFields(
+      form.fields.filter(f => !['hidden'].includes(f.type))
+    );
     const fills = validFields
       .map(f => `  await pageObj.${this.toSafeIdentifier(f.name)}Input.fill(${this.fakerFill(f)});`)
       .join('\n');
@@ -484,6 +519,57 @@ export function loadTestData<T = Record<string, string>>(fileName: string): T[] 
       }
     }
     return { path: 'testdata/ui_data.csv', content: rows.join('\n') + '\n' };
+  }
+
+  // ─── README ───────────────────────────────────────────────────────────────────
+
+  private buildReadme(pageMap: PageMap): GeneratedFile {
+    const { baseUrl, pages } = pageMap;
+    return {
+      path: 'README.md',
+      content: `# Playwright TypeScript Test Suite
+
+Auto-generated by Qlitz · ${pages.length} page(s) · Base URL: \`${baseUrl || 'http://localhost:3000'}\`
+
+## Prerequisites
+- Node.js 20+
+
+## Setup
+\`\`\`bash
+npm install
+npx playwright install
+\`\`\`
+
+## Running Tests
+\`\`\`bash
+# All tests
+npx playwright test
+
+# Smoke tests only
+npx playwright test tests/ui/smoke/
+
+# Functional tests only
+npx playwright test tests/ui/functional/
+
+# Set base URL
+BASE_URL=https://your-site.com npx playwright test
+\`\`\`
+
+## Project Structure
+\`\`\`
+src/
+  pages/                         Page Object classes
+  fixtures/auth.fixture.ts       Authenticated page fixture
+  helpers/                       Faker + CSV data helpers
+tests/
+  ui/
+    smoke/                       Fast sanity checks (2 tests per page)
+    functional/                  Full feature coverage (positive + negative)
+testdata/
+  ui_data.csv                    Sample test data
+\`\`\`
+`,
+    };
   }
 
   // ─── String utilities ─────────────────────────────────────────────────────────

@@ -10,8 +10,13 @@ import { SampleTestsService } from '../samples/sample-tests.service';
 import { SwaggerParserService } from '../swagger/swagger-parser.service';
 import { ApiTestGeneratorService } from '../api/api-test-generator.service';
 import { PlaywrightCrawlerService } from '../crawler/playwright-crawler.service';
-import { PlaywrightApiTestGeneratorService } from '../playwright/playwright-api-test-generator.service';
-import { PlaywrightUiTestGeneratorService } from '../playwright/playwright-ui-test-generator.service';
+import { PlaywrightApiTestGeneratorService }        from '../playwright/playwright-api-test-generator.service';
+import { PlaywrightJavaApiTestGeneratorService }    from '../playwright/playwright-java-api-test-generator.service';
+import { PlaywrightPythonApiTestGeneratorService }  from '../playwright/playwright-python-api-test-generator.service';
+import { PlaywrightUiTestGeneratorService }       from '../playwright/playwright-ui-test-generator.service';
+import { PlaywrightJavaUiTestGeneratorService }   from '../playwright/playwright-java-ui-test-generator.service';
+import { PlaywrightPythonUiTestGeneratorService } from '../playwright/playwright-python-ui-test-generator.service';
+import { CodegenParserService }                   from '../codegen/codegen-parser.service';
 import type { FrameworkBlueprint } from '../blueprint/blueprint.model';
 import type { SwaggerSummary } from '../swagger/swagger.types';
 
@@ -41,8 +46,13 @@ export class AssemblyOrchestrator {
     private readonly swaggerParser:    SwaggerParserService,
     private readonly apiTestGen:       ApiTestGeneratorService,
     private readonly pwCrawler:        PlaywrightCrawlerService,
-    private readonly pwApiGen:         PlaywrightApiTestGeneratorService,
+    private readonly pwApiGen:          PlaywrightApiTestGeneratorService,
+    private readonly pwJavaApiGen:      PlaywrightJavaApiTestGeneratorService,
+    private readonly pwPythonApiGen:    PlaywrightPythonApiTestGeneratorService,
     private readonly pwUiGen:          PlaywrightUiTestGeneratorService,
+    private readonly pwJavaUiGen:      PlaywrightJavaUiTestGeneratorService,
+    private readonly pwPythonUiGen:    PlaywrightPythonUiTestGeneratorService,
+    private readonly codegenParser:    CodegenParserService,
   ) {}
 
   async assembleFramework(blueprint: FrameworkBlueprint): Promise<AssemblyResult> {
@@ -133,7 +143,12 @@ export class AssemblyOrchestrator {
       if ((mode === 'api' || mode === 'hybrid') && swaggerSummary) {
         try {
           this.logger.log(`Generating Playwright API tests: ${swaggerSummary.endpoints.length} endpoints`);
-          const pwApiFiles = this.pwApiGen.generate(swaggerSummary, effectiveBlueprint);
+          const apiLang = (effectiveBlueprint.language ?? 'typescript').toLowerCase();
+          const pwApiFiles = apiLang === 'java'
+            ? this.pwJavaApiGen.generate(swaggerSummary, effectiveBlueprint)
+            : apiLang === 'python'
+            ? this.pwPythonApiGen.generate(swaggerSummary, effectiveBlueprint)
+            : this.pwApiGen.generate(swaggerSummary, effectiveBlueprint);
           files.push(...pwApiFiles);
           this.writer.writeAll(projectRoot, pwApiFiles);
         } catch (err: any) {
@@ -141,13 +156,26 @@ export class AssemblyOrchestrator {
         }
       }
 
-      // UI mode — crawler-driven
-      if ((mode === 'ui' || mode === 'hybrid') && effectiveBlueprint.websiteUrl) {
+      // UI mode — codegen-driven or crawler-driven
+      const hasUiSource = effectiveBlueprint.codegenScript || effectiveBlueprint.websiteUrl;
+      if ((mode === 'ui' || mode === 'hybrid') && hasUiSource) {
         try {
-          this.logger.log(`Crawling website: ${effectiveBlueprint.websiteUrl}`);
-          const pageMap    = await this.pwCrawler.crawl(effectiveBlueprint.websiteUrl);
-          this.logger.log(`Crawl complete: ${pageMap.pages.length} pages discovered`);
-          const pwUiFiles  = this.pwUiGen.generate(pageMap, effectiveBlueprint);
+          let pageMap;
+          if (effectiveBlueprint.codegenScript) {
+            this.logger.log('Parsing Playwright codegen script...');
+            pageMap = this.codegenParser.parse(effectiveBlueprint.codegenScript);
+            this.logger.log(`Codegen parsed: ${pageMap.pages.length} pages discovered`);
+          } else {
+            this.logger.log(`Crawling website: ${effectiveBlueprint.websiteUrl}`);
+            pageMap = await this.pwCrawler.crawl(effectiveBlueprint.websiteUrl!);
+            this.logger.log(`Crawl complete: ${pageMap.pages.length} pages discovered`);
+          }
+          const lang = (effectiveBlueprint.language ?? 'typescript').toLowerCase();
+          const pwUiFiles = lang === 'java'
+            ? this.pwJavaUiGen.generate(pageMap, effectiveBlueprint)
+            : lang === 'python'
+            ? this.pwPythonUiGen.generate(pageMap, effectiveBlueprint)
+            : this.pwUiGen.generate(pageMap, effectiveBlueprint);
           files.push(...pwUiFiles);
           this.writer.writeAll(projectRoot, pwUiFiles);
         } catch (err: any) {

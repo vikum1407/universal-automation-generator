@@ -331,6 +331,62 @@ export const DISTRIBUTED_NODES: FrameworkNode[] = [
     },
   }),
 
+  defineNode({
+    id: 'playwright-java-docker',
+    label: 'Docker (Local)',
+    category: 'distributed',
+    compatibleFrameworks: ['playwright'],
+    compatibleLanguages: ['java'],
+    templates: ['playwright/java/distributed/docker/base'],
+    metadata: {
+      description: 'Dockerfile for Playwright + Java (Maven). Eclipse Temurin 17 + Playwright browsers bundled, ready for CI or local container runs.',
+      version: '1.x',
+      tags: ['docker', 'playwright', 'java', 'maven', 'containerised'],
+      docs: 'https://playwright.dev/java/docs/docker',
+      since: '1.0.0',
+    },
+    constraints: {
+      required: false,
+      maxInstances: 1,
+      requires: [],
+      conflicts: [],
+      recommendedWith: ['ci-github-actions'],
+    },
+    capabilities: { canBeRoot: false, supportsParallel: true, supportsDistributed: true, hasAIIntegration: false, hasReporting: false, hasRetry: false },
+    configSchema: {
+      imageName: { type: 'string', label: 'Docker image name', default: 'qlitz-playwright-java', required: true },
+      imageTag:  { type: 'string', label: 'Image tag',         default: 'latest' },
+    },
+  }),
+
+  defineNode({
+    id: 'playwright-python-docker',
+    label: 'Docker (Local)',
+    category: 'distributed',
+    compatibleFrameworks: ['playwright'],
+    compatibleLanguages: ['python'],
+    templates: ['playwright/python/distributed/docker/base'],
+    metadata: {
+      description: 'Dockerfile for Playwright + Python (pytest). Python 3.12 slim + Playwright browsers bundled, ready for CI or local container runs.',
+      version: '1.x',
+      tags: ['docker', 'playwright', 'python', 'pytest', 'containerised'],
+      docs: 'https://playwright.dev/python/docs/docker',
+      since: '1.0.0',
+    },
+    constraints: {
+      required: false,
+      maxInstances: 1,
+      requires: [],
+      conflicts: [],
+      recommendedWith: ['ci-github-actions'],
+    },
+    capabilities: { canBeRoot: false, supportsParallel: true, supportsDistributed: true, hasAIIntegration: false, hasReporting: false, hasRetry: false },
+    configSchema: {
+      imageName: { type: 'string', label: 'Docker image name', default: 'qlitz-playwright-python', required: true },
+      imageTag:  { type: 'string', label: 'Image tag',         default: 'latest' },
+    },
+  }),
+
   // ─── REST Assured distributed ────────────────────────────────────────────────
 
   defineNode({

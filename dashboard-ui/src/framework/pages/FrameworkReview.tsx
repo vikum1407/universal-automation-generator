@@ -75,6 +75,10 @@ export default function FrameworkReview() {
   const [aiEnabled,  setAiEnabled]  = useState<boolean>(true);
   const [aiSafeMode, setAiSafeMode] = useState<boolean>(true);
 
+  // Codegen import (alternative to crawling for Playwright UI/Hybrid)
+  const [codegenMode,   setCodegenMode]   = useState<"crawl" | "recording">("crawl");
+  const [codegenScript, setCodegenScript] = useState<string>("");
+
   // Sample tests config (Phase 7)
   const [sampleUI,     setSampleUI]     = useState<boolean>(false);
   const [sampleAPI,    setSampleAPI]    = useState<boolean>(false);
@@ -157,13 +161,17 @@ export default function FrameworkReview() {
       } else if (isPlaywrightFramework) {
         // Playwright — mode-aware payload
         payload.playwrightMode   = pwMode;
-        payload.websiteUrl       = selection!.websiteUrl;
         payload.swaggerUrl       = selection!.swaggerUrl;
         payload.swaggerFile      = selection!.swaggerFile;
         payload.coverageLevel    = selection!.coverageLevel    ?? "functional";
         payload.testDataStrategy = selection!.testDataStrategy ?? "faker";
-        // UI + Hybrid still need browser config for the UI project
+        // UI + Hybrid: either crawl or codegen recording
         if (pwMode !== "api") {
+          if (codegenMode === "recording" && codegenScript.trim()) {
+            payload.codegenScript = codegenScript.trim();
+          } else {
+            payload.websiteUrl = selection!.websiteUrl;
+          }
           payload.executionConfig = {
             ...blueprint!.executionConfig,
             baseUrl:  selection!.websiteUrl ?? baseUrl,
@@ -285,7 +293,9 @@ export default function FrameworkReview() {
           }}
         >
           {status === "generating"
-            ? (selection?.framework === "playwright" && selection?.playwrightMode !== "api" ? "Crawling & Generating…" : "Generating…")
+            ? (selection?.framework === "playwright" && selection?.playwrightMode !== "api"
+                ? (codegenMode === "recording" ? "Parsing & Generating…" : "Crawling & Generating…")
+                : "Generating…")
             : status === "done" ? "✓ Generated" : "⚡ Generate Framework"}
         </button>
       </div>
@@ -294,15 +304,22 @@ export default function FrameworkReview() {
       <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
 
-          {/* ── Playwright crawl progress banner ─────────────────────── */}
+          {/* ── Progress banner ───────────────────────────────────── */}
           {status === "generating" && selection?.framework === "playwright" && selection?.playwrightMode !== "api" && (
             <div style={{ padding: "14px 18px", borderRadius: 12, background: "#7B5FFF0d", border: "1.5px solid #7B5FFF40", display: "flex", alignItems: "center", gap: 14 }}>
               <div style={{ width: 18, height: 18, border: "2.5px solid #7B5FFF", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#7B5FFF" }}>Crawling {selection.websiteUrl ?? "your website"}…</div>
-                <div style={{ fontSize: 11, color: S.textMuted, marginTop: 3 }}>
-                  Playwright is launching a headless browser, discovering pages (up to 10), and generating Page Objects + tests. This takes ~30–60 s.
-                </div>
+                {codegenMode === "recording" ? (
+                  <>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#7B5FFF" }}>Parsing recording & generating framework…</div>
+                    <div style={{ fontSize: 11, color: S.textMuted, marginTop: 3 }}>Extracting page objects and test cases from your Playwright recording. This is fast — usually under 5 s.</div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#7B5FFF" }}>Crawling {selection.websiteUrl ?? "your website"}…</div>
+                    <div style={{ fontSize: 11, color: S.textMuted, marginTop: 3 }}>Playwright is launching a headless browser, discovering pages (up to 10), and generating Page Objects + tests. This takes ~30–60 s.</div>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -359,7 +376,61 @@ export default function FrameworkReview() {
                     </label>
                   </Field>
                 </div>
-                {/* Playwright config summary — read-only, set on Start page */}
+
+                {/* ── Input source toggle (only for UI / Hybrid modes) ── */}
+                {(selection.playwrightMode ?? "ui") !== "api" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: S.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                      Page Discovery Source
+                    </div>
+                    <div style={{ display: "flex", gap: 0, borderRadius: 8, overflow: "hidden", border: `1px solid ${S.border}`, width: "fit-content" }}>
+                      {(["crawl", "recording"] as const).map(mode => (
+                        <button
+                          key={mode}
+                          onClick={() => setCodegenMode(mode)}
+                          style={{
+                            padding: "7px 18px", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer",
+                            background: codegenMode === mode ? "#7B5FFF" : S.card,
+                            color: codegenMode === mode ? "#fff" : S.textMuted,
+                            transition: "all 0.15s",
+                          }}
+                        >
+                          {mode === "crawl" ? "🌐 Auto-Crawl" : "⏺ Import Recording"}
+                        </button>
+                      ))}
+                    </div>
+
+                    {codegenMode === "crawl" ? (
+                      <div style={{ fontSize: 11, color: S.textMuted, padding: "8px 12px", borderRadius: 7, background: "#7B5FFF06", border: `1px solid ${S.border}` }}>
+                        Qlitz will crawl <strong>{selection.websiteUrl ?? "your website"}</strong> (up to 10 pages), generate Page Object classes, and produce smoke + functional tests for every discovered page. ~30–60 s.
+                      </div>
+                    ) : (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        <div style={{ fontSize: 11, color: S.textMuted, padding: "8px 12px", borderRadius: 7, background: "#7B5FFF06", border: `1px solid ${S.border}` }}>
+                          Run <code style={{ fontSize: 10, background: `${S.border}`, padding: "1px 5px", borderRadius: 3 }}>npx playwright codegen {selection.websiteUrl ?? "https://your-site.com"}</code>, record your journey, then paste the generated <code style={{ fontSize: 10, background: `${S.border}`, padding: "1px 5px", borderRadius: 3 }}>.ts</code> script below.
+                        </div>
+                        <textarea
+                          value={codegenScript}
+                          onChange={e => setCodegenScript(e.target.value)}
+                          placeholder={"import { test, expect } from '@playwright/test';\n\ntest('recorded journey', async ({ page }) => {\n  await page.goto('https://...');\n  // ... paste your codegen output here\n});"}
+                          spellCheck={false}
+                          style={{
+                            ...inputStyle(S),
+                            height: 200, resize: "vertical", fontFamily: "monospace",
+                            fontSize: 11, padding: "10px 12px", lineHeight: 1.5,
+                          }}
+                        />
+                        {codegenScript.trim() && (
+                          <div style={{ fontSize: 11, color: "#10B981", fontWeight: 600 }}>
+                            ✓ Script ready — {codegenScript.split('\n').length} lines
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Playwright config summary — read-only */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
                   <div style={{ padding: "10px 14px", borderRadius: 8, background: "#7B5FFF08", border: "1px solid #7B5FFF30" }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: "#7B5FFF", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Mode</div>
@@ -375,9 +446,6 @@ export default function FrameworkReview() {
                     <div style={{ fontSize: 10, fontWeight: 700, color: "#7B5FFF", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Coverage</div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: S.text, textTransform: "capitalize" }}>{selection.coverageLevel ?? "functional"}</div>
                   </div>
-                </div>
-                <div style={{ fontSize: 11, color: S.textMuted, padding: "8px 12px", borderRadius: 7, background: "#7B5FFF06", border: `1px solid ${S.border}` }}>
-                  Qlitz will crawl <strong>{selection.websiteUrl ?? "your website"}</strong> (up to 10 pages), generate Page Object classes, and produce smoke + functional test coverage for every discovered page. Generation takes ~30–60 s.
                 </div>
               </div>
             ) : (

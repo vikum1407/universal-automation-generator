@@ -24,8 +24,13 @@ import { SwaggerParserService }              from './swagger/swagger-parser.serv
 import { SwaggerValidatorService }           from './swagger/swagger-validator.service';
 import { ApiTestGeneratorService }           from './api/api-test-generator.service';
 import { PlaywrightCrawlerService }          from './crawler/playwright-crawler.service';
-import { PlaywrightApiTestGeneratorService } from './playwright/playwright-api-test-generator.service';
-import { PlaywrightUiTestGeneratorService }  from './playwright/playwright-ui-test-generator.service';
+import { PlaywrightApiTestGeneratorService }        from './playwright/playwright-api-test-generator.service';
+import { PlaywrightJavaApiTestGeneratorService }    from './playwright/playwright-java-api-test-generator.service';
+import { PlaywrightPythonApiTestGeneratorService }  from './playwright/playwright-python-api-test-generator.service';
+import { PlaywrightUiTestGeneratorService }         from './playwright/playwright-ui-test-generator.service';
+import { PlaywrightJavaUiTestGeneratorService }     from './playwright/playwright-java-ui-test-generator.service';
+import { PlaywrightPythonUiTestGeneratorService }   from './playwright/playwright-python-ui-test-generator.service';
+import { CodegenParserService }              from './codegen/codegen-parser.service';
 
 @Module({
   controllers: [FrameworkController, FrameworkRegistryController],
@@ -53,7 +58,12 @@ import { PlaywrightUiTestGeneratorService }  from './playwright/playwright-ui-te
     ApiTestGeneratorService,
     PlaywrightCrawlerService,
     PlaywrightApiTestGeneratorService,
+    PlaywrightJavaApiTestGeneratorService,
+    PlaywrightPythonApiTestGeneratorService,
     PlaywrightUiTestGeneratorService,
+    PlaywrightJavaUiTestGeneratorService,
+    PlaywrightPythonUiTestGeneratorService,
+    CodegenParserService,
     AssemblyOrchestrator,
   ],
 })

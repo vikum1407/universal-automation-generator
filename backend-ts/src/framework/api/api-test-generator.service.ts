@@ -68,7 +68,7 @@ export class ApiTestGeneratorService {
     className: string,
     tag: string,
     endpoints: ParsedEndpoint[],
-    level: 'smoke' | 'functional',
+    level: 'smoke' | 'functional' | 'regression',
     runner: 'testng' | 'junit5',
     dataStrat: string,
     reporting: 'allure' | 'extent' | 'none',
@@ -403,7 +403,7 @@ public class ApiRetryAnalyzer implements TestExecutionExceptionHandler {
 
   private buildTestMethods(
     ep: ParsedEndpoint,
-    level: 'smoke' | 'functional',
+    level: 'smoke' | 'functional' | 'regression',
     runner: 'testng' | 'junit5',
     dataStrat: string,
     reporting: 'allure' | 'extent' | 'none',
