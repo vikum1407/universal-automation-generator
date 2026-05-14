@@ -33,6 +33,12 @@ interface GenerateResult {
   projectStructure: string[];
   aiDocs:    boolean;
   aiHeaders: boolean;
+  // Persistence fields (returned after Phase 3/4 save)
+  projectId?:    string;
+  frameworkId?:  string;
+  versionId?:    string;
+  versionNumber?: number;
+  isNewProject?:  boolean;
 }
 
 // ─── Framework colour maps ────────────────────────────────────────────────────
@@ -62,9 +68,10 @@ export default function FrameworkReview() {
   const [gridHubUrl,   setGridHubUrl]   = useState<string>("http://selenium-hub:4444");
   const [k8sNamespace, setK8sNamespace] = useState<string>("qa-automation");
 
-  const [status,  setStatus]  = useState<GenerateStatus>("idle");
-  const [result2, setResult2] = useState<GenerateResult | null>(null);
-  const [error,   setError]   = useState<string | null>(null);
+  const [status,    setStatus]    = useState<GenerateStatus>("idle");
+  const [result2,   setResult2]   = useState<GenerateResult | null>(null);
+  const [error,     setError]     = useState<string | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   // Framework Registry integration
   const [registering,        setRegistering]        = useState(false);
@@ -87,6 +94,22 @@ export default function FrameworkReview() {
   useEffect(() => {
     if (!result) navigate("/framework/start", { replace: true });
   }, [result, navigate]);
+
+  // Auto-redirect countdown — starts when generation succeeds and a projectId is returned
+  useEffect(() => {
+    if (status !== "done" || !result2?.projectId) return;
+    setCountdown(5);
+  }, [status, result2?.projectId]);
+
+  useEffect(() => {
+    if (countdown === null) return;
+    if (countdown === 0) {
+      navigate(`/projects/${result2!.projectId}`);
+      return;
+    }
+    const t = setTimeout(() => setCountdown(c => (c !== null ? c - 1 : null)), 1000);
+    return () => clearTimeout(t);
+  }, [countdown, navigate, result2]);
 
   useEffect(() => {
     if (!blueprint) return;
@@ -132,7 +155,8 @@ export default function FrameworkReview() {
     groupedNodes[c.category].push(c);
   }
 
-  const isApiFramework = selection?.framework === "restassured";
+  const isApiFramework    = selection?.framework === "restassured";
+  const isCypressFramework = selection?.framework === "cypress";
 
   const handleGenerate = async () => {
     setStatus("generating");
@@ -248,14 +272,24 @@ export default function FrameworkReview() {
         background: S.card, borderBottom: `1px solid ${S.border}`, zIndex: 10,
       }}>
         <button
-          onClick={() => navigate(isApiFramework ? "/framework/start" : "/framework/builder")}
+          onClick={() => {
+            if (selection?.skipBuilder) {
+              const params = new URLSearchParams();
+              if (selection.projectId)   params.set("projectId",   selection.projectId);
+              if (selection.projectName) params.set("projectName", selection.projectName);
+              params.set("skipBuilder", "1");
+              navigate(`/framework/start?${params.toString()}`);
+            } else {
+              navigate(isApiFramework ? "/framework/start" : "/framework/builder");
+            }
+          }}
           style={{
             display: "flex", alignItems: "center", gap: 5,
             background: "none", border: "none", cursor: "pointer",
             color: S.textMuted, fontSize: 13, fontWeight: 500, padding: 0,
           }}
         >
-          {isApiFramework ? "← Start" : "← Builder"}
+          {selection?.skipBuilder ? "← Start" : isApiFramework ? "← Start" : "← Builder"}
         </button>
 
         <div style={{ width: 1, height: 18, background: S.border }} />
@@ -268,7 +302,7 @@ export default function FrameworkReview() {
         </span>
 
         <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 10px", borderRadius: 10, background: `${S.accent}14`, color: S.accent, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          Step 3 of 5
+          {selection?.skipBuilder ? "Step 2 of 3" : "Step 3 of 5"}
         </span>
 
         <div style={{ flex: 1 }} />
@@ -449,27 +483,39 @@ export default function FrameworkReview() {
                 </div>
               </div>
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <Field label="Project Name" S={S}>
-                  <input value={projectName} onChange={e => setProjectName(e.target.value)} style={inputStyle(S)} />
-                </Field>
-                <Field label="Base URL" S={S}>
-                  <input value={baseUrl} onChange={e => setBaseUrl(e.target.value)} style={inputStyle(S)} placeholder="https://example.com" />
-                </Field>
-                <Field label="Browser" S={S}>
-                  <select value={browser} onChange={e => setBrowser(e.target.value)} style={inputStyle(S)}>
-                    <option value="chrome">Chrome</option>
-                    <option value="firefox">Firefox</option>
-                    <option value="edge">Edge</option>
-                    <option value="safari">Safari</option>
-                  </select>
-                </Field>
-                <Field label="Run Headless" S={S}>
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                    <input type="checkbox" checked={headless} onChange={e => setHeadless(e.target.checked)} style={{ width: 14, height: 14, accentColor: S.accent, cursor: "pointer" }} />
-                    <span style={{ fontSize: 12, color: S.textMuted }}>Headless mode</span>
-                  </label>
-                </Field>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {isCypressFramework && (
+                  <div style={{ padding: "10px 14px", borderRadius: 8, background: "#17B26A0d", border: "1px solid #17B26A30", display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <span style={{ fontSize: 14, flexShrink: 0 }}>ℹ</span>
+                    <div style={{ fontSize: 11, color: S.textMuted, lineHeight: 1.6 }}>
+                      <strong style={{ color: "#17B26A" }}>Cypress is UI-first.</strong> It generates component and E2E tests using <code style={{ fontSize: 10 }}>cy.get()</code> chains — not Swagger-driven coverage. For dedicated API test suites, choose{" "}
+                      <strong style={{ color: S.text }}>REST Assured</strong> or{" "}
+                      <strong style={{ color: S.text }}>Playwright (API mode)</strong>.
+                    </div>
+                  </div>
+                )}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <Field label="Project Name" S={S}>
+                    <input value={projectName} onChange={e => setProjectName(e.target.value)} style={inputStyle(S)} />
+                  </Field>
+                  <Field label="Base URL" S={S}>
+                    <input value={baseUrl} onChange={e => setBaseUrl(e.target.value)} style={inputStyle(S)} placeholder="https://example.com" />
+                  </Field>
+                  <Field label="Browser" S={S}>
+                    <select value={browser} onChange={e => setBrowser(e.target.value)} style={inputStyle(S)}>
+                      <option value="chrome">Chrome</option>
+                      <option value="firefox">Firefox</option>
+                      <option value="edge">Edge</option>
+                      <option value="safari">Safari</option>
+                    </select>
+                  </Field>
+                  <Field label="Run Headless" S={S}>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                      <input type="checkbox" checked={headless} onChange={e => setHeadless(e.target.checked)} style={{ width: 14, height: 14, accentColor: S.accent, cursor: "pointer" }} />
+                      <span style={{ fontSize: 12, color: S.textMuted }}>Headless mode</span>
+                    </label>
+                  </Field>
+                </div>
               </div>
             )}
           </Section>
@@ -657,12 +703,27 @@ export default function FrameworkReview() {
                   )}
                 </div>
               )}
+                {/* Project created / updated badge */}
+                {result2.projectId && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{
+                      fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 12,
+                      background: result2.isNewProject ? "#10B98120" : `${S.accent}18`,
+                      color: result2.isNewProject ? "#10B981" : S.accent,
+                      border: `1px solid ${result2.isNewProject ? "#10B98140" : S.accent + "40"}`,
+                    }}>
+                      {result2.isNewProject ? "✦ New project created" : `✦ Project updated — v${result2.versionNumber}`}
+                    </span>
+                  </div>
+                )}
+
                 {/* Stats row */}
                 <div style={{ display: "flex", gap: 16 }}>
                   {[
-                    { label: "Project",    value: result2.projectName },
-                    { label: "Files",      value: `${result2.fileCount} files` },
-                    { label: "Job ID",     value: result2.jobId.split("-")[0] + "…" },
+                    { label: "Project",  value: result2.projectName },
+                    { label: "Files",    value: `${result2.fileCount} files` },
+                    ...(result2.versionNumber ? [{ label: "Version", value: `v${result2.versionNumber}` }] : []),
+                    { label: "Job ID",   value: result2.jobId.split("-")[0] + "…" },
                   ].map(({ label, value }) => (
                     <div key={label} style={{
                       flex: 1, padding: "12px 16px", borderRadius: 10,
@@ -675,20 +736,74 @@ export default function FrameworkReview() {
                   ))}
                 </div>
 
-                {/* Download button */}
-                <a
-                  href={getDownloadUrl(result2.jobId)}
-                  download={`${result2.projectName}.zip`}
-                  style={{
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                    padding: "12px 24px", borderRadius: 10,
-                    background: "#10B981", color: "#fff",
-                    fontWeight: 700, fontSize: 14, textDecoration: "none",
-                    transition: "opacity 0.15s",
-                  }}
-                >
-                  ↓ Download {result2.projectName}.zip
-                </a>
+                {/* Auto-redirect countdown banner */}
+                {countdown !== null && result2.projectId && (
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "12px 16px", borderRadius: 10,
+                    background: `${S.accent}0d`, border: `1px solid ${S.accent}30`,
+                  }}>
+                    <div style={{ flex: 1, fontSize: 13, color: S.text }}>
+                      Redirecting to your project in{" "}
+                      <strong style={{ color: S.accent }}>{countdown}s</strong>…
+                    </div>
+                    <button
+                      onClick={() => navigate(`/projects/${result2.projectId}`)}
+                      style={{
+                        padding: "6px 14px", borderRadius: 8,
+                        background: S.accent, color: "#fff",
+                        border: "none", cursor: "pointer",
+                        fontSize: 12, fontWeight: 700,
+                      }}
+                    >
+                      Go now →
+                    </button>
+                    <button
+                      onClick={() => setCountdown(null)}
+                      style={{
+                        padding: "6px 12px", borderRadius: 8,
+                        background: "transparent", color: S.textMuted,
+                        border: `1px solid ${S.border}`, cursor: "pointer",
+                        fontSize: 12, fontWeight: 500,
+                      }}
+                    >
+                      Stay
+                    </button>
+                  </div>
+                )}
+
+                {/* Action buttons row — View Project is primary */}
+                <div style={{ display: "flex", gap: 12 }}>
+                  {result2.projectId && (
+                    <button
+                      onClick={() => navigate(`/projects/${result2.projectId}`)}
+                      style={{
+                        flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                        padding: "12px 24px", borderRadius: 10,
+                        background: S.accent, color: "#fff",
+                        fontWeight: 700, fontSize: 14, border: "none",
+                        cursor: "pointer", transition: "opacity 0.15s",
+                      }}
+                    >
+                      View Project →
+                    </button>
+                  )}
+                  <a
+                    href={getDownloadUrl(result2.jobId)}
+                    download={`${result2.projectName}.zip`}
+                    style={{
+                      flex: result2.projectId ? "0 0 auto" : 1,
+                      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                      padding: "12px 22px", borderRadius: 10,
+                      background: "transparent", color: "#10B981",
+                      fontWeight: 700, fontSize: 14, textDecoration: "none",
+                      border: "1.5px solid #10B98140",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    ↓ Download .zip
+                  </a>
+                </div>
 
                 {/* File tree */}
                 <div style={{

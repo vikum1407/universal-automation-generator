@@ -367,21 +367,54 @@ model CloudSync {
 //  FRAMEWORK REGISTRY
 // ------------------------------------------------------
 
+enum FrameworkStatus {
+  pending
+  generated
+  regenerating
+  failed
+}
+
 model Framework {
-  id               String   @id @default(uuid())
+  id               String          @id @default(uuid())
   projectId        String
   name             String
   frameworkType    String
   language         String
+  blueprint        Json?
   blueprintId      String?
   artifactLocation String?
-  isRTMEnabled     Boolean  @default(false)
-  createdAt        DateTime @default(now())
+  versionNumber    Int             @default(1)
+  status           FrameworkStatus @default(generated)
+  isRTMEnabled     Boolean         @default(false)
+  currentVersionId String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
   createdBy        String?
 
-  project Project @relation(fields: [projectId], references: [id])
+  project        Project           @relation(fields: [projectId], references: [id])
+  versions       FrameworkVersion[] @relation("FrameworkVersions")
+  currentVersion FrameworkVersion?  @relation("CurrentFrameworkVersion", fields: [currentVersionId], references: [id])
 
   @@index([projectId])
+  @@index([status])
+}
+
+model FrameworkVersion {
+  id               String    @id @default(uuid())
+  frameworkId      String
+  versionNumber    Int
+  blueprint        Json
+  artifactLocation String?
+  fileCount        Int       @default(0)
+  projectStructure String[]
+  label            String?
+  generatedAt      DateTime  @default(now())
+
+  framework  Framework   @relation("FrameworkVersions", fields: [frameworkId], references: [id])
+  currentFor Framework[] @relation("CurrentFrameworkVersion")
+
+  @@unique([frameworkId, versionNumber])
+  @@index([frameworkId])
 }
 
 // ------------------------------------------------------

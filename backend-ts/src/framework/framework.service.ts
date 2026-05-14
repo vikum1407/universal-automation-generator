@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { NodeFilterService }    from './filter/node-filter.service';
-import { BlueprintValidator }   from './blueprint/blueprint-validator';
-import { NodeLibraryService }   from './nodes/node-library.service';
-import { AssemblyOrchestrator } from './assembly/assembly-orchestrator';
-import { FolderBuilder }        from './assembly/folder-builder';
-import { AIExplainService }     from './ai/ai-explain.service';
-import { AIDocGenerator }       from './ai/ai-doc-generator';
-import { FrameworkBlueprint }   from './blueprint/blueprint.model';
+import { NodeFilterService }             from './filter/node-filter.service';
+import { BlueprintValidator }            from './blueprint/blueprint-validator';
+import { NodeLibraryService }            from './nodes/node-library.service';
+import { AssemblyOrchestrator }          from './assembly/assembly-orchestrator';
+import { FrameworkPersistenceService, RegenerateOverrides } from './assembly/framework-persistence.service';
+import { FolderBuilder }                 from './assembly/folder-builder';
+import { AIExplainService }              from './ai/ai-explain.service';
+import { AIDocGenerator }                from './ai/ai-doc-generator';
+import { FrameworkBlueprint }            from './blueprint/blueprint.model';
 
 // FrameworkService is the orchestration layer.
 // All business logic lives here — controllers stay thin.
@@ -18,6 +19,7 @@ export class FrameworkService {
     private readonly validator:    BlueprintValidator,
     private readonly nodeLibrary:  NodeLibraryService,
     private readonly orchestrator: AssemblyOrchestrator,
+    private readonly persistence:  FrameworkPersistenceService,
     private readonly folder:       FolderBuilder,
     private readonly explainSvc:   AIExplainService,
     private readonly docGen:       AIDocGenerator,
@@ -88,7 +90,113 @@ export class FrameworkService {
       return { success: false, validation };
     }
     const result = await this.orchestrator.assembleFramework(blueprint);
-    return { success: true, ...result };
+
+    // Persist to DB — non-blocking on failure so download is always returned
+    let saved: { projectId: string; frameworkId: string; versionId: string; versionNumber: number; isNew: boolean } | null = null;
+    try {
+      saved = await this.persistence.saveGeneration(result, blueprint);
+    } catch (err: any) {
+      // Persistence failure must not break the generation response
+      console.error('[FrameworkService] Persistence failed:', err?.message);
+    }
+
+    return {
+      success: true,
+      ...result,
+      ...(saved && {
+        projectId:     saved.projectId,
+        frameworkId:   saved.frameworkId,
+        versionId:     saved.versionId,
+        versionNumber: saved.versionNumber,
+        isNewProject:  saved.isNew,
+      }),
+    };
+  }
+
+  async regenerateFramework(frameworkId: string, overrides: RegenerateOverrides) {
+    // Load saved blueprint from DB
+    const saved = await this.persistence.loadBlueprint(frameworkId);
+
+    // Merge overrides — only defined keys replace saved values
+    const blueprint: FrameworkBlueprint = {
+      ...saved,
+      ...(overrides.websiteUrl    !== undefined && { websiteUrl:    overrides.websiteUrl }),
+      ...(overrides.swaggerUrl    !== undefined && { swaggerUrl:    overrides.swaggerUrl }),
+      ...(overrides.swaggerFile   !== undefined && { swaggerFile:   overrides.swaggerFile }),
+      ...(overrides.coverageLevel !== undefined && { coverageLevel: overrides.coverageLevel }),
+    };
+
+    const validation = this.validator.validate(blueprint);
+    if (!validation.valid) {
+      return { success: false, validation };
+    }
+
+    const result = await this.orchestrator.assembleFramework(blueprint);
+
+    let persisted: Awaited<ReturnType<FrameworkPersistenceService['saveGeneration']>> | null = null;
+    try {
+      persisted = await this.persistence.saveGeneration(result, blueprint);
+      if (overrides.label && persisted) {
+        await this.persistence.labelVersion(persisted.versionId, overrides.label);
+      }
+    } catch (err: any) {
+      console.error('[FrameworkService] Persistence failed on regenerate:', err?.message);
+    }
+
+    return {
+      success: true,
+      ...result,
+      ...(persisted && {
+        projectId:     persisted.projectId,
+        frameworkId:   persisted.frameworkId,
+        versionId:     persisted.versionId,
+        versionNumber: persisted.versionNumber,
+      }),
+    };
+  }
+
+  async regenerateFromVersion(versionId: string, overrides: RegenerateOverrides) {
+    // Regenerate from a specific historical version's blueprint
+    const saved = await this.persistence.loadVersionBlueprint(versionId);
+
+    const blueprint: FrameworkBlueprint = {
+      ...saved,
+      ...(overrides.websiteUrl    !== undefined && { websiteUrl:    overrides.websiteUrl }),
+      ...(overrides.swaggerUrl    !== undefined && { swaggerUrl:    overrides.swaggerUrl }),
+      ...(overrides.swaggerFile   !== undefined && { swaggerFile:   overrides.swaggerFile }),
+      ...(overrides.coverageLevel !== undefined && { coverageLevel: overrides.coverageLevel }),
+    };
+
+    const result = await this.orchestrator.assembleFramework(blueprint);
+
+    let persisted: Awaited<ReturnType<FrameworkPersistenceService['saveGeneration']>> | null = null;
+    try {
+      persisted = await this.persistence.saveGeneration(result, blueprint);
+      if (overrides.label && persisted) {
+        await this.persistence.labelVersion(persisted.versionId, overrides.label);
+      }
+    } catch (err: any) {
+      console.error('[FrameworkService] Persistence failed on regenerate-from-version:', err?.message);
+    }
+
+    return {
+      success: true,
+      ...result,
+      ...(persisted && {
+        projectId:     persisted.projectId,
+        frameworkId:   persisted.frameworkId,
+        versionId:     persisted.versionId,
+        versionNumber: persisted.versionNumber,
+      }),
+    };
+  }
+
+  getFramework(frameworkId: string) {
+    return this.persistence.getFramework(frameworkId);
+  }
+
+  getProjectFrameworks(projectId: string) {
+    return this.persistence.getProjectFrameworks(projectId);
   }
 
   getDownloadPath(jobId: string): string | null {

@@ -9,6 +9,9 @@ export interface DerivedBlueprint {
   framework: string;
   language: string;
   architecture: string;
+  // Project linkage
+  projectId?:   string;
+  projectName?: string;
   // API generation (REST Assured + Playwright API/Hybrid)
   swaggerUrl?:       string;
   swaggerFile?:      string;
@@ -106,6 +109,8 @@ export function useBlueprint(): DerivedBlueprint | null {
       testDataStrategy: selection.testDataStrategy,
       playwrightMode:   selection.playwrightMode,
       websiteUrl:       selection.websiteUrl,
+      projectId:        selection.projectId,
+      projectName:      selection.projectName,
     };
   }, [selection, architecture, components, getAllInstances]);
 }

@@ -47,6 +47,47 @@ export async function getJobDocs(jobId: string) {
   return api.get(`/framework/job/${encodeURIComponent(jobId)}/docs`);
 }
 
+// ─── Persisted framework records ─────────────────────────────────────────────
+
+export interface FrameworkVersion {
+  id:               string;
+  frameworkId:      string;
+  versionNumber:    number;
+  blueprint:        any;
+  artifactLocation: string | null;
+  fileCount:        number;
+  projectStructure: string[];
+  label:            string | null;
+  generatedAt:      string;
+}
+
+export interface PersistedFramework {
+  id:               string;
+  projectId:        string;
+  name:             string;
+  frameworkType:    string;
+  language:         string;
+  blueprint:        any;
+  artifactLocation: string | null;
+  versionNumber:    number;
+  status:           string;
+  currentVersionId: string | null;
+  createdAt:        string;
+  updatedAt:        string;
+  versions:         FrameworkVersion[];
+}
+
+export async function getProjectFrameworks(projectId: string): Promise<PersistedFramework[]> {
+  return api.get(`/framework/project/${encodeURIComponent(projectId)}/frameworks`);
+}
+
+export async function regeneratePersistedFramework(
+  frameworkId: string,
+  overrides: { websiteUrl?: string; swaggerUrl?: string; coverageLevel?: string; label?: string } = {},
+): Promise<any> {
+  return api.post(`/framework/record/${encodeURIComponent(frameworkId)}/regenerate`, overrides);
+}
+
 // ─── Framework Registry ───────────────────────────────────────────────────────
 
 export interface RegisteredFramework {

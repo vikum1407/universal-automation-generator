@@ -449,19 +449,35 @@ export default function ProjectsList() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <h1 style={{ color: P, margin: 0 }}>Projects</h1>
-        <button
-          onClick={() => navigate("/projects/new")}
-          style={{
-            padding: "10px 20px", borderRadius: 10,
-            background: P, border: "none",
-            fontWeight: 700, cursor: "pointer", color: "white", fontSize: 14,
-            transition: "opacity 0.12s",
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
-        >
-          + New Project
-        </button>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button
+            onClick={() => navigate("/framework/start")}
+            style={{
+              padding: "10px 18px", borderRadius: 10,
+              background: "transparent", border: `1.5px solid ${P}`,
+              fontWeight: 700, cursor: "pointer", color: P, fontSize: 13,
+              display: "flex", alignItems: "center", gap: 7,
+              transition: "background 0.12s",
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = `${P}10`; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+          >
+            ⬡ Framework Generator
+          </button>
+          <button
+            onClick={() => navigate("/projects/new")}
+            style={{
+              padding: "10px 20px", borderRadius: 10,
+              background: P, border: "none",
+              fontWeight: 700, cursor: "pointer", color: "white", fontSize: 14,
+              transition: "opacity 0.12s",
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+          >
+            + New Project
+          </button>
+        </div>
       </div>
 
       {!projects.length && <EmptyState message="No projects yet. Create your first project." />}

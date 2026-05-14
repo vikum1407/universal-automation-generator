@@ -61,10 +61,9 @@ export default function NewProjectSummary() {
 
     const data = await res.json();
     const projectId = data.id;
+    const projectName = encodeURIComponent(data.name ?? data.title ?? "New Project");
 
-    navigate(`/projects/${projectId}/initializing`, {
-      state
-    });
+    navigate(`/framework/start?projectId=${projectId}&projectName=${projectName}&skipBuilder=1`);
   }
 
   return (

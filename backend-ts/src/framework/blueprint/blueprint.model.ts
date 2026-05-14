@@ -88,6 +88,9 @@ export interface FrameworkBlueprint {
   playwrightMode?:   PlaywrightMode;   // 'ui' | 'api' | 'hybrid'
   codegenScript?:    string;           // raw Playwright codegen .ts script (alternative to crawling)
   components: Record<string, any>; // free-form extensions + legacy compat
+  // Persistence
+  projectId?:   string;  // link to existing All Projects record
+  projectName?: string;  // name for auto-created project (falls back to metadata.name)
 }
 
 // ─── Validation result ────────────────────────────────────────────────────────

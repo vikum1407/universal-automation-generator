@@ -17,6 +17,10 @@ import { PlaywrightUiTestGeneratorService }       from '../playwright/playwright
 import { PlaywrightJavaUiTestGeneratorService }   from '../playwright/playwright-java-ui-test-generator.service';
 import { PlaywrightPythonUiTestGeneratorService } from '../playwright/playwright-python-ui-test-generator.service';
 import { CodegenParserService }                   from '../codegen/codegen-parser.service';
+import { CypressUiTestGeneratorService }          from '../cypress/cypress-ui-test-generator.service';
+import { SeleniumJavaUiTestGeneratorService }     from '../selenium/selenium-java-ui-test-generator.service';
+import { SeleniumPythonUiTestGeneratorService }   from '../selenium/selenium-python-ui-test-generator.service';
+import { WebdriverioUiTestGeneratorService }      from '../webdriverio/webdriverio-ui-test-generator.service';
 import type { FrameworkBlueprint } from '../blueprint/blueprint.model';
 import type { SwaggerSummary } from '../swagger/swagger.types';
 
@@ -53,6 +57,10 @@ export class AssemblyOrchestrator {
     private readonly pwJavaUiGen:      PlaywrightJavaUiTestGeneratorService,
     private readonly pwPythonUiGen:    PlaywrightPythonUiTestGeneratorService,
     private readonly codegenParser:    CodegenParserService,
+    private readonly cypressGen:       CypressUiTestGeneratorService,
+    private readonly seleniumJavaGen:  SeleniumJavaUiTestGeneratorService,
+    private readonly seleniumPythonGen: SeleniumPythonUiTestGeneratorService,
+    private readonly wdioGen:          WebdriverioUiTestGeneratorService,
   ) {}
 
   async assembleFramework(blueprint: FrameworkBlueprint): Promise<AssemblyResult> {
@@ -181,6 +189,78 @@ export class AssemblyOrchestrator {
         } catch (err: any) {
           this.logger.warn(`Playwright UI generation failed: ${err?.message}`);
         }
+      }
+    }
+
+    // Step 5d — Cypress generation
+    if (effectiveBlueprint.framework === 'cypress') {
+      try {
+        let pageMap = null;
+        const hasUiSource = effectiveBlueprint.codegenScript || effectiveBlueprint.websiteUrl;
+        if (hasUiSource) {
+          if (effectiveBlueprint.codegenScript) {
+            pageMap = this.codegenParser.parse(effectiveBlueprint.codegenScript);
+            this.logger.log(`Codegen parsed: ${pageMap.pages.length} pages`);
+          } else {
+            this.logger.log(`Crawling for Cypress: ${effectiveBlueprint.websiteUrl}`);
+            pageMap = await this.pwCrawler.crawl(effectiveBlueprint.websiteUrl!);
+            this.logger.log(`Crawl complete: ${pageMap.pages.length} pages`);
+          }
+        }
+        const cypressFiles = this.cypressGen.generate(pageMap, effectiveBlueprint);
+        files.push(...cypressFiles);
+        this.writer.writeAll(projectRoot, cypressFiles);
+      } catch (err: any) {
+        this.logger.warn(`Cypress generation failed: ${err?.message}`);
+      }
+    }
+
+    // Step 5e — Selenium generation
+    if (effectiveBlueprint.framework === 'selenium') {
+      try {
+        let pageMap = null;
+        const hasUiSource = effectiveBlueprint.codegenScript || effectiveBlueprint.websiteUrl;
+        if (hasUiSource) {
+          if (effectiveBlueprint.codegenScript) {
+            pageMap = this.codegenParser.parse(effectiveBlueprint.codegenScript);
+            this.logger.log(`Codegen parsed: ${pageMap.pages.length} pages`);
+          } else {
+            this.logger.log(`Crawling for Selenium: ${effectiveBlueprint.websiteUrl}`);
+            pageMap = await this.pwCrawler.crawl(effectiveBlueprint.websiteUrl!);
+            this.logger.log(`Crawl complete: ${pageMap.pages.length} pages`);
+          }
+        }
+        const seLang = (effectiveBlueprint.language ?? 'java').toLowerCase();
+        const seleniumFiles = seLang === 'python'
+          ? this.seleniumPythonGen.generate(pageMap, effectiveBlueprint)
+          : this.seleniumJavaGen.generate(pageMap, effectiveBlueprint);
+        files.push(...seleniumFiles);
+        this.writer.writeAll(projectRoot, seleniumFiles);
+      } catch (err: any) {
+        this.logger.warn(`Selenium generation failed: ${err?.message}`);
+      }
+    }
+
+    // Step 5f — WebdriverIO generation
+    if (effectiveBlueprint.framework === 'webdriverio') {
+      try {
+        let pageMap = null;
+        const hasUiSource = effectiveBlueprint.codegenScript || effectiveBlueprint.websiteUrl;
+        if (hasUiSource) {
+          if (effectiveBlueprint.codegenScript) {
+            pageMap = this.codegenParser.parse(effectiveBlueprint.codegenScript);
+            this.logger.log(`Codegen parsed: ${pageMap.pages.length} pages`);
+          } else {
+            this.logger.log(`Crawling for WebdriverIO: ${effectiveBlueprint.websiteUrl}`);
+            pageMap = await this.pwCrawler.crawl(effectiveBlueprint.websiteUrl!);
+            this.logger.log(`Crawl complete: ${pageMap.pages.length} pages`);
+          }
+        }
+        const wdioFiles = this.wdioGen.generate(pageMap, effectiveBlueprint);
+        files.push(...wdioFiles);
+        this.writer.writeAll(projectRoot, wdioFiles);
+      } catch (err: any) {
+        this.logger.warn(`WebdriverIO generation failed: ${err?.message}`);
       }
     }
 

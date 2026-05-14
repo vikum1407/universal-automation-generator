@@ -14,6 +14,11 @@ export interface FrameworkSelection {
   // Playwright-specific
   playwrightMode?:   'ui' | 'api' | 'hybrid';
   websiteUrl?:       string;
+  // Project linkage (when navigating from All Projects → Framework Generator)
+  projectId?:    string;
+  projectName?:  string;
+  // Skip the Architecture Canvas step (used when entering from the New Project wizard)
+  skipBuilder?:  boolean;
 }
 
 export interface CombinationValidation {

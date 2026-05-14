@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFramework } from "../context/FrameworkContext";
+import { useBuilderState } from "../builder/useBuilderState";
 import { getNodes, validateCombination } from "../api/framework";
 import type { CombinationValidation } from "../context/FrameworkContext";
 
@@ -19,12 +20,12 @@ function useDarkMode() {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const FRAMEWORKS = [
-  { id: "selenium",    label: "Selenium",     tagline: "Cross-browser UI automation",   color: "#E25C1D", langs: ["Java", "Python", "TypeScript", "C#"], apiOnly: false },
-  { id: "playwright",  label: "Playwright",   tagline: "Modern web testing",             color: "#7B5FFF", langs: ["TypeScript", "JavaScript", "Python", "Java", "C#"], apiOnly: false },
-  { id: "cypress",     label: "Cypress",      tagline: "Fast component & E2E tests",     color: "#17B26A", langs: ["TypeScript", "JavaScript"],           apiOnly: false },
-  { id: "webdriverio", label: "WebdriverIO",  tagline: "Flexible WDIO automation",       color: "#E8A000", langs: ["TypeScript", "JavaScript"],           apiOnly: false },
-  { id: "appium",      label: "Appium",       tagline: "Mobile & cross-platform",        color: "#2563EB", langs: ["Java", "Python", "TypeScript", "C#"], apiOnly: false },
-  { id: "restassured", label: "REST Assured", tagline: "Swagger-driven API test suite",  color: "#10B981", langs: ["Java"],                              apiOnly: true  },
+  { id: "selenium",    label: "Selenium",     tagline: "Cross-browser UI automation",   color: "#E25C1D", langs: ["Java", "Python", "TypeScript", "C#"], apiOnly: false, comingSoon: false },
+  { id: "playwright",  label: "Playwright",   tagline: "Modern web testing",             color: "#7B5FFF", langs: ["TypeScript", "JavaScript", "Python", "Java", "C#"], apiOnly: false, comingSoon: false },
+  { id: "cypress",     label: "Cypress",      tagline: "Fast component & E2E tests",     color: "#17B26A", langs: ["TypeScript", "JavaScript"],           apiOnly: false, comingSoon: false },
+  { id: "webdriverio", label: "WebdriverIO",  tagline: "Flexible WDIO automation",       color: "#E8A000", langs: ["TypeScript", "JavaScript"],           apiOnly: false, comingSoon: false },
+  { id: "appium",      label: "Appium",       tagline: "Mobile & cross-platform",        color: "#2563EB", langs: ["Java", "Python", "TypeScript", "C#"], apiOnly: false, comingSoon: true  },
+  { id: "restassured", label: "REST Assured", tagline: "Swagger-driven API test suite",  color: "#10B981", langs: ["Java"],                              apiOnly: true,  comingSoon: false },
 ];
 
 const LANGUAGES = [
@@ -84,17 +85,28 @@ function FrameworkCard({ fw, selected, onSelect, S }: {
   S: { card: string; border: string; text: string; textMuted: string };
 }) {
   const [hovered, setHovered] = useState(false);
+  const disabled = fw.comingSoon;
   return (
-    <button onClick={onSelect} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
-      display: "flex", flexDirection: "column", alignItems: "flex-start",
-      padding: "14px 16px", borderRadius: 12, cursor: "pointer",
-      border: selected ? `2px solid ${fw.color}` : `1.5px solid ${hovered ? fw.color + "60" : S.border}`,
-      background: selected ? `${fw.color}10` : hovered ? `${fw.color}06` : S.card,
-      transition: "all 0.15s", textAlign: "left", width: "100%",
-      boxShadow: selected ? `0 0 0 3px ${fw.color}18` : "none", position: "relative",
-    }}>
+    <button
+      onClick={disabled ? undefined : onSelect}
+      onMouseEnter={() => !disabled && setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      disabled={disabled}
+      style={{
+        display: "flex", flexDirection: "column", alignItems: "flex-start",
+        padding: "14px 16px", borderRadius: 12,
+        cursor: disabled ? "not-allowed" : "pointer",
+        border: selected ? `2px solid ${fw.color}` : `1.5px solid ${hovered ? fw.color + "60" : S.border}`,
+        background: disabled ? S.card : selected ? `${fw.color}10` : hovered ? `${fw.color}06` : S.card,
+        transition: "all 0.15s", textAlign: "left", width: "100%",
+        boxShadow: selected ? `0 0 0 3px ${fw.color}18` : "none",
+        position: "relative", opacity: disabled ? 0.55 : 1,
+      }}>
       {fw.apiOnly && (
         <span style={{ position: "absolute", top: 8, right: 8, fontSize: 9, fontWeight: 700, padding: "1px 5px", borderRadius: 3, background: `${fw.color}18`, color: fw.color, border: `1px solid ${fw.color}30` }}>API</span>
+      )}
+      {fw.comingSoon && (
+        <span style={{ position: "absolute", top: 8, right: 8, fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 3, background: "#6B728018", color: "#6B7280", border: "1px solid #6B728030", letterSpacing: "0.04em" }}>COMING SOON</span>
       )}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
         <div style={{ width: 9, height: 9, borderRadius: "50%", background: fw.color, flexShrink: 0 }} />
@@ -102,7 +114,8 @@ function FrameworkCard({ fw, selected, onSelect, S }: {
       </div>
       <div style={{ fontSize: 11, color: S.textMuted, marginBottom: 7 }}>{fw.tagline}</div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-        {fw.langs.map(l => <span key={l} style={{ fontSize: 9, fontWeight: 500, padding: "1px 5px", borderRadius: 3, background: `${fw.color}14`, color: fw.color }}>{l}</span>)}
+        {fw.langs.slice(0, 3).map(l => <span key={l} style={{ fontSize: 9, fontWeight: 500, padding: "1px 5px", borderRadius: 3, background: `${fw.color}14`, color: fw.color }}>{l}</span>)}
+        {fw.langs.length > 3 && <span style={{ fontSize: 9, fontWeight: 500, padding: "1px 5px", borderRadius: 3, background: `${fw.color}14`, color: fw.color }}>+{fw.langs.length - 3}</span>}
       </div>
     </button>
   );
@@ -197,9 +210,19 @@ function IssueRow({ issue, S }: { issue: SpecIssue; S: any }) {
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function FrameworkStart() {
-  const navigate    = useNavigate();
-  const dark        = useDarkMode();
+  const navigate      = useNavigate();
+  const [searchParams] = useSearchParams();
+  const dark          = useDarkMode();
   const { setSelection, setResult } = useFramework();
+  const { addNode } = useBuilderState();
+
+  // Pre-linked project (when navigating from All Projects → Framework tab → Generate)
+  const linkedProjectId   = searchParams.get("projectId")   ?? undefined;
+  const linkedProjectName = searchParams.get("projectName") ?? undefined;
+  const skipBuilder       = searchParams.get("skipBuilder") === "1";
+  // Pre-selected framework / mode (when arriving from the New Project wizard)
+  const linkedFramework     = searchParams.get("framework")     ?? "";
+  const linkedPlaywrightMode = (searchParams.get("playwrightMode") ?? "") as "ui" | "api" | "hybrid" | "";
 
   const S = {
     bg:        dark ? "#0D0F14" : "#F8F9FC",
@@ -212,7 +235,7 @@ export default function FrameworkStart() {
     api:       "#10B981",
   };
 
-  const [selectedFw,   setSelectedFw]   = useState("");
+  const [selectedFw,   setSelectedFw]   = useState(linkedFramework);
   const [selectedLang, setSelectedLang] = useState("");
   const [combo,        setCombo]        = useState<CombinationValidation | null>(null);
 
@@ -225,7 +248,9 @@ export default function FrameworkStart() {
   const [testDataStrategy,   setTestDataStrategy]   = useState<"faker" | "custom" | "csv" | "json">("faker");
 
   // Playwright-specific fields
-  const [playwrightMode, setPlaywrightMode] = useState<"ui" | "api" | "hybrid">("ui");
+  const [playwrightMode, setPlaywrightMode] = useState<"ui" | "api" | "hybrid">(
+    linkedPlaywrightMode || "ui"
+  );
   const [websiteUrl,     setWebsiteUrl]     = useState("");
 
   // Validation state
@@ -237,8 +262,12 @@ export default function FrameworkStart() {
   const [error,   setError]   = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Crawlable UI frameworks (non-Playwright) website URL
+  const [uiWebsiteUrl, setUiWebsiteUrl] = useState("");
+
   const isApiFramework        = selectedFw === "restassured";
   const isPlaywrightFramework = selectedFw === "playwright";
+  const isCrawlableFramework  = ["cypress", "selenium", "webdriverio"].includes(selectedFw);
   const pwNeedsSwagger        = isPlaywrightFramework && (playwrightMode === "api" || playwrightMode === "hybrid");
   const pwNeedsWebsite        = isPlaywrightFramework && (playwrightMode === "ui" || playwrightMode === "hybrid");
   const needsSwagger          = isApiFramework || pwNeedsSwagger;
@@ -272,7 +301,9 @@ export default function FrameworkStart() {
     ? (validationResult?.canGenerate ?? false)
     : isPlaywrightFramework
       ? pwCanContinue
-      : !!selectedFw && !!selectedLang && combo?.valid !== false;
+      : isCrawlableFramework
+        ? !!selectedFw && !!selectedLang && combo?.valid !== false
+        : !!selectedFw && !!selectedLang && combo?.valid !== false;
 
   // ── File upload handler ─────────────────────────────────────────────────────
 
@@ -342,9 +373,26 @@ export default function FrameworkStart() {
           swaggerFile:      pwNeedsSwagger && specSource === "file" ? swaggerFileContent ?? undefined : undefined,
           testDataStrategy: pwNeedsSwagger ? testDataStrategy : undefined,
         }),
+        ...(isCrawlableFramework && {
+          coverageLevel,
+          websiteUrl: uiWebsiteUrl.trim() || undefined,
+        }),
+        // Carry forward any pre-linked project (from All Projects → Framework tab)
+        ...(linkedProjectId   && { projectId:   linkedProjectId }),
+        ...(linkedProjectName && { projectName: linkedProjectName }),
+        ...(skipBuilder && { skipBuilder: true }),
       });
       setResult(result);
-      navigate("/framework/builder");
+
+      if (skipBuilder) {
+        // Auto-select first architecture node so FrameworkReview has a valid blueprint
+        const archNode = result.byCategory?.["architecture"]?.[0]
+          ?? result.nodes.find(n => n.category === "architecture");
+        if (archNode) addNode(archNode);
+        navigate("/framework/review");
+      } else {
+        navigate("/framework/builder");
+      }
     } catch (err: any) {
       setError(err?.message ?? "Failed to load nodes. Is the backend running?");
     } finally {
@@ -358,8 +406,27 @@ export default function FrameworkStart() {
 
         {/* Header */}
         <div style={{ marginBottom: 32, textAlign: "center" }}>
+          {linkedProjectId ? (
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 7,
+              padding: "5px 14px", borderRadius: 20, marginBottom: 10,
+              background: "#10B98114", border: "1px solid #10B98130",
+              fontSize: 11, fontWeight: 700, color: "#10B981",
+            }}>
+              ⬡ Adding to: {linkedProjectName ?? linkedProjectId}
+            </div>
+          ) : (
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 7,
+              padding: "5px 14px", borderRadius: 20, marginBottom: 10,
+              background: `${S.accent}0d`, border: `1px solid ${S.accent}25`,
+              fontSize: 11, fontWeight: 600, color: S.textMuted,
+            }}>
+              ⬡ A new project will be created in All Projects automatically
+            </div>
+          )}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 20, background: `${S.accent}14`, border: `1px solid ${S.accent}30`, fontSize: 11, fontWeight: 700, color: S.accent, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14 }}>
-            Step 1 of 5
+            {skipBuilder ? "Step 1 of 3" : "Step 1 of 5"}
           </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: S.text, margin: 0, lineHeight: 1.2 }}>Framework Generator</h1>
           <p style={{ fontSize: 13, color: S.textMuted, marginTop: 8, lineHeight: 1.6 }}>
@@ -548,6 +615,39 @@ export default function FrameworkStart() {
             </div>
           )}
 
+          {/* ─── Cypress / Selenium / WebdriverIO fields ──────────────────────── */}
+          {isCrawlableFramework && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+              {/* Website URL — optional, enables crawler */}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: S.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Website URL <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(optional)</span></div>
+                <input type="url" value={uiWebsiteUrl} onChange={e => setUiWebsiteUrl(e.target.value)}
+                  placeholder="https://your-app.com"
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: 9, border: `1.5px solid ${uiWebsiteUrl ? S.accent + "60" : S.border}`, background: S.input, color: S.text, fontSize: 13, outline: "none", boxSizing: "border-box", transition: "border-color 0.15s" }} />
+                <div style={{ fontSize: 11, color: S.textMuted, marginTop: 5 }}>
+                  When provided, Qlitz crawls your site (up to 20 pages) and generates Page Objects with real selectors. Without a URL, a starter framework with example tests is generated.
+                </div>
+              </div>
+
+              {/* Coverage level */}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: S.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Coverage Level</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {COVERAGE_OPTIONS.map(opt => (
+                    <label key={opt.id} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 14px", borderRadius: 8, cursor: "pointer", background: coverageLevel === opt.id ? `${S.accent}0a` : S.bg, border: `1px solid ${coverageLevel === opt.id ? S.accent + "44" : S.border}` }}>
+                      <input type="radio" name="coverage" checked={coverageLevel === opt.id} onChange={() => setCoverageLevel(opt.id)} style={{ marginTop: 2, accentColor: S.accent, cursor: "pointer" }} />
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: S.text }}>{opt.label}</div>
+                        <div style={{ fontSize: 11, color: S.textMuted, marginTop: 2 }}>{opt.desc}</div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ─── REST Assured fields ───────────────────────────────────────────── */}
           {isApiFramework && (
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -695,7 +795,9 @@ export default function FrameworkStart() {
 
         {/* Step hint */}
         <div style={{ textAlign: "center", marginTop: 18, fontSize: 11, color: S.textMuted }}>
-          Next: Node Builder · Blueprint Review · Generate · Download
+          {skipBuilder
+            ? "Next: Blueprint Review · Generate · Download"
+            : "Next: Node Builder · Blueprint Review · Generate · Download"}
         </div>
       </div>
     </div>

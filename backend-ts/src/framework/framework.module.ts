@@ -14,7 +14,8 @@ import { TemplateEngine }           from './templates/template-engine';
 import { FolderBuilder }            from './assembly/folder-builder';
 import { FileWriter }               from './assembly/file-writer';
 import { ZipGenerator }             from './assembly/zip-generator';
-import { AssemblyOrchestrator }     from './assembly/assembly-orchestrator';
+import { AssemblyOrchestrator }           from './assembly/assembly-orchestrator';
+import { FrameworkPersistenceService }    from './assembly/framework-persistence.service';
 import { AIClient }                 from './ai/ai-client';
 import { AIDocGenerator }           from './ai/ai-doc-generator';
 import { AIFileHeaderGenerator }    from './ai/ai-file-header-generator';
@@ -30,7 +31,11 @@ import { PlaywrightPythonApiTestGeneratorService }  from './playwright/playwrigh
 import { PlaywrightUiTestGeneratorService }         from './playwright/playwright-ui-test-generator.service';
 import { PlaywrightJavaUiTestGeneratorService }     from './playwright/playwright-java-ui-test-generator.service';
 import { PlaywrightPythonUiTestGeneratorService }   from './playwright/playwright-python-ui-test-generator.service';
-import { CodegenParserService }              from './codegen/codegen-parser.service';
+import { CypressUiTestGeneratorService }        from './cypress/cypress-ui-test-generator.service';
+import { SeleniumJavaUiTestGeneratorService }   from './selenium/selenium-java-ui-test-generator.service';
+import { SeleniumPythonUiTestGeneratorService } from './selenium/selenium-python-ui-test-generator.service';
+import { WebdriverioUiTestGeneratorService }    from './webdriverio/webdriverio-ui-test-generator.service';
+import { CodegenParserService }                 from './codegen/codegen-parser.service';
 
 @Module({
   controllers: [FrameworkController, FrameworkRegistryController],
@@ -63,8 +68,13 @@ import { CodegenParserService }              from './codegen/codegen-parser.serv
     PlaywrightUiTestGeneratorService,
     PlaywrightJavaUiTestGeneratorService,
     PlaywrightPythonUiTestGeneratorService,
+    CypressUiTestGeneratorService,
+    SeleniumJavaUiTestGeneratorService,
+    SeleniumPythonUiTestGeneratorService,
+    WebdriverioUiTestGeneratorService,
     CodegenParserService,
     AssemblyOrchestrator,
+    FrameworkPersistenceService,
   ],
 })
 export class FrameworkModule {}

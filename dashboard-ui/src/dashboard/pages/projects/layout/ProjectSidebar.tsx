@@ -30,6 +30,7 @@ export type TabId =
   | "budgets"
   | "workflow"
   | "graph"
+  | "framework"
   | "settings";
 
 // ─── Tab groups ───────────────────────────────────────────────────────────────
@@ -53,6 +54,7 @@ const GROUPS: { label: string; tabs: TabDef[] }[] = [
   {
     label: "Improve",
     tabs: [
+      { id: "framework",    label: "Framework",        icon: <IconFramework /> },
       { id: "suggestions",  label: "Suggestions",      icon: <IconBulb /> },
       { id: "tests",        label: "Tests",            icon: <IconPlay /> },
       { id: "test-data",    label: "Test Data",        icon: <IconTestData /> },
@@ -146,6 +148,10 @@ function IconHeal() {
 
 function IconReplay() {
   return <Svg><path d="M3.5 8A4.5 4.5 0 108 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M8 1.5L5.5 4 8 6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></Svg>;
+}
+
+function IconFramework() {
+  return <Svg><rect x="1" y="2" width="6" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" fill="none"/><rect x="9" y="2" width="6" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" fill="none"/><rect x="1" y="9" width="6" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" fill="none"/><path d="M12 7v2M12 9h-3M12 9h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="12" r="1.5" fill="currentColor" opacity=".7"/></Svg>;
 }
 
 function IconWorkflow() {

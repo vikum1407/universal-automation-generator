@@ -100,6 +100,42 @@ export class FrameworkController {
     res.download(zipPath, `${jobId}.zip`);
   }
 
+  // ── Regenerate ────────────────────────────────────────────────────────────────
+
+  // POST /framework/record/:frameworkId/regenerate
+  // Body: { websiteUrl?, swaggerUrl?, swaggerFile?, coverageLevel?, label? }
+  @Post('record/:frameworkId/regenerate')
+  async regenerate(
+    @Param('frameworkId') frameworkId: string,
+    @Body() overrides: any,
+  ) {
+    return this.service.regenerateFramework(frameworkId, overrides);
+  }
+
+  // POST /framework/version/:versionId/regenerate
+  // Regenerate from a specific historical version's blueprint
+  @Post('version/:versionId/regenerate')
+  async regenerateFromVersion(
+    @Param('versionId') versionId: string,
+    @Body() overrides: any,
+  ) {
+    return this.service.regenerateFromVersion(versionId, overrides);
+  }
+
+  // ── Framework record queries ──────────────────────────────────────────────────
+
+  // GET /framework/record/:frameworkId
+  @Get('record/:frameworkId')
+  getFramework(@Param('frameworkId') frameworkId: string) {
+    return this.service.getFramework(frameworkId);
+  }
+
+  // GET /framework/project/:projectId/frameworks
+  @Get('project/:projectId/frameworks')
+  getProjectFrameworks(@Param('projectId') projectId: string) {
+    return this.service.getProjectFrameworks(projectId);
+  }
+
   // ── AI endpoints ─────────────────────────────────────────────────────────────
 
   @Post('explain')

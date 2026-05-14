@@ -21,16 +21,35 @@ const SEV_COLOR: Record<string, string> = { critical: "#EF5350", high: "#FF7043"
 const SEV_BG:    Record<string, string> = { critical: "#EF535018", high: "#FF704318", medium: "#FFA72618", low: "#66BB6A18" };
 
 const EVENT_ICON: Record<string, string> = {
-  "requirements-generated": "📋",
-  "tests-generated":        "🧪",
-  "test-run":               "▶️",
-  "flows-discovered":       "🔀",
-  "endpoints-discovered":   "🔌",
-  "auto-heal":              "🩹",
-  "suggestions-generated":  "💡",
-  "project-created":        "🚀",
-  "coverage-milestone":     "📊",
-  "re-crawl":               "🔄",
+  "requirements-generated":  "📋",
+  "tests-generated":         "🧪",
+  "test-run":                "▶️",
+  "flows-discovered":        "🔀",
+  "endpoints-discovered":    "🔌",
+  "auto-heal":               "🩹",
+  "suggestions-generated":   "💡",
+  "project-created":         "🚀",
+  "coverage-milestone":      "📊",
+  "re-crawl":                "🔄",
+  "framework_generated":     "⬡",
+  "framework_regenerated":   "⬡",
+};
+
+const FW_COLORS: Record<string, string> = {
+  selenium:    "#E25C1D",
+  playwright:  "#7B5FFF",
+  cypress:     "#17B26A",
+  webdriverio: "#E8A000",
+  restassured: "#EF4444",
+  appium:      "#2563EB",
+};
+
+const LANG_COLORS: Record<string, string> = {
+  java:        "#E76F00",
+  typescript:  "#3178C6",
+  javascript:  "#C4A000",
+  python:      "#3B82F6",
+  csharp:      "#9B59B6",
 };
 
 // ─── Card wrapper ──────────────────────────────────────────────────────────────
@@ -168,10 +187,12 @@ export default function Overview({ project, onNavigate }: OverviewProps) {
   const { P, CARD, BDR, TXT, TXT2 } = useColors();
   const isUI = project.type === "ui";
 
-  const [data, setData]       = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [fcst, setFcst]       = useState<any>(null);
-  const [budgets, setBudgets] = useState<any>(null);
+  const [data, setData]           = useState<any>(null);
+  const [loading, setLoading]     = useState(true);
+  const [fcst, setFcst]           = useState<any>(null);
+  const [budgets, setBudgets]     = useState<any>(null);
+  const [frameworks, setFrameworks] = useState<any[]>([]);
+  const [fwLoading, setFwLoading]   = useState(true);
 
   const [progress, setProgress] = useState({ open: false, percent: 0, step: "Starting…" });
 
@@ -220,6 +241,16 @@ export default function Overview({ project, onNavigate }: OverviewProps) {
       .catch(() => {});
   }, [project.id]);
 
+  // Load generated frameworks for this project (non-blocking, best-effort)
+  useEffect(() => {
+    setFwLoading(true);
+    fetch(`${API}/framework/project/${project.id}/frameworks`)
+      .then(r => r.ok ? r.json() : [])
+      .then(setFrameworks)
+      .catch(() => setFrameworks([]))
+      .finally(() => setFwLoading(false));
+  }, [project.id]);
+
   const recrawl = async () => {
     setProgress({ open: true, percent: 0, step: "Starting…" });
     await fetch(`${API}/projects/${project.id}/recrawl`, { method: "POST" });
@@ -240,11 +271,12 @@ export default function Overview({ project, onNavigate }: OverviewProps) {
 
   // ── Quick links ──────────────────────────────────────────────────────────────
   const quickLinks: { label: string; tab: TabId }[] = [
-    { label: "RTM",       tab: "rtm" },
-    { label: "Tests",     tab: "tests" },
-    { label: "Flows",     tab: "flows" },
-    { label: "Insights",  tab: "insights" },
-    { label: "Settings",  tab: "settings" },
+    { label: "RTM",        tab: "rtm" },
+    { label: "Tests",      tab: "tests" },
+    { label: "Flows",      tab: "flows" },
+    { label: "Insights",   tab: "insights" },
+    { label: "Framework",  tab: "framework" },
+    { label: "Settings",   tab: "settings" },
   ];
 
   return (
@@ -782,6 +814,111 @@ export default function Overview({ project, onNavigate }: OverviewProps) {
           )}
         </Card>
       </div>
+
+      {/* ── ROW 4: Automation Frameworks ──────────────────────────────────── */}
+      <Card
+        title="Automation Frameworks"
+        action={() => nav("framework")}
+        actionLabel={frameworks.length > 0 ? "Manage →" : undefined}
+      >
+        {fwLoading ? (
+          <div style={{ display: "flex", gap: 12 }}>
+            {[1, 2].map(i => <Skeleton key={i} h={72} w="50%" />)}
+          </div>
+        ) : frameworks.length === 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "20px 0" }}>
+            <div style={{ fontSize: 24, opacity: 0.2 }}>⬡</div>
+            <div style={{ fontSize: 12, color: TXT2, textAlign: "center", lineHeight: 1.6 }}>
+              No automation frameworks generated yet.
+            </div>
+            <button
+              onClick={() => nav("framework")}
+              style={{
+                padding: "7px 18px", borderRadius: 8,
+                background: P, color: "#fff", border: "none",
+                cursor: "pointer", fontSize: 12, fontWeight: 700,
+              }}
+            >
+              + Generate Framework
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {frameworks.map((fw: any) => {
+              const fwColor   = FW_COLORS[fw.frameworkType]  ?? P;
+              const langColor = LANG_COLORS[fw.language]     ?? P;
+              const latestV   = fw.versions?.[0];
+              const fileCount = latestV?.fileCount ?? 0;
+              const genDate   = latestV?.generatedAt ?? fw.updatedAt;
+              return (
+                <div
+                  key={fw.id}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "10px 14px", borderRadius: 10,
+                    background: `${P}06`, border: `1px solid ${BDR}`,
+                  }}
+                >
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 5,
+                    background: `${fwColor}18`, color: fwColor,
+                    border: `1px solid ${fwColor}30`, textTransform: "capitalize", flexShrink: 0,
+                  }}>
+                    {fw.frameworkType}
+                  </span>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 5,
+                    background: `${langColor}18`, color: langColor,
+                    border: `1px solid ${langColor}30`, textTransform: "capitalize", flexShrink: 0,
+                  }}>
+                    {fw.language}
+                  </span>
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 8,
+                    background: `${P}14`, color: P, flexShrink: 0,
+                  }}>
+                    v{fw.versionNumber}
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 11, color: TXT2, display: "flex", gap: 10 }}>
+                      {fileCount > 0 && <span>{fileCount} files</span>}
+                      {genDate && (
+                        <span>
+                          Generated {new Date(genDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {fw.artifactLocation && (
+                    <a
+                      href={fw.artifactLocation}
+                      download
+                      onClick={e => e.stopPropagation()}
+                      style={{
+                        fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 7,
+                        background: "#10B98114", color: "#10B981",
+                        border: "1px solid #10B98128", textDecoration: "none", flexShrink: 0,
+                      }}
+                    >
+                      ↓ Download
+                    </a>
+                  )}
+                  <button
+                    onClick={() => nav("framework")}
+                    style={{
+                      background: "none", border: "none", cursor: "pointer",
+                      color: P, fontSize: 14, padding: "0 2px", flexShrink: 0,
+                    }}
+                    title="Open Framework tab"
+                  >
+                    →
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

@@ -28,6 +28,7 @@ import { RTMEndpointsPage }    from "@/features/rtm/pages/RTMEndpointsPage";
 import { RTMCoveragePage }     from "@/features/rtm/pages/RTMCoveragePage";
 import { RTMGapsPage }         from "@/features/rtm/pages/RTMGapsPage";
 import { RTMClosureJobsPage }  from "@/features/rtm/pages/RTMClosureJobsPage";
+import ProjectFrameworkTab    from "@/pages/projects/ProjectFrameworkTab";
 
 import type { TabId } from "@/dashboard/pages/projects/layout/ProjectSidebar";
 
@@ -209,6 +210,16 @@ export default function ProjectTabs({ project, activeTab, setActiveTab }: Projec
       return (
         <div style={{ marginTop: 0, height: "calc(100vh - 64px)" }}>
           <GraphPage projectId={project.id} />
+        </div>
+      );
+
+    case "framework":
+      return (
+        <div style={{ height: "calc(100vh - 64px)", overflowY: "auto" }}>
+          <ProjectFrameworkTab
+            projectId={project.id}
+            projectName={project.name ?? project.title ?? "Project"}
+          />
         </div>
       );
 
